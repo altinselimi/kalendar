@@ -1,6 +1,6 @@
 <template>
   <ul style="position: relative;" @mouseleave="clearCreatingLeftovers" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': calendarOptions.currently_working_on_date === day.date}">
-    <cell v-for="(quarter, index) in day.date_hours" :key="`${day.date}_${index}`" :creator="creator" :day="day" :index="index" :cell-data.sync="quarter" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" />
+    <kalendar-cell v-for="(quarter, index) in day.date_hours" :key="`${day.date}_${index}`" :creator="creator" :day="day" :index="index" :cell-data.sync="quarter" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" />
     <div :class="calendarOptions.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
       <span class="line" v-show="calendarOptions.style === 'material_design'"></span>
     </div>
@@ -14,8 +14,8 @@ import format from 'date-fns/format';
 export default {
   props: ['day', 'passedTime'],
   components: {
-    Cell: () =>
-      import ('./Cell.vue'),
+    kalendarCell: () =>
+      import ('./kalendar-cell.vue'),
   },
   inject: ['calendarOptions'],
   computed: {

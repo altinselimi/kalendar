@@ -29,8 +29,8 @@
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <days :day="day" class="building-blocks" v-for="day in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
-        </days>
+        <kalendar-days :day="day" class="building-blocks" v-for="day in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
+        </kalendar-days>
       </div>
     </div>
   </div>
@@ -38,12 +38,12 @@
 <script>
 import format from 'date-fns/format';
 import isToday from 'date-fns/is_today';
-import days from './Day.vue';
+import KalendarDays from './kalendar-day.vue';
 import isBefore from 'date-fns/is_before';
 
 export default {
   components: {
-    days,
+    KalendarDays,
   },
   props: ['days', 'hours'],
   inject: ['calendarOptions'],

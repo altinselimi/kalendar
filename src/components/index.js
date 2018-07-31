@@ -1,4 +1,11 @@
-import Vue from 'vue';
-import Kalendar from './Container.vue';
+import Kalendar from './kalendar-components/kalendar-container.vue';
 
-export default { Kalendar };
+// Install the components
+export function install (Vue) {
+  Vue.component('kalendar', Kalendar)
+}
+
+// Expose the components
+export {
+  Kalendar,
+}

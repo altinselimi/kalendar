@@ -18,7 +18,7 @@
         </slot>
       </div>
     </portal>
-    <week-view :days="calendar_options.current_week" :hours="hours"></week-view>
+    <kalendar-week-view :days="calendar_options.current_week" :hours="hours"></kalendar-week-view>
     <portal to="calendar-card">
       <div slot-scope="appointment_props" class="new-event">
         <slot name="creating-card" :appointment_props="appointment_props">
@@ -73,10 +73,8 @@ const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 
 export default {
   components: {
-    WeekView: () =>
-      import ('./WeekView.vue'),
-    ControlToolbar: () =>
-      import ('./ControlToolbar.vue'),
+    KalendarWeekView: () =>
+      import ('./kalendar-weekview.vue'),
   },
   props: {
     appointments: {

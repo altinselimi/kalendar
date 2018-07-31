@@ -7,7 +7,7 @@
 			</portal-target>
 			<div class="popup-parent" v-if="status === 'popup-initiated'" ref="popupRef">
 				<div>
-					<event-popup :appointment-props="appointment_props" @closePopup="clearPopups('popup-initiated')"></event-popup>
+					<kalendar-eventpopup :appointment-props="appointment_props" @closePopup="clearPopups('popup-initiated')"></kalendar-eventpopup>
 				</div>
 			</div>
 		</div>
@@ -24,8 +24,8 @@ export default {
 	props: ['creator', 'day', 'index', 'cellData'],
 	inject: ['calendarOptions'],
 	components: {
-		eventPopup: () =>
-			import ('./EventPopup.vue'),
+		kalendarEventpopup: () =>
+			import ('./kalendar-eventpopup.vue'),
 	},
 	computed: {
 		appointments: {

@@ -25,7 +25,7 @@
         </label>
       </div>
     </div>
-    <calendar :configuration="config" :appointments="appointments" ref="calendar-component">
+    <kalendar :configuration="config" :appointments="appointments" ref="calendar-component">
       <div slot="creating-card" slot-scope="{appointment_props}">
         <h4 class="appointment-title">New Appointment</h4>
         <span class="time">{{getHours(appointment_props.start_value.value, appointment_props.end_value.value)}}
@@ -45,7 +45,7 @@
         <small class="description" v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
         <span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
       </div>
-    </calendar>
+    </kalendar>
   </div>
 </template>
 <script>
@@ -104,8 +104,8 @@ import getTime from 'date-fns/get_time';
 
 export default {
   components: {
-    calendar: () =>
-      import ('./Container.vue'),
+    kalendar: () =>
+      import ('./kalendar-components/kalendar-container.vue'),
   },
   data: () => ({
     appointments: existing_appointments,
