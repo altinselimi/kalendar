@@ -64,7 +64,7 @@ export default {
 			let { start, end } = this.appointment;
 			let hour_start_data = this.day.date_hours[start];
 			let hour_end_data = this.day.date_hours[end + 1];
-			if(!hour_end_data) {
+			if (!hour_end_data) {
 				hour_end_data = this.day.date_hours[end];
 				hour_end_data['value'] = new Date(this.day.date);
 				hour_end_data['value'].setHours(24, 0, 0);
@@ -143,5 +143,86 @@ export default {
 		},
 	},
 }
-
 </script>
+<style lang="scss">
+$creator-bg: #34aadc;
+$creator-content: white;
+
+li {
+	font-size: 13px;
+	position: relative;
+}
+
+ul.building-blocks {
+	li {
+		z-index: 0;
+		border-bottom: dotted 1px var(--odd-cell-border-color);
+		&.first_of_appointment {
+			z-index: 1;
+			opacity: 1; //z-index:0;
+		}
+		&.is-an-hour {
+			border-bottom: solid 1px var(--table-cell-border-color);
+		}
+		.creator_block {
+			display: none; //opacity: .85;
+		}
+		&.first_of_appointment.last_of_appointment  {
+			.new-event, .existing-event {
+				font-size: 80%;
+			}
+			.time {
+				opacity: 0;
+			}
+		}
+		&.first_of_appointment .creator_block {
+			display: flex;
+			flex-direction: column;
+			>* {
+				flex: 1;
+			}
+			position: absolute;
+			pointer-events: none;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0; //z-index: 20!important;
+			//background-color: rgba($creator-bg, .85);
+			color: $creator-content;
+			width: 100%;
+			user-select: none;
+			will-change: height; //padding: 4px 6px;
+		}
+		.time {
+			position: absolute;
+			bottom: 4px;
+			right: 6px;
+			font-size: 11px;
+		}
+	}
+	.popup-parent {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0px;
+		pointer-events: auto;
+		z-index: 3;
+		left: 0px;
+		user-select: all;
+		>div {
+			position: relative;
+			width: 100%;
+			height: 100%; // margin-left: 10px;
+		}
+	}
+}
+
+
+div.creator_block {
+	h4,
+	p,
+	span {
+		margin: 0px;
+	}
+}
+</style>

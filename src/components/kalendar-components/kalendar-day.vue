@@ -106,3 +106,25 @@ export default {
 
 }
 </script>
+<style lang="scss">
+ul.kalendar-day {
+  position: relative;
+  background-color: white;
+  &.is-weekend {
+    background-color: var(--weekend-color);
+  }
+  &.is-today {
+    background-color: var(--current-day-color);
+  }
+  .clear {
+    position: absolute;
+    z-index: 1;
+    top: -20px;
+    right: 0;
+    font-size: 10px;
+  }
+  .creating {
+    z-index: 3;
+  }
+}
+</style>
