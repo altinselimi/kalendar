@@ -6,7 +6,6 @@
           <div class="nav-wrapper">
             <button @click="previousWeek()" class="chevron left"></button>
             <div v-if="calendar_options.view_type === 'Month' && !!calendar_options.current_week">
-              <span>{{isMobile}}</span>
               <span>{{startOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD')}}</span>
               <span style="margin:0px 5px;">-</span>
               <span>{{endOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD, YYYY')}}</span>
