@@ -111,7 +111,7 @@
       }
     }
   }
-  &.non-desktop {
+  &.non-desktop .building-blocks{
     pointer-events: none;
   }
 }
@@ -187,6 +187,13 @@
   .chevron.left:before {
     left: 0.25em;
     transform: rotate(-135deg);
+  }
+  .chevron {
+    outline: none;
+    opacity: .7;
+  }
+  .chevron:active, .chevron:focus, .chevron:hover {
+    opacity: 1;
   }
 }
 
