@@ -2,6 +2,9 @@
 > Your best friend when it comes to event managment in Vue, React or Angular.
 > This is the Vue version of this plugin.
 
+## Live Demo
+[Kalendar Showcase](http://kalendar.altinselimi.com/)
+
 ## Getting Started
 - Install plugin from npm
 ```
