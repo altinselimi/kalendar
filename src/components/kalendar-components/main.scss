@@ -102,7 +102,7 @@
         &::before {
           content: '';
           position: absolute;
-          left: 0;
+          left: -1px;
           top: 0;
           width: 1px;
           height: 100%;

@@ -25,7 +25,7 @@
             <span>{{formatDate(hour, 'H A')}}</span>
           </li>
         </ul>
-        <div ref="nowIndicator" v-show="calendarOptions.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
+        <div v-show="calendarOptions.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
@@ -49,12 +49,6 @@ export default {
   inject: ['calendarOptions'],
   created() {
     setInterval(() => this.calendarOptions.now = new Date, 1000 * 60);
-  },
-  mounted() {
-    if (this.calendarOptions.scrollToNow) {
-      let topoffset = this.$refs.nowIndicator.offsetTop;
-      window.scroll({ top: topoffset, left: 0, behavior: 'smooth' });
-    }
   },
   computed: {
     colsSpace() {

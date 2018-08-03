@@ -1,6 +1,6 @@
 <template>
   <div class="calendarium wrapping-all" :class="{'dark': !!calendar_options.dark, 'no-scroll': !scrollable, 'is-day-view': calendar_options.view_type === 'Day', 'gstyle': calendar_options.style === 'material_design'}" @touchstart="scrollable = false" @touchend="scrollable=true" @mouseDown="clearPendingPopups()">
-    <portal to="week-navigator-place">
+    <portal to="week-navigator-place" class="slotable">
       <div class="week-navigator">
         <slot name="navigation-space">
           <div class="nav-wrapper">
@@ -19,7 +19,7 @@
       </div>
     </portal>
     <kalendar-week-view :days="calendar_options.current_week" :hours="hours"></kalendar-week-view>
-    <portal to="calendar-card">
+    <portal to="calendar-card" class="slotable">
       <div slot-scope="appointment_props" class="new-event">
         <slot name="creating-card" :appointment_props="appointment_props">
           <h4 class="appointment-title">New Appointment</h4>
@@ -28,7 +28,7 @@
         </slot>
       </div>
     </portal>
-    <portal to="event-popup">
+    <portal to="event-popup" class="slotable">
       <div slot-scope="popup_scope" class="event-popup">
         <slot name="popup-form" :popup_scope="popup_scope">
           <h4 style="margin-bottom: 10px">New Appointment</h4>
@@ -40,7 +40,7 @@
         </slot>
       </div>
     </portal>
-    <portal to="calendar-card-details">
+    <portal to="calendar-card-details" class="slotable">
       <div slot-scope="appointment_props" class="existing-event">
         <slot name="details-card" :appointment_props="appointment_props">
           <h4 style="margin-bottom: 10px">{{appointment_props.title}}</h4>
@@ -119,12 +119,13 @@ export default {
         let today = new Date();
         options.current_day = today;
         let conditions = {
-          dark: (val) => typeof val === 'boolean',
+          //dark: (val) => typeof val === 'boolean',
           split_value: (val) => 60 % parseInt(val) === 0,
           scrollToNow: (val) => typeof val === 'boolean',
           current_week: (val) => val === null,
           current_day: (val) => isValid(val),
           view_type: (val) => ['Month', 'Day'].includes(val),
+          cell_height: (val) => !isNaN(val),
           style: (val) => ['material_design', 'flat_design'].includes(val),
         };
         for (let key in provided_props) {
@@ -144,11 +145,16 @@ export default {
     split_value() {
       return this.calendar_options.split_value;
     },
+    current_day() {
+      return this.calendar_options.current_day;
+    },
   },
   beforeMount() {
     let visible_hours = [];
     var today = new Date();
-    let y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+    let y = today.getFullYear(),
+      m = today.getMonth(),
+      d = today.getDate();
     for (let i = 0; i <= 23; i++) {
       visible_hours.push(new Date(y, m, d, i, 0, 0));
     }
@@ -258,8 +264,10 @@ export default {
     split_value(val) {
       if (60 % parseInt(val) === 0) this.generateCalendarProperties();
     },
+    current_day(val) {
+      if (val) this.generateCalendarProperties();
+    }
   },
 }
-
 </script>
 <style lang="scss" src="./main.scss"></style>

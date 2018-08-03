@@ -1,5 +1,5 @@
 <template>
-	<li @mouseover.self="mouseMove($event)" @mousedown.self="mouseDown()" @mouseup.self="mouseUp()" :class="{'selected': cellData.selected, 'inbetween': isInBetween, 'first_of_appointment': cell_data.first, 'last_of_appointment': cell_data.last, 'is-an-hour': (index+1)%(60/calendarOptions.split_value) === 0}" :style="`height: ${calendarOptions.cell_height}px`">
+	<li @mouseover.self="mouseMove($event)" @mousedown.self="mouseDown()" @mouseup.self="mouseUp()" :class="{'selected': cellData.selected, 'inbetween': isInBetween, 'first_of_appointment': cell_data.first, 'last_of_appointment': cell_data.last, 'is-an-hour': (index+1)%(60/calendarOptions.split_value) === 0, 'is-active': status === 'popup-initiated' || status === 'creating'}" :style="`height: ${calendarOptions.cell_height}px`">
 		<div v-if="cell_data" class="creator_block" :style="`height: ${distance-1}px`">
 			<portal-target name="calendar-card" :slot-props="appointment_props" v-if="!appointment_props.data">
 			</portal-target>
@@ -160,6 +160,9 @@ ul.building-blocks {
 		&.first_of_appointment {
 			z-index: 1;
 			opacity: 1; //z-index:0;
+		}
+		&.first_of_appointment.is-active {
+			z-index:3;
 		}
 		&.is-an-hour {
 			border-bottom: solid 1px var(--table-cell-border-color);
