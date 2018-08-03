@@ -1,6 +1,6 @@
 {
   "name": "kalendar-vue",
-  "version": "0.0.99",
+  "version": "0.1.0",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
