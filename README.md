@@ -99,3 +99,12 @@ components: {
 	},
 </script>
 ```
+## Roadmap
+- Improve performance
+ -- Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
+ -- Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
+ -- This way, the rendering will be almost instant.
+- Write docs
+- Write unit-test
+- Write the React version of this plugin
+- Write the Angular version of this plugin
