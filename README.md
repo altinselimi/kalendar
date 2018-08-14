@@ -1,5 +1,5 @@
 # Kalendar
-> Your best friend when it comes to event managment in Vue, React or Angular.
+> Your best friend when it comes to events managment in Vue, React or Angular.
 > This is the Vue version of this plugin.
 
 ## Live Demo
