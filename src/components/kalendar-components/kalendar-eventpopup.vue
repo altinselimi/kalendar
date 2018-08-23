@@ -77,8 +77,9 @@ ul:last-child .popup-wrapper {
 	margin-right: 10px;
 }
 
-.is-day-view .popup-wrapper {
-	left: auto;
-	right: auto;
+.is-day-view ul .popup-wrapper {
+    left: auto;
+    right: auto;
+    width: 100%;
 }
 </style>
