@@ -102,8 +102,9 @@ components: {
 ## Roadmap
 - Improve performance
 	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
-	* Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
-	* This way, the rendering will be almost instant.
+	** Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
+	** This way, the rendering will be almost instant.
+	* Use event delegation and remove listeners from every cell. Use event target instead, to manipulate the cell DOM object.
 - Write docs
 - Write unit-test
 - Write the React version of this plugin
