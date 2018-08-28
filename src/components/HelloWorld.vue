@@ -102,6 +102,7 @@ const existing_appointments = [{
 import format from 'date-fns/format';
 import getTime from 'date-fns/get_time';
 import kalendar from './kalendar-components/kalendar-container.vue';
+import en from 'date-fns/locale/en';
 
 export default {
   data: () => ({
@@ -124,6 +125,7 @@ export default {
         style: this.style,
         view_type: this.view_type,
         scrollToNow: true,
+        locale: en,
       }
     },
   },

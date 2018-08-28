@@ -6,12 +6,12 @@
           <div class="nav-wrapper">
             <button @click="previousWeek()" class="chevron left"></button>
             <div v-if="calendar_options.view_type === 'Month' && !!calendar_options.current_week">
-              <span>{{startOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD')}}</span>
+              <span>{{startOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD', calendar_options.locale)}}</span>
               <span style="margin:0px 5px;">-</span>
-              <span>{{endOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD, YYYY')}}</span>
+              <span>{{endOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD, YYYY', calendar_options.locale)}}</span>
             </div>
             <div v-else>
-              <span>{{ calendar_options.current_day | normalizeDate('DD MMM, YYYY') }}</span>
+              <span>{{ calendar_options.current_day | normalizeDate('DD MMM, YYYY', calendar_options.locale) }}</span>
             </div>
             <button @click="nextWeek()" class="chevron"></button>
           </div>
@@ -103,6 +103,7 @@ export default {
       existing_appointments: {},
       style: 'material_design',
       now: new Date,
+      locale: null
     },
     weeks: {},
     hours: [],
@@ -129,6 +130,7 @@ export default {
           view_type: (val) => ['Month', 'Day'].includes(val),
           cell_height: (val) => !isNaN(val),
           style: (val) => ['material_design', 'flat_design'].includes(val),
+          locale: (val) => typeof val === 'object',
         };
         for (let key in provided_props) {
           if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
@@ -185,12 +187,12 @@ export default {
       let date = new Date(this.calendar_options.current_day);
       date.setHours(0, 0, 0, 0);
       let _days = [];
-      let start = this.calendar_options.view_type === 'Month' ? startOfWeek(date) : format(date);
+      let start = this.calendar_options.view_type === 'Month' ? startOfWeek(date) : this.formatDate(date);
       let num_of_days = this.calendar_options.view_type === 'Month' ? 7 : 1;
       for (let i = 0; i < num_of_days; i++) {
         let _date = addDays(start, i);
         let payload = {
-          date: format(_date, 'YYYY-MM-DD'),
+          date: this.formatDate(_date, 'YYYY-MM-DD'),
         };
         payload.date_hours = new Array(this.hourParts).fill(1).map((hour, index) => {
           return {
@@ -226,7 +228,7 @@ export default {
       return { filtered_appointments: filtered_appointments, _days: _days };
     },
     formatDate(_format, how) {
-      return format(_format, how);
+      return format(_format, how, { locale: this.calendar_options.locale });
     },
     generateUUID() {
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -256,7 +258,7 @@ export default {
       this.$set(this.calendar_options, 'current_week', _days);
     },
     getHours(start, end) {
-      return `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`;
+      return `${this.formatDate(start, 'HH:mm')} - ${this.formatDate(end, 'HH:mm')}`;
     },
   },
   watch: {

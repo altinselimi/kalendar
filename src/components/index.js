@@ -15,7 +15,7 @@ export function install(Vue) {
 	Vue.component('kalendar-eventpopup', KalendarEventpopup);
 	Vue.component('kalendar-week-view', KalendarWeekView);
 	Vue.use(PortalVue);
-	Vue.filter("normalizeDate", (date, format_type = 'YYYY-MM-DD') => format(date, format_type));
+	Vue.filter("normalizeDate", (date, format_type = 'YYYY-MM-DD', locale) => format(date, format_type, { locale }));
 
 	// kick off the polyfill!
 	smoothscroll.polyfill();

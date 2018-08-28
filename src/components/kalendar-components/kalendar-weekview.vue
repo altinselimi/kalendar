@@ -58,7 +58,7 @@ export default {
       return this.calendarOptions.cell_height * (60 / this.calendarOptions.split_value); // * this.calendarOptions.hour_parts;
     },
     passedtime() {
-      let time = format(this.calendarOptions.now, 'HH:mm');
+      let time = this.formatDate(this.calendarOptions.now, 'HH:mm');
       let hours_minutes = time.split(':');
       let minutat = hours_minutes[1],
         oret = hours_minutes[0];
@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     formatDate(_format, how) {
-      return format(_format, how);
+      return format(_format, how, { locale: this.calendarOptions.locale });
     },
     _isToday(day) {
       return isToday(day);
