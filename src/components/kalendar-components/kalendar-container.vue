@@ -75,6 +75,7 @@ import "./filters";
 Vue.use(PortalVue);
 
 smoothscroll.polyfill();
+const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
