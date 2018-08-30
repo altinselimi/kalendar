@@ -101,6 +101,7 @@ components: {
 </script>
 ```
 ## Roadmap
+- Remove date-fns dependency
 - Improve performance
 	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
 	* Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
