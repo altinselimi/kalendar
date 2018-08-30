@@ -110,6 +110,7 @@ export default {
       existing_appointments: {},
       style: 'material_design',
       now: new Date,
+      military_time: true,
     },
     weeks: {},
     hours: [],

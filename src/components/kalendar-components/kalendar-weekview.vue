@@ -22,7 +22,7 @@
       <div class="calendar-blocks">
         <ul class="hours">
           <li class="hour-row-identifier" v-for="hour in (hours || [])" :style="`height:${hourHeight}px`">
-            <span>{{formatDate(hour, 'H A')}}</span>
+            <span>{{formatDate(hour, military_time)}}</span>
           </li>
         </ul>
         <div v-show="calendarOptions.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
@@ -79,6 +79,9 @@ export default {
         return this.existing_appointments || {};
       },
     },
+    military_time() {
+      return this.calendarOptions.military_time ? 'H A' : 'h A';
+    }
   },
   methods: {
     formatDate(_format, how) {
