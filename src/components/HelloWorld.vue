@@ -23,6 +23,9 @@
             <option value="30">30 minutes</option>
           </select>
         </label>
+        <label>24 Hour Time
+          <input type="checkbox" v-model="military_time">
+        </label>
       </div>
     </div>
     <kalendar :configuration="config" :appointments="appointments" ref="calendar-component">
@@ -113,6 +116,7 @@ export default {
       description: null,
       title: null,
     },
+    military_time: true,
   }),
   components: {
     kalendar,
@@ -124,6 +128,7 @@ export default {
         style: this.style,
         view_type: this.view_type,
         scrollToNow: true,
+        military_time: this.military_time,
       }
     },
   },
