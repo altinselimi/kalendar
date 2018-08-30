@@ -37,6 +37,7 @@ components: {
 			cell_height: 20, // !isNaN(Value)
 			scrollToNow: true, // Boolean
 			current_day: new Date(), // Valid date
+			military_time: true, // Boolean
 		},
 		...
 	})
