@@ -14,7 +14,7 @@ npm install kalendar-vue -S
 - Import plugin in your component
 ```js
 import { Kalendar } from 'kalendar-vue';
-import 'kalendar-vue/dist/kalendar-vue.css';
+import 'kalendar-vue/dist/KalendarVue.css';
 ...
 components: {
 	Kalendar,
