@@ -1,13 +1,13 @@
 {
   "name": "kalendar-vue",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build-bundle": "vue-cli-service build --target lib --name KalendarVue ./src/components/index.js"
   },
-  "main": "./dist/kalendar-vue.common.js",
+  "main": "./dist/KalendarVue.common.js",
   "files": [
     "dist/*",
     "src/*",

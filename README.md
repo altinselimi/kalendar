@@ -14,7 +14,7 @@ npm install kalendar-vue -S
 - Import plugin in your component
 ```js
 import { Kalendar } from 'kalendar-vue';
-import 'kalendar-vue/dist/kalendar-vue.css';
+import 'kalendar-vue/dist/KalendarVue.css';
 ...
 components: {
 	Kalendar,
@@ -37,6 +37,7 @@ components: {
 			cell_height: 20, // !isNaN(Value)
 			scrollToNow: true, // Boolean
 			current_day: new Date(), // Valid date
+			military_time: true, // Boolean
 		},
 		...
 	})
@@ -101,6 +102,7 @@ components: {
 </script>
 ```
 ## Roadmap
+- Remove date-fns dependency
 - Improve performance
 	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
 	* Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop

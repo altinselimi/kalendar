@@ -31,12 +31,19 @@
     <portal to="event-popup" class="slotable">
       <div slot-scope="popup_scope" class="event-popup">
         <slot name="popup-form" :popup_scope="popup_scope">
-          <h4 style="margin-bottom: 10px">New Appointment</h4>
-          <p>Status: {{popup_scope.status || null}}</p>
-          <p>Close popup: {{popup_scope.close_popup}}</p>
-          <input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
-          <textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
-          <button @click="popup_scope.close_popup = true">COMPLETE</button>
+          <div slot="popup-form" slot-scope="{popup_scope}" style="display: flex; flex-direction: column;">
+            <!-- This is the popup that is displayed when user has finished dragging(selecting) appointment start and end values. -->
+            <!-- You can use the popup_scope variable to access various fields, such as: appointment_data (similar to appointment_props) and close. -->
+            <!-- There is a listener attached to the close field. Whenever it gets a false value, the popup closes. -->
+            <!-- You can add as many fields as you want. When saving them, make sure to insert them in the data field of the payload for appointments array. In that way you can access them even in the *details-card* slot.-->
+            <h4 style="margin-bottom: 10px">New Appointment</h4>
+            <input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
+            <textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
+            <div class="buttons">
+              <button class="cancel" @click="popup_scope.close_popup = true">Cancel</button>
+              <button @click="completeAppointment(popup_scope, new_appointment)">Save</button>
+            </div>
+          </div>
         </slot>
       </div>
     </portal>
@@ -103,7 +110,8 @@ export default {
       existing_appointments: {},
       style: 'material_design',
       now: new Date,
-      locale: null
+      locale: null,
+      military_time: true,
     },
     weeks: {},
     hours: [],
@@ -120,7 +128,7 @@ export default {
         let provided_props = this.configuration;
         let today = new Date();
         options.current_day = today;
-        if(this.isMobile) provided_props.view_type = 'Day';
+        if (this.isMobile) provided_props.view_type = 'Day';
         let conditions = {
           //dark: (val) => typeof val === 'boolean',
           split_value: (val) => 60 % parseInt(val) === 0,
@@ -131,6 +139,7 @@ export default {
           cell_height: (val) => !isNaN(val),
           style: (val) => ['material_design', 'flat_design'].includes(val),
           locale: (val) => typeof val === 'object',
+          military_time: (val) => typeof val === 'boolean',
         };
         for (let key in provided_props) {
           if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
