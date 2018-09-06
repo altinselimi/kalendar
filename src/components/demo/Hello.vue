@@ -95,10 +95,13 @@
 						<button @click="completeAppointment(popup_scope, new_appointment)">Save</button>
 					</div>
 				</div>
-				<div slot="details-card" slot-scope="{appointment_props}">
+				<div slot="details-card" slot-scope="{appointment_props}" class="details-card">
 					<h4 class="appointment-title">{{appointment_props.data.title}}</h4>
 					<small v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
 					<span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
+					<button @click="removeAppointment(appointment_props)" class="cancel">
+						<svg class="feather feather-x-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+					</button>
 				</div>
 			</kalendar>
 		</div>
@@ -217,9 +220,12 @@ export default {
 			this.manual_form = JSON.parse(JSON.stringify(manual_appointment_model));
 			this.adding_manually = false;
 		},
+		removeAppointment(appointment) {
+			let index = this.appointments.findIndex(item => item.from === appointment.start_value.value);
+			this.appointments.splice(index, 1);
+		},
 	},
 };
-
 </script>
 <style lang="scss">
 $green: #00F0B5;
@@ -239,6 +245,26 @@ body {
 	//padding: 50px 0px;
 	position: relative;
 	z-index: 1;
+	.details-card {
+		display: flex;
+		flex-direction: column;
+		width: 100px;
+		height: 100%;
+		button {
+			margin: 0;
+			border: none;
+			background-color: transparent;
+			color: $red;
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			cursor: pointer;
+			svg {
+				width: 18px;
+				height: 18px;
+			}
+		}
+	}
 }
 
 .event-popup {
@@ -354,5 +380,4 @@ body {
 	outline: dashed 1px red;
 	outline-offset: -1px;
 }
-
 </style>
