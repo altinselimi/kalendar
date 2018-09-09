@@ -17,7 +17,9 @@ export default {
 	},
 	data: () => ({
 		popup_scope: {
-			close_popup: false,
+			close_popup: (val) => {
+				if(val) this.$emit('closePopup');
+			},
 			status: null,
 			appointment_props: null,
 		}
@@ -26,17 +28,6 @@ export default {
 		this.$on('completedForm', () => {
 			console.log('completed form in eventpopup.vue');
 		});
-	},
-	watch: {
-		popup_scope: {
-			handler(val) {
-				if (val.close_popup) {
-					console.log('Closing popup.');
-					this.$emit('closePopup');
-				}
-			},
-			deep: true,
-		},
 	},
 }
 </script>

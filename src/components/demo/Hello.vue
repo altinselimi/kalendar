@@ -177,8 +177,8 @@ export default {
 		calendar_settings: {
 			style: 'material_design',
 			view_type: 'Month',
-			split_value: 20,
-			cell_height: 20,
+			//split_value: 20,
+			cell_height: 5,
 			scrollToNow: false,
 			current_day: new Date(),
 			military_time: false,

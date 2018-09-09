@@ -3,26 +3,26 @@
     <div class="sticky-top">
       <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
-        <li class="day-indicator" v-for="{date} in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
-          <span class="number-date">{{formatDate(date, 'D')}}</span>
-          <span class="letters-date">{{formatDate(date,'ddd')}}</span>
+        <li class="day-indicator" v-for="{date} in (days || [])" :class="{'today': isToday(date), 'is-before': isBefore(date)}">
+          <span class="number-date">{{date | normalizeDate('D')}}</span>
+          <span class="letters-date">{{date | normalizeDate('ddd')}}</span>
         </li>
       </ul>
       <ul class="all-day">
         <span>All Day</span>
-        <li v-for="date in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${calendarOptions.cell_height + 5}px`"></li>
+        <li v-for="date in days" :class="{'all-today': isToday(date), 'is-all-day': false}" :style="`height:${calendarOptions.cell_height + 5}px`"></li>
       </ul>
     </div>
     <div class="dummy-row" v-if="false">
       <ul class="dummy-days">
-        <li v-for="day in (days || [])" :style="`height:${calendarOptions.cell_height}px`"></li>
+        <li v-for="day in days" :style="`height:${calendarOptions.cell_height}px`"></li>
       </ul>
     </div>
     <div class="blocks">
       <div class="calendar-blocks">
         <ul class="hours">
-          <li class="hour-row-identifier" v-for="hour in (hours || [])" :style="`height:${hourHeight}px`">
-            <span>{{formatDate(hour, hour_format)}}</span>
+          <li class="hour-row-identifier" v-for="hour in hours" :style="`height:${hourHeight}px`">
+            <span>{{hour | normalizeDate(hour_format)}}</span>
           </li>
         </ul>
         <div v-show="calendarOptions.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
@@ -40,22 +40,26 @@ import format from 'date-fns/format';
 import isToday from 'date-fns/is_today';
 import KalendarDays from './kalendar-day.vue';
 import isBefore from 'date-fns/is_before';
+import utils from './utils';
 
 export default {
   components: {
     KalendarDays,
   },
-  props: ['days', 'hours'],
+  props: ['days'],
   inject: ['calendarOptions'],
   created() {
     setInterval(() => this.calendarOptions.now = new Date, 1000 * 60);
   },
   computed: {
+    hours() {
+      return utils.getDayHours('full');
+    },
     colsSpace() {
       return this.calendarOptions.style === 'flat_design' ? '5px' : '0px';
     },
     hourHeight() {
-      return this.calendarOptions.cell_height * (60 / this.calendarOptions.split_value); // * this.calendarOptions.hour_parts;
+      return this.calendarOptions.cell_height * 12; //(60 / this.calendarOptions.split_value); // * this.calendarOptions.hour_parts;
     },
     passedtime() {
       let time = format(this.calendarOptions.now, 'HH:mm');
@@ -83,11 +87,14 @@ export default {
       return this.calendarOptions.military_time ? 'HH:mm' : 'h A';
     }
   },
-  methods: {
-    formatDate(_format, how) {
-      return format(_format, how);
+  filters: {
+    normalizeDate(value, date_format = 'YYYY-MM-DD') {
+      if(!value) return;
+      return format(value, date_format);
     },
-    _isToday(day) {
+  },
+  methods: {
+    isToday(day) {
       return isToday(day);
     },
     updateAppointments({ id, data }) {
@@ -251,6 +258,9 @@ $theme-color: #e5e5e5;
     }
     &:first-child span {
       visibility: hidden;
+    }
+    &:last-child {
+      height: 5px!important;
     }
   }
 }

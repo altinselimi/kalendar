@@ -111,7 +111,7 @@ export default {
     appointments: existing_appointments,
     style: 'material_design',
     view_type: 'Month',
-    split_value: 20,
+    split_value: 5,
     new_appointment: {
       description: null,
       title: null,
