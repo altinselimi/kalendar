@@ -3,7 +3,7 @@
 		<div v-if="cell_data" class="creator_block" :style="`height: ${distance-1}px`">
 			<portal-target name="calendar-card" :slot-props="appointment_props" v-if="!appointment_props.data">
 			</portal-target>
-			<portal-target name="calendar-card-details" :slot-props="appointment_props" v-if="appointment_props.data">
+			<portal-target @mousedown.self class="calendar-card-details" name="calendar-card-details" :slot-props="appointment_props" v-if="appointment_props.data">
 			</portal-target>
 			<div class="popup-parent" v-if="status === 'popup-initiated'" ref="popupRef">
 				<div>
@@ -197,6 +197,9 @@ ul.building-blocks {
 			width: 100%;
 			user-select: none;
 			will-change: height; //padding: 4px 6px;
+		}
+		.calendar-card-details {
+			pointer-events: all;
 		}
 		.time {
 			position: absolute;

@@ -80,7 +80,7 @@ export default {
       },
     },
     hour_format() {
-      return this.calendarOptions.military_time ? 'H A' : 'h A';
+      return this.calendarOptions.military_time ? 'HH:mm' : 'h A';
     }
   },
   methods: {
