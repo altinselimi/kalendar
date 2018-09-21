@@ -134,7 +134,7 @@ Vue.use(VueHighlightJS)
 import format from 'date-fns/format';
 import getTime from 'date-fns/get_time';
 
-import Kalendar from '../kalendar/kalendar-container.vue';
+import Kalendar from '../components/kalendar/kalendar-container.vue';
 //import { Kalendar } from 'kalendar-vue';
 //import 'kalendar-vue/dist/kalendar-vue.css';
 
