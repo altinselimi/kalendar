@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-bundle": "vue-cli-service build --target lib --name KalendarVue ./src/components/index.js"
+    "build-bundle": "vue-cli-service build --target lib --name KalendarVue ./src/components/kalendar/index.js"
   },
   "main": "./dist/KalendarVue.common.js",
   "files": [

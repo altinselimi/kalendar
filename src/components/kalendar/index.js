@@ -1,11 +1,11 @@
-import Kalendar from './kalendar-components/kalendar-container';
-import KalendarCell from './kalendar-components/kalendar-cell';
-import KalendarDay from './kalendar-components/kalendar-day';
-import KalendarEventpopup from './kalendar-components/kalendar-eventpopup';
-import KalendarWeekView from './kalendar-components/kalendar-weekview';
 import PortalVue from 'portal-vue'
 import format from 'date-fns/format';
 import smoothscroll from 'smoothscroll-polyfill';
+import Kalendar from './kalendar-container';
+import KalendarCell from './kalendar-cell';
+import KalendarDay from './kalendar-day';
+import KalendarEventpopup from './kalendar-eventpopup';
+import KalendarWeekView from './kalendar-weekview';
 
 // Install the components
 export function install(Vue) {

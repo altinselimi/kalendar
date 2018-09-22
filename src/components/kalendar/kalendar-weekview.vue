@@ -3,25 +3,25 @@
     <div class="sticky-top">
       <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
-        <li class="day-indicator" v-for="{date} in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
+        <li class="day-indicator" :key="index" v-for="({date}, index) in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
           <span class="number-date">{{formatDate(date, 'D')}}</span>
           <span class="letters-date">{{formatDate(date,'ddd')}}</span>
         </li>
       </ul>
       <ul class="all-day">
         <span>All Day</span>
-        <li v-for="date in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${calendarOptions.cell_height + 5}px`"></li>
+        <li :key="index" v-for="(date, index) in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${calendarOptions.cell_height + 5}px`"></li>
       </ul>
     </div>
     <div class="dummy-row" v-if="false">
       <ul class="dummy-days">
-        <li v-for="day in (days || [])" :style="`height:${calendarOptions.cell_height}px`"></li>
+        <li :key="index" v-for="(day, index) in (days || [])" :style="`height:${calendarOptions.cell_height}px`"></li>
       </ul>
     </div>
     <div class="blocks">
       <div class="calendar-blocks">
         <ul class="hours">
-          <li class="hour-row-identifier" v-for="hour in (hours || [])" :style="`height:${hourHeight}px`">
+          <li class="hour-row-identifier" :key="index" v-for="(hour, index) in (hours || [])" :style="`height:${hourHeight}px`">
             <span>{{formatDate(hour, hour_format)}}</span>
           </li>
         </ul>
@@ -29,7 +29,7 @@
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days :day="day" class="building-blocks" v-for="day in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
+        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
         </kalendar-days>
       </div>
     </div>
