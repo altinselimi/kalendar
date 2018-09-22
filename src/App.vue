@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <HelloWorld />
+    <Demo />
   </div>
 </template>
 <script>
-import HelloWorld from './components/demo/Hello.vue'
+import Demo from './demo/index.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    Demo
   }
 }
 </script>
