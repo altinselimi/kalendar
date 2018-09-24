@@ -99,11 +99,11 @@ components: {
       {{ date | normalizeDate('DD MMM, YYYY') }}
     </template>
     <template slot="number-date" slot-scope="{ date }">
-      <!-- Day number in date indicators -->
+      <!-- Day number in day indicators -->
       {{ date | normalizeDate('D') }}
     </template>
     <template slot="letters-date" slot-scope="{ date }">
-      <!-- Weekday name in date indicators -->
+      <!-- Weekday name in day indicators -->
       {{ date | normalizeDate('ddd') }}
     </template>
   </kalendar>
