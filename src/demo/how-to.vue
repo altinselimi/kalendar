@@ -94,25 +94,25 @@ const slots = `
 
   <!-- Date formatting -->
   <template slot="first-date" slot-scope="{ date }">
-      <!-- Displays first date in week navigation header -->
-      {{ date | normalizeDate('MMM DD') }}
-    </template>
-    <span slot="last-date" slot-scope="{ date }">
-      <!-- Displays last date in week navigation header -->
-      {{ date | normalizeDate('DD MMM, YYYY') }}
-    </template>
-    <template slot="current-date" slot-scope="{ date }">
-      <!-- Displays current date in single day navigation -->
-      {{ date | normalizeDate('DD MMM, YYYY') }}
-    </template>
-    <template slot="number-date" slot-scope="{ date }">
-      <!-- Day number in date indicators -->
-      {{ date | normalizeDate('D') }}
-    </template>
-    <template slot="letters-date" slot-scope="{ date }">
-      <!-- Weekday name in date indicators -->
-      {{ date | normalizeDate('ddd') }}
-    </template>
+    <!-- Displays first date in week navigation header -->
+    {{ date | normalizeDate('MMM DD') }}
+  </template>
+  <span slot="last-date" slot-scope="{ date }">
+    <!-- Displays last date in week navigation header -->
+    {{ date | normalizeDate('DD MMM, YYYY') }}
+  </template>
+  <template slot="current-date" slot-scope="{ date }">
+    <!-- Displays current date in single day navigation -->
+    {{ date | normalizeDate('DD MMM, YYYY') }}
+  </template>
+  <template slot="number-date" slot-scope="{ date }">
+    <!-- Day number in date indicators -->
+    {{ date | normalizeDate('D') }}
+  </template>
+  <template slot="letters-date" slot-scope="{ date }">
+    <!-- Weekday name in date indicators -->
+    {{ date | normalizeDate('ddd') }}
+  </template>
 </kalendar>
 `;
 
