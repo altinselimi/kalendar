@@ -6,17 +6,33 @@
           <div class="nav-wrapper">
             <button @click="previousWeek()" class="chevron left"></button>
             <div v-if="calendar_options.view_type === 'Month' && !!calendar_options.current_week">
-              <span>{{startOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD')}}</span>
-              <span style="margin:0px 5px;">-</span>
-              <span>{{endOfWeek(calendar_options.current_week[0].date) | normalizeDate('MMM DD, YYYY')}}</span>
+              <slot name="first-date" :date="startOfWeek(calendar_options.current_week[0].date)">
+                <span>{{ calendar_options.current_week[0].date | normalizeDate('MMM DD') }}</span>
+              </slot>
+              <span syle="margin:0px 5px;">-</span>
+              <slot name="last-date" :date="endOfWeek(calendar_options.current_week[0].date)">
+                <span>{{ calendar_options.current_week[0].date | normalizeDate('MMM DD, YYYY') }}</span>
+              </slot>
             </div>
             <div v-else>
-              <span>{{ calendar_options.current_day | normalizeDate('DD MMM, YYYY') }}</span>
+              <slot name="current-date" :date="calendar_options.current_day">
+                <span>{{ calendar_options.current_day | normalizeDate('DD MMM, YYYY') }}</span>
+              </slot>
             </div>
             <button @click="nextWeek()" class="chevron"></button>
           </div>
         </slot>
       </div>
+    </portal>
+    <portal to="number-date" class="slotable">
+      <span slot-scope="{ date }" class="number-date">
+        <slot name="number-date" :date="date">{{ formatDate(date, 'D') }}</slot>
+      </span>
+    </portal>
+    <portal to="letters-date" class="slotable">
+      <span slot-scope="{ date }" class="letters-date">
+        <slot name="letters-date" :date="date">{{ formatDate(date, 'ddd') }}</slot>
+      </span>
     </portal>
     <kalendar-week-view :days="calendar_options.current_week" :hours="hours"></kalendar-week-view>
     <portal to="calendar-card" class="slotable">
