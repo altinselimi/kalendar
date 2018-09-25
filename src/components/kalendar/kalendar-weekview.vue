@@ -4,8 +4,8 @@
       <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
         <li class="day-indicator" :key="index" v-for="({date}, index) in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
-          <portal-target name="number-date" :slot-props="{ date }"></portal-target>
-          <portal-target name="letters-date" :slot-props="{ date }"></portal-target>
+          <portal-target name="number-date" :slot-props="{ date }" slim></portal-target>
+          <portal-target name="letters-date" :slot-props="{ date }" slim></portal-target>
         </li>
       </ul>
       <ul class="all-day">
