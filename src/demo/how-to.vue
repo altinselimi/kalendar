@@ -96,7 +96,7 @@ const slots = `
 		<!-- Displays first date in week navigation header -->
 		{{ date | normalizeDate('MMM DD') }}
 	</template>
-	<span slot="last-date" slot-scope="{ date }">
+	<template slot="last-date" slot-scope="{ date }">
 		<!-- Displays last date in week navigation header -->
 		{{ date | normalizeDate('DD MMM, YYYY') }}
 	</template>

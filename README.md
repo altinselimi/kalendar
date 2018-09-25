@@ -143,7 +143,7 @@ Useful for localizing dates
 | Slot name          | Slot scope         | Description                                       |
 |--------------------|--------------------|---------------------------------------------------|
 | first&#8209;date   | {&#160;date&#160;} | Displays first date in week navigation            |
-| last&#8209;date    | {&#160;date&#160;} | Displays last date in week nvagigation            |
+| last&#8209;date    | {&#160;date&#160;} | Displays last date in week navigation             |
 | current&#8209;date | {&#160;date&#160;} | Displays current date in single day navigation    |
 | number&#8209;date  | {&#160;date&#160;} | Displays day number in day indicators             |
 | letters&#8209;date | {&#160;date&#160;} | Displays weekday name in day indicators           |
