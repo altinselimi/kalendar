@@ -91,6 +91,27 @@ const slots = `
 		<small v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
 		<span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
 	</div>
+	<!-- Date formatting -->
+	<template slot="first-date" slot-scope="{ date }">
+		<!-- Displays first date in week navigation header -->
+		{{ date | normalizeDate('MMM DD') }}
+	</template>
+	<template slot="last-date" slot-scope="{ date }">
+		<!-- Displays last date in week navigation header -->
+		{{ date | normalizeDate('DD MMM, YYYY') }}
+	</template>
+	<template slot="current-date" slot-scope="{ date }">
+		<!-- Displays current date in single day navigation -->
+		{{ date | normalizeDate('DD MMM, YYYY') }}
+	</template>
+	<template slot="number-date" slot-scope="{ date }">
+		<!-- Day number in day indicators -->
+		{{ date | normalizeDate('D') }}
+	</template>
+	<template slot="letters-date" slot-scope="{ date }">
+		<!-- Weekday name in day indicators -->
+		{{ date | normalizeDate('ddd') }}
+	</template>
 </kalendar>
 `;
 

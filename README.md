@@ -27,7 +27,7 @@ components: {
 },
 ```
 - Provide Appointments array. This array will be the source of the appointments which are rendered in the calendar.
-```html
+```vue
 <template>
 	<kalendar :configuration="calendar_settings" :appointments="appointments"/>
 </template>
@@ -54,7 +54,7 @@ components: {
 > The plugin can turn incredibly useful using scoped slots. You can customize all the essential parts of it.
 
 
-```html
+```vue
 <kalendar :configuration="calendar_settings" :appointments="appointments" class="generate-shadow">
 	<div slot="creating-card" slot-scope="{appointment_props}">
 		<!-- This is the card that is displayed while the user is dragging mouse on cells -->
@@ -83,6 +83,27 @@ components: {
 		<small v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
 		<span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
 	</div>
+	<!-- Date formatting -->
+	<template slot="first-date" slot-scope="{ date }">
+		<!-- Displays first date in week navigation header -->
+		{{ date | normalizeDate('MMM DD') }}
+	</template>
+	<template slot="last-date" slot-scope="{ date }">
+		<!-- Displays last date in week navigation header -->
+		{{ date | normalizeDate('DD MMM, YYYY') }}
+	</template>
+	<template slot="current-date" slot-scope="{ date }">
+		<!-- Displays current date in single day navigation -->
+		{{ date | normalizeDate('DD MMM, YYYY') }}
+	</template>
+	<template slot="number-date" slot-scope="{ date }">
+		<!-- Day number in day indicators -->
+		{{ date | normalizeDate('D') }}
+	</template>
+	<template slot="letters-date" slot-scope="{ date }">
+		<!-- Weekday name in day indicators -->
+		{{ date | normalizeDate('ddd') }}
+	</template>
 </kalendar>
 
 <script>
@@ -106,6 +127,28 @@ components: {
 	},
 </script>
 ```
+### Slots summary
+
+#### Appointment cards
+
+| Slot name           | Slot scope                      |  Description                                        |
+|---------------------|---------------------------------|-----------------------------------------------------|
+| creating&#8209;card | {&#160;appointment_props&#160;} | Displayed while the user is dragging mouse on cells |
+| details&#8209;card  | {&#160;appointment_props&#160;} | Similar to creating-card, except that this one is displayed for existing appointments |
+| popup&#8209;form    | {&#160;popup_scope&#160;}       | Displayed when user has finished dragging (selecting appointment start and end values) |
+
+#### Date representations
+Useful for localizing dates
+
+| Slot name          | Slot scope         | Description                                       |
+|--------------------|--------------------|---------------------------------------------------|
+| first&#8209;date   | {&#160;date&#160;} | Displays first date in week navigation            |
+| last&#8209;date    | {&#160;date&#160;} | Displays last date in week navigation             |
+| current&#8209;date | {&#160;date&#160;} | Displays current date in single day navigation    |
+| number&#8209;date  | {&#160;date&#160;} | Displays day number in day indicators             |
+| letters&#8209;date | {&#160;date&#160;} | Displays weekday name in day indicators           |
+
+
 ## Roadmap
 - Remove date-fns dependency
 - Improve performance
@@ -114,6 +157,6 @@ components: {
 	* Use event delegation and remove listeners from every cell. Use event target instead, to manipulate the cell DOM object.
 - Add month view
 - Write docs
-- Write unit-test
+- Write unit-tests
 - Write the React version of this plugin
 - Write the Angular version of this plugin
