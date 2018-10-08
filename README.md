@@ -150,6 +150,7 @@ Useful for localizing dates
 
 
 ## Roadmap
+- ⚠️ Refactor so code is readable/understandable and others can help
 - Remove date-fns dependency
 - Improve performance
 	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
