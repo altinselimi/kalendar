@@ -93,6 +93,7 @@ export default {
           }
         });
       }
+      console.log('selected cell');
     },
     initiatePopup() {
       let { creating, appointment_id, ending_cell_index, current_cell_index, starting_cell_index } = this.creator;

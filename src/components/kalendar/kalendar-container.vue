@@ -34,7 +34,7 @@
         <slot name="letters-date" :date="date">{{ formatDate(date, 'ddd') }}</slot>
       </span>
     </portal>
-    <kalendar-week-view :days="calendar_options.current_week" :hours="hours"></kalendar-week-view>
+    <kalendar-week-view :days="calendar_options.current_week" :hours="hours" @update="updateAppointments" @delete="deleteAppointment" @clear="clearAppointments"></kalendar-week-view>
     <portal to="calendar-card" class="slotable">
       <div slot-scope="appointment_props" class="new-event">
         <slot name="creating-card" :appointment_props="appointment_props">
@@ -249,6 +249,16 @@ export default {
         _days.push(payload);
       }
       return { filtered_appointments: filtered_appointments, _days: _days };
+    },
+    updateAppointments({ id, data }) {
+      console.log('updating appointments');
+      this.$set(this.calendar_options.existing_appointments, id, data);
+    },
+    deleteAppointment(id) {
+      this.$delete(this.calendar_options.existing_appointments, id);
+    },
+    clearAppointments() {
+      this.$set(this.calendar_options, 'existing_appointments', {});
     },
     formatDate(_format, how) {
       return format(_format, how);

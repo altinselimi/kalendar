@@ -60,24 +60,16 @@ export default {
     passedtime() {
       let time = format(this.calendarOptions.now, 'HH:mm');
       let hours_minutes = time.split(':');
-      let minutat = hours_minutes[1],
+      let minutes = hours_minutes[1],
         oret = hours_minutes[0];
-      let mintosec = parseInt(minutat) * 60,
+      let mintosec = parseInt(minutes) * 60,
         htosec = parseInt(oret) * 3600;
-      let sekondat = mintosec + htosec;
-      let x = sekondat / 864;
+      let seconds = mintosec + htosec;
+      let x = seconds / 864;
       return { percentage: x, value: time };
     },
-    existing_appointments() {
+    appointments() {
       return this.calendarOptions.existing_appointments;
-    },
-    appointments: {
-      set(val) {
-        this.existing_appointments = val;
-      },
-      get(val) {
-        return this.existing_appointments || {};
-      },
     },
     hour_format() {
       return this.calendarOptions.military_time ? 'HH:mm' : 'h A';
@@ -91,13 +83,13 @@ export default {
       return isToday(day);
     },
     updateAppointments({ id, data }) {
-      this.$set(this.appointments, id, data);
+      this.$emit('update', { id, data });
     },
-    deleteAppointment(appointment_id) {
-      this.$delete(this.appointments, appointment_id);
+    deleteAppointment(id) {
+      this.$emit('delete', { id });
     },
     clearAppointments() {
-      this.appointments = {};
+      this.$emit('clear');
     },
     isBefore(day) {
       return isBefore(day, this.calendarOptions.now);
