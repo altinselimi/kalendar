@@ -217,6 +217,7 @@ export default {
         let payload = {
           date: format(_date, 'YYYY-MM-DD'),
         };
+
         payload.date_hours = new Array(this.hourParts).fill(1).map((hour, index) => {
           return {
             value: index > 0 ? addMinutes(_date, index * this.calendar_options.split_value) : _date,
@@ -231,9 +232,26 @@ export default {
         let hasExistingAppointments = this.appointments.filter(appointment => appointment.date === payload.date);
         if (hasExistingAppointments.length > 0) {
           hasExistingAppointments.forEach(appointment => {
-            let target_hour_from = payload.date_hours.find(hour => getTime(hour.value) === getTime(appointment.from));
-            let target_hour_to = payload.date_hours.find(hour => getTime(hour.value) === getTime(appointment.to));
-            if (!target_hour_from || !target_hour_to) return;
+            let { from, to} = appointment;
+
+            let target_hour_from = payload.date_hours.find(hour => getTime(hour.value) === getTime(from));
+            let target_hour_to = payload.date_hours.find(hour => getTime(hour.value) === getTime(to));
+            
+            if (!target_hour_from || !target_hour_to) { //there's a chance user selected last cell
+              let last_hour_index = payload.date_hours.length - 1; //that's what we checkin here
+              let start_is_midnight = from.getHours() + from.getMinutes() === 0;
+              let end_is_midnight = to.getHours() + to.getMinutes() === 0;
+              if(start_is_midnight) {
+                target_hour_from = payload.date_hours[last_hour_index];
+              }
+              if(end_is_midnight) {
+                target_hour_to = payload.date_hours[last_hour_index];
+                target_hour_to = { ...target_hour_to, ['index']: target_hour_to.index + 1}; //so we take care of the -1 later
+              }
+            } 
+
+            if (!target_hour_from || !target_hour_to) return; //and if we just can't find it, we return
+
             let uuid = this.generateUUID();
             filtered_appointments[uuid] = {
               start: target_hour_from.index,
