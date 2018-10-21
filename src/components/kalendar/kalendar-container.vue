@@ -269,7 +269,6 @@ export default {
       return { filtered_appointments: filtered_appointments, _days: _days };
     },
     updateAppointments({ id, data }) {
-      console.log('updating appointments');
       this.$set(this.calendar_options.existing_appointments, id, data);
     },
     deleteAppointment(id) {

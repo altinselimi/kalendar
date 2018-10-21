@@ -30,13 +30,8 @@ export default {
 			import ('./kalendar-eventpopup.vue'),
 	},
 	computed: {
-		appointments: {
-			set(val) {
-				this.existing_appointments = val;
-			},
-			get() {
-				return this.calendarOptions.existing_appointments;
-			}
+		appointments() {
+			return this.calendarOptions.existing_appointments; //this.calendarOptions.existing_appointments;
 		},
 		distance() {
 			if (!this.cell_data) return false;
@@ -64,13 +59,20 @@ export default {
 		appointment_props() {
 			if (!this.appointment) return;
 			let { start, end } = this.appointment;
+			let num_of_hours = this.day.date_hours.length - 1; //account for index starting at 0
+/*			if(start === num_of_hours || end === num_of_hours) {
+				console.log('We got to the limit', {start, end});
+				start === num_of_hours && start--;
+				end === num_of_hours && end--;
+			}*/
 			let hour_start_data = this.day.date_hours[start];
 			let hour_end_data = this.day.date_hours[end + 1];
 			if (!hour_end_data) {
-				hour_end_data = this.day.date_hours[end];
+				hour_end_data = {...this.day.date_hours[this.day.date_hours.length - 1]};
 				hour_end_data['value'] = new Date(this.day.date);
 				hour_end_data['value'].setHours(24, 0, 0);
 			}
+			console.log({hour_start_data, hour_end_data});
 			return { ...this.appointment, ['start_value']: hour_start_data, ['end_value']: hour_end_data };
 		},
 	},
@@ -159,33 +161,44 @@ ul.building-blocks {
 	li {
 		z-index: 0;
 		border-bottom: dotted 1px var(--odd-cell-border-color);
+
 		&.first_of_appointment {
 			z-index: 1;
 			opacity: 1; //z-index:0;
 		}
+
 		&.first_of_appointment.is-active {
-			z-index:3;
+			z-index: 3;
 		}
+
 		&.is-an-hour {
 			border-bottom: solid 1px var(--table-cell-border-color);
 		}
+
 		.creator_block {
 			display: none; //opacity: .85;
 		}
-		&.first_of_appointment.last_of_appointment  {
-			.new-event, .existing-event {
+
+		&.first_of_appointment.last_of_appointment {
+
+			.new-event,
+			.existing-event {
 				font-size: 80%;
 			}
+
 			.time {
 				opacity: 0;
 			}
 		}
+
 		&.first_of_appointment .creator_block {
 			display: flex;
 			flex-direction: column;
+
 			>* {
 				flex: 1;
 			}
+
 			position: absolute;
 			pointer-events: none;
 			top: 0;
@@ -198,9 +211,11 @@ ul.building-blocks {
 			user-select: none;
 			will-change: height; //padding: 4px 6px;
 		}
+
 		.calendar-card-details {
 			pointer-events: all;
 		}
+
 		.time {
 			position: absolute;
 			bottom: 4px;
@@ -208,6 +223,7 @@ ul.building-blocks {
 			font-size: 11px;
 		}
 	}
+
 	.popup-parent {
 		position: absolute;
 		width: 100%;
@@ -217,6 +233,7 @@ ul.building-blocks {
 		z-index: 3;
 		left: 0px;
 		user-select: all;
+
 		>div {
 			position: relative;
 			width: 100%;
@@ -227,6 +244,7 @@ ul.building-blocks {
 
 
 div.creator_block {
+
 	h4,
 	p,
 	span {
