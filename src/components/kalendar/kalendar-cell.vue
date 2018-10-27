@@ -72,7 +72,6 @@ export default {
 				hour_end_data['value'] = new Date(this.day.date);
 				hour_end_data['value'].setHours(24, 0, 0);
 			}
-			console.log({hour_start_data, hour_end_data});
 			return { ...this.appointment, ['start_value']: hour_start_data, ['end_value']: hour_end_data };
 		},
 	},
