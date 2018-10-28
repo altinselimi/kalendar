@@ -127,6 +127,7 @@ export default {
       style: 'material_design',
       now: new Date,
       military_time: true,
+      read_only: false,
     },
     weeks: {},
     hours: [],
@@ -154,6 +155,7 @@ export default {
           cell_height: (val) => !isNaN(val),
           style: (val) => ['material_design', 'flat_design'].includes(val),
           military_time: (val) => typeof val === 'boolean',
+          read_only: (val) => typeof val === 'boolean'
         };
         for (let key in provided_props) {
           if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {

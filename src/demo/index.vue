@@ -78,6 +78,9 @@
 			<label>Outline slots
 				<el-checkbox size="small" v-model="outline_slots"></el-checkbox>
 			</label>
+			<label>Read only
+				<el-checkbox size="small" v-model="calendar_settings['read_only']"></el-checkbox>
+			</label>
 		</options>
 		<div class="calendar-component" :class="{'show-slots': outline_slots}">
 			<kalendar :configuration="calendar_settings" :appointments="appointments" class="generate-shadow">
@@ -197,6 +200,7 @@ export default {
 			scrollToNow: false,
 			current_day: new Date(),
 			military_time: false,
+			read_only: true
 		},
 		outline_slots: false,
 		new_appointment: JSON.parse(JSON.stringify(new_appointment_model)),

@@ -77,6 +77,7 @@ export default {
 	},
 	methods: {
 		mouseDown() {
+			if(this.calendarOptions.read_only) return;
 			this.clearPopups('popup-initiated');
 			this.calendarOptions.currently_working_on_date = this.day.date;
 
@@ -96,6 +97,7 @@ export default {
 			this.$emit('select', { index: this.index, payload: payload });
 		},
 		mouseMove(event) {
+			if(this.calendarOptions.read_only) return;
 			if (this.creator && !this.creator.creating) return;
 			//index is the index of this component, whereas this.creator is the object which is used for the day component
 			let { starting_cell_index, creating, appointment_id } = this.creator;
@@ -123,6 +125,7 @@ export default {
 			}
 		},
 		mouseUp() {
+			if(this.calendarOptions.read_only) return;
 			if (this.creator.creating) {
 				this.$emit('initiatePopup');
 			}
