@@ -200,7 +200,7 @@ export default {
 			scrollToNow: false,
 			current_day: new Date(),
 			military_time: false,
-			read_only: true
+			read_only: false
 		},
 		outline_slots: false,
 		new_appointment: JSON.parse(JSON.stringify(new_appointment_model)),
