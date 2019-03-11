@@ -1,8 +1,8 @@
 <template>
-  <ul style="position: relative;" @mouseleave="clearCreatingLeftovers" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': calendarOptions.currently_working_on_date === day.date}" class="kalendar-day">
-    <kalendar-cell v-for="(quarter, index) in day.date_hours" :key="`${day.date}_${index}`" :creator="creator" :day="day" :index="index" :cell-data.sync="quarter" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" />
-    <div ref="nowIndicator" :class="calendarOptions.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
-      <span class="line" v-show="calendarOptions.style === 'material_design'"></span>
+  <ul style="position: relative;" @mouseleave="clearCreatingLeftovers" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': calendar_options.currently_working_on_date === day.date}" class="kalendar-day">
+    <kalendar-cell v-for="(quarter, index) in day_cells" :key="`${index}`" :creator="creator" :day="day" :index="index" :cell-data.sync="quarter" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" />
+    <div ref="nowIndicator" :class="calendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
+      <span class="line" v-show="calendar_options.style === 'material_design'"></span>
     </div>
   </ul>
 </template>
@@ -10,14 +10,25 @@
 import isWeekend from 'date-fns/is_weekend';
 import isToday from 'date-fns/is_today';
 import format from 'date-fns/format';
+import addMinutes from 'date-fns/add_minutes';
+
+import myWorker from '@/components/kalendar/workers';
 
 export default {
-  props: ['day', 'passedTime'],
+  props: ['day', 'passedTime', 'dayAppointments'],
+  created() {
+    myWorker.send('getDayCells', {
+      day: this.day.value
+    }).then(reply => {
+      console.log('Got day cells:', reply);
+      this.day_cells = reply;
+    })
+  },
   components: {
     kalendarCell: () =>
-      import ('./kalendar-cell.vue'),
+      import('./kalendar-cell.vue'),
   },
-  inject: ['calendarOptions'],
+  inject: ['calendar_options'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -29,10 +40,7 @@ export default {
       return isToday(this.day.date);
     },
     currentDay() {
-      return this.calendarOptions.current_day;
-    },
-    scrollToNow() {
-      return this.calendarOptions.scrollToNow;
+      return this.calendar_options.current_day;
     },
   },
   data: () => ({
@@ -43,7 +51,7 @@ export default {
       appointment_id: null,
       status: null,
     },
-
+    day_cells: []
   }),
   methods: {
     resetEvents() {
@@ -55,10 +63,11 @@ export default {
         appointment_id: null,
         status: null,
       };
-      this.calendarOptions.currently_working_on_date = null;
+      this.calendar_options.currently_working_on_date = null;
     },
     clearCreatingLeftovers() {
-      let { existing_appointments } = this.calendarOptions;
+      // should be done in a web worker
+      let { existing_appointments } = this.calendar_options;
       for (let key in existing_appointments) {
         if (existing_appointments[key]['status'] === 'creating') {
           this.resetEvents();
@@ -84,12 +93,12 @@ export default {
       };
       this.$emit('updateAppointments', payload);
       if (creating) {
-        this.day.date_hours.forEach((hour, index) => {
+        this.day_cells.forEach((hour, index) => {
           let is_in_range = hour.index >= starting_cell_index && hour.index <= _ending_index;
           if (is_in_range) {
-            this.day.date_hours[index] = { ...hour, ['appointment_id']: appointment_id };
+            this.day_cells[index] = { ...hour, ['appointment_id']: appointment_id };
           } else if (hour['appointment_id'] === appointment_id && !is_in_range) {
-            this.day.date_hours[index] = { ...hour, ['appointment_id']: null };
+            this.day_cells[index] = { ...hour, ['appointment_id']: null };
           }
         });
       }
@@ -116,23 +125,21 @@ export default {
       }, 500);
     },
   },
-  watch: {
-    scrollToNow(val) {
-      if (val && this.isToday) this.scrollView();
-    },
-  },
 }
 </script>
 <style lang="scss">
 ul.kalendar-day {
   position: relative;
   background-color: white;
+
   &.is-weekend {
     background-color: var(--weekend-color);
   }
+
   &.is-today {
     background-color: var(--current-day-color);
   }
+
   .clear {
     position: absolute;
     z-index: 1;
@@ -140,6 +147,7 @@ ul.kalendar-day {
     right: 0;
     font-size: 10px;
   }
+
   .creating {
     z-index: 3;
   }

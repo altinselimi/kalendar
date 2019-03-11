@@ -1,15 +1,23 @@
 <template>
   <div id="app">
-    <Demo />
+    <Demo v-if="!isDev" />
+    <DevDemo v-else />
   </div>
 </template>
 <script>
 import Demo from './demo/index.vue'
+import DevDemo from './demo/dev-demo.vue';
 
 export default {
   name: 'app',
+  computed: {
+    isDev() {
+      return process.env.NODE_ENV === 'development';
+    }
+  },
   components: {
-    Demo
+    Demo,
+    DevDemo
   }
 }
 </script>

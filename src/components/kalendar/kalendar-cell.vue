@@ -1,9 +1,29 @@
 <template>
-	<li @mouseover.self="mouseMove($event)" @mousedown.self="mouseDown()" @mouseup.self="mouseUp()" :class="{'selected': cellData.selected, 'inbetween': isInBetween, 'first_of_appointment': cell_data.first, 'last_of_appointment': cell_data.last, 'is-an-hour': (index+1)%(60/calendarOptions.split_value) === 0, 'is-active': status === 'popup-initiated' || status === 'creating'}" :style="`height: ${calendarOptions.cell_height}px`">
-		<div v-if="cell_data" class="creator_block" :style="`height: ${distance-1}px`">
-			<portal-target name="calendar-card" :slot-props="appointment_props" v-if="!appointment_props.data">
+	<li @mouseover.self="mouseMove($event)" 
+		@mousedown.self="mouseDown()" 
+		@mouseup.self="mouseUp()" 
+		:class="{
+			'selected': cellData.selected, 
+			'inbetween': isInBetween, 
+			'first_of_appointment': cell_data.first, 
+			'last_of_appointment': cell_data.last, 
+			'is-an-hour': (index+1)%(60/calendar_options.split_value) === 0, 
+			'is-active': status === 'popup-initiated' || status === 'creating'}" 
+		:style="`height: ${calendar_options.cell_height}px`"
+	>
+		<div v-if="cell_data" 
+			class="creator_block" 
+			style="`height: ${distance-1}px`">
+			<portal-target 
+				name="event-creation" 
+				:slot-props="appointment_props" 
+				v-if="!appointment_props.data">
 			</portal-target>
-			<portal-target class="calendar-card-details" name="calendar-card-details" :slot-props="appointment_props" v-if="appointment_props.data">
+			<portal-target 
+				class="event-details" 
+				name="event-details" 
+				:slot-props="appointment_props" 
+				v-if="appointment_props.data">
 			</portal-target>
 			<div class="popup-parent" v-if="status === 'popup-initiated'" ref="popupRef">
 				<div>
@@ -24,19 +44,19 @@ const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 
 export default {
 	props: ['creator', 'day', 'index', 'cellData'],
-	inject: ['calendarOptions'],
+	inject: ['calendar_options'],
 	components: {
 		kalendarEventpopup: () =>
 			import ('./kalendar-eventpopup.vue'),
 	},
 	computed: {
 		appointments() {
-			return this.calendarOptions.existing_appointments; //this.calendarOptions.existing_appointments;
+			return this.calendar_options.existing_appointments;
 		},
 		distance() {
 			if (!this.cell_data) return false;
 			let appointment = this.appointments[this.cellData.appointment_id];
-			return ((appointment.end - appointment.start) + 1) * this.calendarOptions.cell_height;
+			return ((appointment.end - appointment.start) + 1) * this.calendar_options.cell_height;
 		},
 		isInBetween() {
 			let l_appointment = this.appointments[this.cellData.appointment_id];
@@ -77,9 +97,9 @@ export default {
 	},
 	methods: {
 		mouseDown() {
-			if(this.calendarOptions.read_only) return;
+			if(this.calendar_options.read_only) return;
 			this.clearPopups('popup-initiated');
-			this.calendarOptions.currently_working_on_date = this.day.date;
+			this.calendar_options.currently_working_on_date = this.day.date;
 
 			if (this.cellData.appointment_id && this.appointment) {
 				this.resetCreator();
@@ -97,7 +117,7 @@ export default {
 			this.$emit('select', { index: this.index, payload: payload });
 		},
 		mouseMove(event) {
-			if(this.calendarOptions.read_only) return;
+			if(this.calendar_options.read_only) return;
 			if (this.creator && !this.creator.creating) return;
 			//index is the index of this component, whereas this.creator is the object which is used for the day component
 			let { starting_cell_index, creating, appointment_id } = this.creator;
@@ -125,7 +145,7 @@ export default {
 			}
 		},
 		mouseUp() {
-			if(this.calendarOptions.read_only) return;
+			if(this.calendar_options.read_only) return;
 			if (this.creator.creating) {
 				this.$emit('initiatePopup');
 			}
@@ -139,8 +159,8 @@ export default {
 			)
 		},
 		clearPopups(status) {
-			this.calendarOptions.currently_working_on_date = null;
-			let { existing_appointments } = this.calendarOptions;
+			this.calendar_options.currently_working_on_date = null;
+			let { existing_appointments } = this.calendar_options;
 			for (let key in existing_appointments) {
 				if (existing_appointments[key]['status'] === 'popup-initiated') {
 					this.$delete(existing_appointments, key);
@@ -214,7 +234,7 @@ ul.building-blocks {
 			will-change: height; //padding: 4px 6px;
 		}
 
-		.calendar-card-details {
+		.event-details {
 			pointer-events: all;
 		}
 

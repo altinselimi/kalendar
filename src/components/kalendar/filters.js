@@ -1,4 +1,30 @@
-import Vue from "vue";
 import format from 'date-fns/format';
+import startOfWeek from 'date-fns/start_of_week';
+import endOfWeek from 'date-fns/end_of_week';
 
-Vue.filter("normalizeDate", (date, format_type = 'YYYY-MM-DD') => format(date, format_type));
+export default {
+  formatUTCDate(value, how) {
+    return format(getUTCDate(value), how);
+  },
+  formatDate(value, how) {
+    return format(value, how);
+  },
+  startOfWeek(value) {
+    return startOfWeek(value);
+  },
+  endOfWeek(value) {
+    return endOfWeek(value);
+  }
+}
+
+const getUTCDate = (dateString = Date.now()) => {
+  const date = new Date(dateString);
+  return new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds(),
+  );
+};

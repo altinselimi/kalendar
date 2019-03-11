@@ -1,6 +1,6 @@
 <template>
 	<div class="popup-wrapper">
-		<portal-target name="event-popup" :slot-props="popup_scope">
+		<portal-target name="event-popup-form" :slot-props="popup_scope">
 		</portal-target>
 	</div>
 </template>
