@@ -29,7 +29,7 @@
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
+        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :passed-time="passedtime.percentage">
         </kalendar-days>
       </div>
     </div>
@@ -55,7 +55,7 @@ export default {
       day: date
     }).then(reply => {
       console.log('Got days:', reply);
-      this.days = reply
+      this.days = reply;//.slice(0,1);
     });
     myWorker.send('getHours').then(reply => {
       // Handle the reply
@@ -86,9 +86,6 @@ export default {
       let seconds = mintosec + htosec;
       let x = seconds / 864;
       return { percentage: x, value: time };
-    },
-    appointments() {
-      return this.calendar_options.existing_appointments;
     },
     hour_format() {
       return this.calendar_options.military_time ? 'HH:mm' : 'h A';

@@ -2,7 +2,7 @@
     <div>
         <input type="text" v-model="input_value">
         <button @click="sendMessageToWorker">CLICK ME</button>
-        <kalendar :configuration="calendar_settings" :appointments="appointments" class="generate-shadow">
+        <kalendar :configuration="calendar_settings" :events="events" class="generate-shadow">
         <div slot="creating-card" slot-scope="{appointment_props}">
             <h4 class="appointment-title" style="text-align: left;">
                 New Appointment
@@ -42,23 +42,53 @@
     </div>
 </template>
 <script>
-const existing_appointments = [{
-    from: 'Wed Aug 01 2018 01:00:00',
-    to: 'Wed Aug 01 2018 02:00:00',
-    date: '2018-08-01',
-    data: {
-        title: 'Barber Checkin',
-        description: 'Lorem ipsum dolor sit amet.',
-    },
-}, {
-    from: 'Thu Aug 09 2018 01:00:00',
-    to: 'Thu Aug 09 2018 02:00:00',
-    date: '2018-08-09',
-    data: {
-        title: 'My Birthday',
-        description: 'Lorem ipsum dolor sit amet.',
-    },
-}];
+
+let today_from = new Date();
+let today_to = new Date();
+today_from.setUTCHours(3,22,0,0);
+today_to.setUTCHours(4,55,0,0);
+
+let today_from2 = new Date();
+let today_to2 = new Date();
+today_from2.setUTCHours(3,22,0,0);
+today_to2.setUTCHours(4,20,0,0);
+
+
+let tomorrow_from = new Date();
+tomorrow_from.setDate(tomorrow_from.getDate() + 1);
+let tomorrow_to = new Date(tomorrow_from.getTime());
+tomorrow_from.setUTCHours(10,17,0,0);
+tomorrow_to.setUTCHours(10,19,0,0);
+
+
+const existing_events = [
+  {
+    "from": today_from.toISOString(),
+    "to": today_to.toISOString(),
+    "data": {
+      "title": "Barber Checkin",
+      "description": "Lorem ipsum dolor sit amet."
+    }
+  },
+  {
+    "from": today_from2.toISOString(),
+    "to": today_to2.toISOString(),
+    "data": {
+      "title": "Barber Checkin2",
+      "description": "Lorem ipsum dolor sit amet.2"
+    }
+  },
+  {
+    "from": tomorrow_from.toISOString(),
+    "to": tomorrow_to.toISOString(),
+    "data": {
+      "title": "Barber Checkin",
+      "description": "Lorem ipsum dolor sit amet."
+    }
+  }
+]
+
+
 import Vue from 'vue';
 
 import VueHighlightJS from 'vue-highlightjs'
@@ -109,7 +139,7 @@ export default {
         HowTo,
     },
     data: () => ({
-        appointments: existing_appointments,
+        events: existing_events,
         calendar_settings: {
             //style: 'material_design',
             view_type: 'Month',
@@ -146,7 +176,7 @@ export default {
                 to: popup_data.appointment_props.end_value.value,
                 date: format(popup_data.appointment_props.start_value.value, 'YYYY-MM-DD'),
             };
-            this.appointments.push(payload);
+            this.events(payload);
             this.new_appointment = JSON.parse(JSON.stringify(new_appointment_model));
             popup_data.close_popup = true;
         },
@@ -160,7 +190,7 @@ export default {
                 to,
                 date: format(from, 'YYYY-MM-DD'),
             };
-            this.appointments.push(payload);
+            this.events(payload);
             this.manual_form = JSON.parse(JSON.stringify(manual_appointment_model));
             this.adding_manually = false;
         },

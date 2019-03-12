@@ -1,6 +1,15 @@
 <template>
   <ul style="position: relative;" @mouseleave="clearCreatingLeftovers" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': calendar_options.currently_working_on_date === day.date}" class="kalendar-day">
-    <kalendar-cell v-for="(quarter, index) in day_cells" :key="`${index}`" :creator="creator" :day="day" :index="index" :cell-data.sync="quarter" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" />
+    <kalendar-cell v-for="(cell, index) in day_cells" 
+      :constructed-events="day_events" 
+      :key="`${index}`" 
+      :creator="creator" 
+      :cell-data="cell" 
+      :temporary-event="temporary_events[cell.value]"
+      :index="index" 
+      @select="updateCreator" 
+      @reset="resetEvents()" 
+      @initiatePopup="initiatePopup()" />
     <div ref="nowIndicator" :class="calendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
       <span class="line" v-show="calendar_options.style === 'material_design'"></span>
     </div>
@@ -15,20 +24,21 @@ import addMinutes from 'date-fns/add_minutes';
 import myWorker from '@/components/kalendar/workers';
 
 export default {
-  props: ['day', 'passedTime', 'dayAppointments'],
+  props: ['day', 'passedTime'],
   created() {
     myWorker.send('getDayCells', {
       day: this.day.value
     }).then(reply => {
       console.log('Got day cells:', reply);
       this.day_cells = reply;
-    })
+      return this.getDayEvents();
+    });
   },
   components: {
     kalendarCell: () =>
       import('./kalendar-cell.vue'),
   },
-  inject: ['calendar_options'],
+  inject: ['calendar_options', 'events'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -46,52 +56,74 @@ export default {
   data: () => ({
     creator: {
       creating: false,
-      starting_cell_index: null,
-      current_cell_index: null,
-      appointment_id: null,
+      starting_cell: null,
+      current_cell: null,
+      ending_cell: null,
       status: null,
     },
-    day_cells: []
+    day_cells: [],
+    day_events: null,
+    temporary_events: {}
   }),
   methods: {
+    getDayEvents() {
+      return myWorker.send('constructDayEvents', {
+          events: this.events,
+          day: this.day.value
+      }).then(constructed_events => {
+        console.log('Constructed events:', constructed_events);
+        this.day_events = constructed_events;
+      })
+    },
     resetEvents() {
       if (!this.creator.creating && this.creator.status === null) return;
       this.creator = {
         creating: false,
-        starting_cell_index: null,
-        current_cell_index: null,
-        appointment_id: null,
+        starting_cell: null,
+        current_cell: null,
+        ending_cell: null,
         status: null,
       };
-      this.calendar_options.currently_working_on_date = null;
     },
     clearCreatingLeftovers() {
       // should be done in a web worker
-      let { existing_appointments } = this.calendar_options;
-      for (let key in existing_appointments) {
-        if (existing_appointments[key]['status'] === 'creating') {
-          this.resetEvents();
-          this.$delete(existing_appointments, key);
-        }
-      }
+      this.temporary_events = {};
     },
-    updateCreator({ payload, index, event_type }) {
+    updateCreator(payload) {
+      console.log('Updated creator:', payload);
       this.creator = payload;
-      this.selectCell(index);
+      this.selectCell(payload);
     },
-    selectCell(index, status = 'creating') {
+    selectCell(status = 'creating') {
       if (!this.creator.creating) return;
-      let { creating, appointment_id, ending_cell_index, current_cell_index, starting_cell_index } = this.creator;
-      let _ending_index = ending_cell_index == null ? current_cell_index : ending_cell_index;
-      let payload = {
-        id: appointment_id,
-        data: {
-          start: starting_cell_index,
-          end: _ending_index,
-          status: status,
+      let { creating, ending_cell, current_cell, starting_cell } = this.creator;
+
+      const diffInMs = new Date(ending_cell.value) - new Date(starting_cell.value);
+      const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
+      const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
+      let startDate = new Date(starting_cell.value);
+      let endDate = new Date(ending_cell.value);
+
+      let constructedEvent = {
+        start: {
+          masked_value: startDate.toISOString(),
+          value: startDate.toISOString(),
+          rounded: false,
+          round_offset: null
         },
+        end: {
+          masked_value: endDate.toISOString(),
+          value: endDate.toISOString(),
+          rounded: false,
+          round_offset: null
+        },
+        distance: diffMins + (diffInHrs * 60),
+        status
       };
-      this.$emit('updateAppointments', payload);
+      this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
+      //this.temporary_events[starting_cell.value] = payload;
+
+/*
       if (creating) {
         this.day_cells.forEach((hour, index) => {
           let is_in_range = hour.index >= starting_cell_index && hour.index <= _ending_index;
@@ -101,25 +133,38 @@ export default {
             this.day_cells[index] = { ...hour, ['appointment_id']: null };
           }
         });
-      }
+      }*/
     },
     initiatePopup() {
-      let { creating, appointment_id, ending_cell_index, current_cell_index, starting_cell_index } = this.creator;
-      let _ending_index = ending_cell_index == null ? current_cell_index : ending_cell_index;
-      let payload = {
-        id: appointment_id,
-        data: {
-          start: starting_cell_index,
-          end: _ending_index,
-          status: 'popup-initiated',
-        }
+      let { creating, ending_cell, current_cell, starting_cell } = this.creator;
+      const diffInMs = new Date(ending_cell.value) - new Date(starting_cell.value);
+      const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
+      const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
+      let startDate = new Date(starting_cell.value);
+      let endDate = new Date(ending_cell.value);
+
+      let constructedEvent = {
+        start: {
+          masked_value: startDate.toISOString(),
+          value: startDate.toISOString(),
+          rounded: false,
+          round_offset: null
+        },
+        end: {
+          masked_value: endDate.toISOString(),
+          value: endDate.toISOString(),
+          rounded: false,
+          round_offset: null
+        },
+        distance: diffMins + (diffInHrs * 60),
+        status: 'popup-initiated'
       };
-      this.$emit('updateAppointments', payload);
+      this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
+      //this.temporary_events[starting_cell.value] = payload;
       this.creator = { ...this.creator, ['creating']: false };
     },
     scrollView() {
       let topoffset = this.$refs.nowIndicator.offsetTop;
-      console.log('Scrolling to now.', topoffset);
       setTimeout(() => {
         window.scroll({ top: topoffset, left: 0, behavior: 'smooth' });
       }, 500);
@@ -131,7 +176,7 @@ export default {
 ul.kalendar-day {
   position: relative;
   background-color: white;
-
+  max-width: 400px;
   &.is-weekend {
     background-color: var(--weekend-color);
   }
