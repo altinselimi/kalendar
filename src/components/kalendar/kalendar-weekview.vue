@@ -3,19 +3,19 @@
     <div class="sticky-top">
       <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
-        <li class="day-indicator" :key="index" v-for="({date}, index) in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
-          <portal-target name="number-date" :slot-props="{ date }" slim></portal-target>
-          <portal-target name="letters-date" :slot-props="{ date }" slim></portal-target>
+        <li class="day-indicator" :key="index" v-for="({value}, index) in (days || [])" :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
+          <span class="letters-date">{{value | formatDate('ddd')}}</span>
+          <span class="number-date">{{value | formatDate('DD')}}</span>
         </li>
       </ul>
       <ul class="all-day">
         <span>All Day</span>
-        <li :key="index" v-for="(date, index) in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${calendar_options.cell_height + 5}px`"></li>
+        <li :key="index" v-for="(date, index) in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${kalendar_options.cell_height + 5}px`"></li>
       </ul>
     </div>
     <div class="dummy-row" v-if="false">
       <ul class="dummy-days">
-        <li :key="index" v-for="(day, index) in (days || [])" :style="`height:${calendar_options.cell_height}px`"></li>
+        <li :key="index" v-for="(day, index) in (days || [])" :style="`height:${kalendar_options.cell_height}px`"></li>
       </ul>
     </div>
     <div class="blocks" v-if="hours">
@@ -25,7 +25,7 @@
             <span>{{hour.value | formatUTCDate(hour_format)}}</span>
           </li>
         </ul>
-        <div v-show="calendar_options.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
+        <div v-show="kalendar_options.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
@@ -47,10 +47,10 @@ export default {
   components: {
     KalendarDays,
   },
-  inject: ['calendar_options'],
+  inject: ['kalendar_options'],
   created() {
-    setInterval(() => this.calendar_options.now = new Date, 1000 * 60);
-    const date = format(this.calendar_options.current_day, 'YYYY-MM-DD');
+    setInterval(() => this.kalendar_options.now = new Date, 1000 * 60);
+    const date = format(this.kalendar_options.current_day, 'YYYY-MM-DD');
     myWorker.send('getDays', {
       day: date
     }).then(reply => {
@@ -69,15 +69,15 @@ export default {
   }),
   computed: {
     colsSpace() {
-      return this.calendar_options.style === 'flat_design' ? '5px' : '0px';
+      return this.kalendar_options.style === 'flat_design' ? '5px' : '0px';
     },
     hourHeight() {
       return 60;
-      //this.calendar_options.cell_height * (60 / this.calendar_options.split_value); 
-      // * this.calendar_options.hour_parts;
+      //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value); 
+      // * this.kalendar_options.hour_parts;
     },
     passedtime() {
-      let time = format(this.calendar_options.now, 'HH:mm');
+      let time = format(this.kalendar_options.now, 'HH:mm');
       let hours_minutes = time.split(':');
       let minutes = hours_minutes[1],
         oret = hours_minutes[0];
@@ -88,7 +88,7 @@ export default {
       return { percentage: x, value: time };
     },
     hour_format() {
-      return this.calendar_options.military_time ? 'HH:mm' : 'h A';
+      return this.kalendar_options.military_time ? 'HH:mm' : 'h A';
     }
   },
   methods: {
@@ -105,7 +105,7 @@ export default {
       this.$emit('clear');
     },
     isBefore(day) {
-      return isBefore(day, this.calendar_options.now);
+      return isBefore(day, this.kalendar_options.now);
     },
   },
 };

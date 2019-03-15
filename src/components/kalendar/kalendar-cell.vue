@@ -4,11 +4,9 @@
       @mouseup.self="mouseUp()" 
       :class="{
 			'selected': selected, 
-			'is-an-hour': (index+1)%(60/calendar_options.split_value) === 0,
-      'is-active': status === 'popup-initiated' || status === 'creating'
-			}" :style="`height: ${calendar_options.cell_height}px`">
-    <!--  'is-active': status === 'popup-initiated' || status === 'creating'
- -->
+			'is-an-hour': (index+1)%(60/10) === 0,
+      'has-events': cell_events && cell_events.length > 0
+			}" :style="`height: ${kalendar_options.cell_height}px`">
     <div class="created-events" v-if="cell_events">
     	<KalendarEvent v-for="(event, index) in cell_events" 
 	    	:event="event" 
@@ -17,11 +15,6 @@
 	    	:index="index"
 	  	/>
     </div>
-    <div class="popup-parent" v-if="status === 'popup-initiated'" ref="popupRef">
-      <div>
-        <kalendar-eventpopup :event="event" @closePopup="clearPopups('popup-initiated')"></kalendar-eventpopup>
-      </div>
-      </div>
   </li>
 </template>
 <script>
@@ -29,8 +22,8 @@ const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 const { cloneObject } = window.kalendarHelpers;
 
 export default {
-  props: ['creator', 'index', 'cellData', 'constructedEvents', 'temporaryEvent'],
-  inject: ['calendar_options', 'events'],
+  props: ['creator', 'index', 'cellData', 'constructedEvents'],
+  inject: ['kalendar_options', 'events'],
   components: {
     kalendarEventpopup: () =>
       import('./kalendar-eventpopup.vue'),
@@ -43,19 +36,14 @@ export default {
         this.constructedEvents[this.cellData.value];
     },
     selected() {
-      return this.temporaryEvent
-        && this.temporaryEvent.start_index < this.index
-        && this.temporaryEvent.end_index >= this.index
-    },
-    status() {
-      return this.selected && this.temporaryEvent.status;
+      return this.cell_events && this.cell_events.length > 0;
     }
   },
   methods: {
     mouseDown() {
-      if (this.calendar_options.read_only) return;
+      if (this.kalendar_options.read_only) return;
       // this.clearPopups('popup-initiated');
-      // this.calendar_options.currently_working_on_date = this.cellData.value;
+      // this.kalendar_options.currently_working_on_date = this.cellData.value;
 
       let payload = {
         creating: true,
@@ -67,8 +55,10 @@ export default {
       this.$emit('select', payload);
     },
     mouseMove(event) {
-      if (this.calendar_options.read_only) return;
+      if (this.kalendar_options.read_only) return;
       if (this.creator && !this.creator.creating) return;
+            console.log('Moving on', this.cellData.value);
+
       let { starting_cell, ending_cell, creating } = cloneObject(this.creator);
       if (this.cellData.index < starting_cell.index) {
         ending_cell = starting_cell;
@@ -84,7 +74,7 @@ export default {
       }
     },
     mouseUp() {
-      if (this.calendar_options.read_only) return;
+      if (this.kalendar_options.read_only) return;
       if (this.creator.creating) {
         this.$emit('initiatePopup');
       }
@@ -98,8 +88,8 @@ export default {
       )
     },
     clearPopups(status) {
-      this.calendar_options.currently_working_on_date = null;
-      let { existing_appointments } = this.calendar_options;
+      this.kalendar_options.currently_working_on_date = null;
+      let { existing_appointments } = this.kalendar_options;
       for (let key in existing_appointments) {
         if (existing_appointments[key]['status'] === 'popup-initiated') {
           this.$delete(existing_appointments, key);
@@ -135,27 +125,12 @@ ul.building-blocks {
     &.is-an-hour {
       border-bottom: solid 1px var(--table-cell-border-color);
     }
-  }
 
-  .popup-parent {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    pointer-events: auto;
-    z-index: 3;
-    left: 0px;
-    user-select: all;
-
-    >div {
-      position: relative;
-      width: 100%;
-      height: 100%; // margin-left: 10px;
+    &.has-events {
+      z-index: 2;
     }
   }
 }
-
-
 div.creator_block {
 
   h4,

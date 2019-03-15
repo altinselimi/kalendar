@@ -1,27 +1,58 @@
 <template>
-	<div class="event-card" :style="`height: ${distance}px; width: ${card_width}%; left: ${index * card_width}%`">
-    <portal-target v-if="status === 'creating' || status === 'popup-initiated'"
-      name="event-creation"
-      :slot-props="event"></portal-target>
-		<portal-target v-else name="event-details" :slot-props="event_data" slim>
-  	</portal-target>
-	</div>
+  <div class="event-card" :style="`height: ${distance}px; width: ${card_width}%; left: ${index * card_width}%`">
+    <portal-target v-if="status === 'creating' || status === 'popup-initiated'" name="event-creation" :slot-props="event" slim></portal-target>
+    <portal-target v-else name="event-details" :slot-props="event.data" slim>
+    </portal-target>
+    <div v-if="status === 'popup-initiated'" class="popup-wrapper">
+      <portal-target name="event-popup-form" slim :slot-props="getPopupProps()">
+      </portal-target>
+    </div>
+  </div>
 </template>
 <script>
 export default {
   props: ['event', 'total', 'index'],
+  inject: ['kalendarAddEvent', 'kalendarClearPopups'],
   computed: {
-  	card_width() {
-  		return 100/this.total;
-  	},
+    card_width() {
+      return 100 / this.total;
+    },
     distance() {
       return this.event && this.event.distance;
     },
     status() {
       return this.event && this.event.status;
     },
-    event_data() {
-      return this.event.data;
+  },
+  methods: {
+    saveEvent(payload) {
+      if (this.event.data) {
+        return this.kalendarAddEvent(payload);
+      } else {
+        return this.kalendarAddEvent(payload);
+      }
+    },
+    closePopup() {
+      return this.kalendarClearPopups();
+    },
+    getPopupProps() {
+      const events = {
+        saveEvent: this.saveEvent,
+        closePopup: this.closePopup,
+        status: 'hello'
+      };
+
+      // information
+      let { start, end, data } = this.event;
+      const information = {
+        start_time: start.value,
+        end_time: end.value,
+        data
+      }
+      return {
+        events,
+        information
+      }
     }
   }
 }
@@ -49,8 +80,15 @@ $creator-content: white;
   width: 100%;
   user-select: none;
   will-change: height; //padding: 4px 6px;
-  h1,h2,h3,h4,h5,h6, p {
-  	margin: 0px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    margin: 0px;
   }
 }
 
@@ -59,5 +97,54 @@ $creator-content: white;
   bottom: 4px;
   right: 6px;
   font-size: 11px;
+}
+
+.popup-wrapper {
+  text-shadow: none;
+  color: black;
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 5px);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  user-select: none;
+  background-color: white;
+  border: solid 1px rgba(black, .08);
+  border-radius: 4px;
+  box-shadow: 0px 2px 12px -3px rgba(black, .3);
+  padding: 10px;
+
+  >* {
+    user-select: all;
+  }
+
+  h4 {
+    color: black;
+    font-weight: 400;
+  }
+
+  input,
+  textarea {
+    border: none;
+    background-color: darken(white, 8);
+    color: lighten(black, 1);
+    border-radius: 4px;
+    padding: 5px 8px;
+    margin-bottom: 5px;
+  }
+}
+
+ul:last-child .popup-wrapper {
+  left: auto;
+  right: 100%;
+  margin-right: 10px;
+}
+
+.is-day-view ul .popup-wrapper {
+  left: auto;
+  right: auto;
+  width: 100%;
 }
 </style>

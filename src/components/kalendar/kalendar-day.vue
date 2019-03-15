@@ -1,17 +1,16 @@
 <template>
-  <ul style="position: relative;" @mouseleave="clearCreatingLeftovers" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': calendar_options.currently_working_on_date === day.date}" class="kalendar-day">
+  <ul style="position: relative;" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': kalendar_options.currently_working_on_date === day.date}" class="kalendar-day">
     <kalendar-cell v-for="(cell, index) in day_cells" 
       :constructed-events="day_events" 
       :key="`${index}`" 
       :creator="creator" 
       :cell-data="cell" 
-      :temporary-event="temporary_events[cell.value]"
       :index="index" 
       @select="updateCreator" 
       @reset="resetEvents()" 
       @initiatePopup="initiatePopup()" />
-    <div ref="nowIndicator" :class="calendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
-      <span class="line" v-show="calendar_options.style === 'material_design'"></span>
+    <div ref="nowIndicator" :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
+      <span class="line" v-show="kalendar_options.style === 'material_design'"></span>
     </div>
   </ul>
 </template>
@@ -20,6 +19,7 @@ import isWeekend from 'date-fns/is_weekend';
 import isToday from 'date-fns/is_today';
 import format from 'date-fns/format';
 import addMinutes from 'date-fns/add_minutes';
+const { cloneObject } = window.kalendarHelpers;
 
 import myWorker from '@/components/kalendar/workers';
 
@@ -31,14 +31,26 @@ export default {
     }).then(reply => {
       console.log('Got day cells:', reply);
       this.day_cells = reply;
-      return this.getDayEvents();
+      return this.getDayEvents(this.events);
     });
   },
   components: {
     kalendarCell: () =>
       import('./kalendar-cell.vue'),
   },
-  inject: ['calendar_options', 'events'],
+  provide() {
+    const provider = {
+      kalendarAddEvent: this.addEvent,
+      kalendarClearPopups: this.clearCreatingLeftovers
+    };
+    /*Object.defineProperty(provider, 'calendar_operations', {
+      enumerable: true,
+      get: () => {
+      },
+    });*/
+    return provider;
+  },
+  inject: ['kalendar_options', 'events', 'updateEvents'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -50,7 +62,7 @@ export default {
       return isToday(this.day.date);
     },
     currentDay() {
-      return this.calendar_options.current_day;
+      return this.kalendar_options.current_day;
     },
   },
   data: () => ({
@@ -63,17 +75,56 @@ export default {
     },
     day_cells: [],
     day_events: null,
-    temporary_events: {}
   }),
   methods: {
-    getDayEvents() {
+    addEvent(payload) {
+      let validation_message = this.checkEventValidity(payload);
+      if(validation_message !== null) {
+        return Promise.reject(validation_message);
+      }
+      let cloned_events = this.events.slice(0);
+      cloned_events.push(payload);
+      return this.getDayEvents(cloned_events)
+        .then(res => {
+          this.updateEvents(cloned_events);
+          //this.events = cloned_events;
+          console.log('Rendered events!');
+        });
+    },
+    checkEventValidity(payload) {
+      let { from, to } = payload;
+      let isoFrom = new Date(from).toISOString();
+      let isoTo = new Date(to).toISOString();
+      if(isoFrom !== from) {
+        return 'From date is not UTC format';
+      }
+      if(isoTo !== to) {
+        return 'To date is not UTC format';
+      }
+      return null;
+    },
+    getDayEvents(events) {
+      let clonedEvents = events.map(event => cloneObject(event));
+      console.log('Events:', clonedEvents);
       return myWorker.send('constructDayEvents', {
-          events: this.events,
+          events: clonedEvents,
           day: this.day.value
       }).then(constructed_events => {
         console.log('Constructed events:', constructed_events);
         this.day_events = constructed_events;
       })
+    },
+    clearCreatingLeftovers() {
+      for(let key in this.day_events){
+        let hasPending = this.day_events[key].some(event => {
+          return event.status === 'popup-initiated' || event.status === 'creating';
+        });
+        if(hasPending) {
+          let completed = this.day_events[key]
+            .filter(event => event.status === 'completed');
+          this.$set(this.day_events, key, completed);
+        }
+      }
     },
     resetEvents() {
       if (!this.creator.creating && this.creator.status === null) return;
@@ -85,16 +136,12 @@ export default {
         status: null,
       };
     },
-    clearCreatingLeftovers() {
-      // should be done in a web worker
-      this.temporary_events = {};
-    },
     updateCreator(payload) {
       console.log('Updated creator:', payload);
       this.creator = payload;
       this.selectCell(payload);
     },
-    selectCell(status = 'creating') {
+    selectCell(status) {
       if (!this.creator.creating) return;
       let { creating, ending_cell, current_cell, starting_cell } = this.creator;
 
@@ -118,22 +165,9 @@ export default {
           round_offset: null
         },
         distance: diffMins + (diffInHrs * 60),
-        status
+        status: 'creating'
       };
       this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
-      //this.temporary_events[starting_cell.value] = payload;
-
-/*
-      if (creating) {
-        this.day_cells.forEach((hour, index) => {
-          let is_in_range = hour.index >= starting_cell_index && hour.index <= _ending_index;
-          if (is_in_range) {
-            this.day_cells[index] = { ...hour, ['appointment_id']: appointment_id };
-          } else if (hour['appointment_id'] === appointment_id && !is_in_range) {
-            this.day_cells[index] = { ...hour, ['appointment_id']: null };
-          }
-        });
-      }*/
     },
     initiatePopup() {
       let { creating, ending_cell, current_cell, starting_cell } = this.creator;
@@ -160,7 +194,6 @@ export default {
         status: 'popup-initiated'
       };
       this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
-      //this.temporary_events[starting_cell.value] = payload;
       this.creator = { ...this.creator, ['creating']: false };
     },
     scrollView() {

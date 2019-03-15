@@ -1,16 +1,10 @@
 import registerPromiseWorker from 'promise-worker/register'
-import { format, addMinutes, getMinutes, startOfWeek, addDays } from 'date-fns'
-
-/*import addMinutes from 'date-fns/add_minutes'; works
-import getTime from 'date-fns/get_time'; doesnt work
-import getHours from 'date-fns/get_hours'; doesnt work
-import getMinutes from 'date-fns/get_minutes'; works
-*/
+import { addMinutes, getMinutes, addDays, getDay } from 'date-fns'
 
 registerPromiseWorker((message) => {
   const { type, data } = message;
   if (type === 'message') {
-    return `Worker replies: ${JSON.stringify(message)}. At ${format(addMinutes(new Date(), 30), 'YYYY/MM/DD HH:mm')}`
+    return `Worker replies: ${new Date().toISOString()}`
   }
 
   switch (type) {
@@ -28,11 +22,11 @@ registerPromiseWorker((message) => {
 function getDays(dayString) {
   let date = new Date(dayString);
   date.setUTCHours(0, 0, 0, 0);
-  let start_of_week = startOfWeek(date);
+  let day_of_week = getDay(date);
   let days = [];
   for (let idx = 0; idx < 7; idx++) {
     days.push({
-      value: idx > 0 ? new Date(addDays(date, idx)).toISOString() : date.toISOString(),
+      value: new Date(addDays(date, idx - day_of_week)).toISOString(),
       index: idx
     });
   }
@@ -78,7 +72,7 @@ const constructDayEvents = (day, existing_events) => {
     to.setUTCHours(0, 0, 0, 0);
     return from.valueOf() === new Date(day).valueOf();
   });
-  if(events_for_this_day.length === 0) return {};
+  if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
   events_for_this_day.forEach(event => {
     let { from, to } = event;
