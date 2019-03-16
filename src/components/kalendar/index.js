@@ -3,7 +3,6 @@ import smoothscroll from 'smoothscroll-polyfill';
 import Kalendar from './kalendar-container';
 import KalendarCell from './kalendar-cell';
 import KalendarDay from './kalendar-day';
-import KalendarEventpopup from './kalendar-eventpopup';
 import KalendarWeekView from './kalendar-weekview';
 import Filters from './filters.js';
 
@@ -18,7 +17,6 @@ export function install(Vue) {
 	Vue.component('kalendar', Kalendar);
 	Vue.component('kalendar-cell', KalendarCell);
 	Vue.component('kalendar-day', KalendarDay);
-	Vue.component('kalendar-eventpopup', KalendarEventpopup);
 	Vue.component('kalendar-week-view', KalendarWeekView);
 	Vue.use(PortalVue);
 
@@ -31,6 +29,5 @@ export {
 	Kalendar,
 	KalendarCell,
 	KalendarDay,
-	KalendarEventpopup,
 	KalendarWeekView,
 }

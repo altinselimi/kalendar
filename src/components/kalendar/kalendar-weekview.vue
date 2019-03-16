@@ -72,7 +72,7 @@ export default {
       return this.kalendar_options.style === 'flat_design' ? '5px' : '0px';
     },
     hourHeight() {
-      return 60;
+      return 6 * this.kalendar_options.cell_height;
       //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value); 
       // * this.kalendar_options.hour_parts;
     },

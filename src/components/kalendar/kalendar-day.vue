@@ -1,14 +1,6 @@
 <template>
   <ul style="position: relative;" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': kalendar_options.currently_working_on_date === day.date}" class="kalendar-day">
-    <kalendar-cell v-for="(cell, index) in day_cells" 
-      :constructed-events="day_events" 
-      :key="`${index}`" 
-      :creator="creator" 
-      :cell-data="cell" 
-      :index="index" 
-      @select="updateCreator" 
-      @reset="resetEvents()" 
-      @initiatePopup="initiatePopup()" />
+    <kalendar-cell v-for="(cell, index) in day_cells" :constructed-events="day_events" :key="`${index}`" :creator="creator" :cell-data="cell" :index="index" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" :temporary-event="temporary_event"/>
     <div ref="nowIndicator" :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
       <span class="line" v-show="kalendar_options.style === 'material_design'"></span>
     </div>
@@ -39,16 +31,10 @@ export default {
       import('./kalendar-cell.vue'),
   },
   provide() {
-    const provider = {
+    return {
       kalendarAddEvent: this.addEvent,
       kalendarClearPopups: this.clearCreatingLeftovers
     };
-    /*Object.defineProperty(provider, 'calendar_operations', {
-      enumerable: true,
-      get: () => {
-      },
-    });*/
-    return provider;
   },
   inject: ['kalendar_options', 'events', 'updateEvents'],
   mounted() {
@@ -69,17 +55,19 @@ export default {
     creator: {
       creating: false,
       starting_cell: null,
+      original_starting_cell: null,
       current_cell: null,
       ending_cell: null,
       status: null,
     },
+    temporary_event: null,
     day_cells: [],
     day_events: null,
   }),
   methods: {
     addEvent(payload) {
       let validation_message = this.checkEventValidity(payload);
-      if(validation_message !== null) {
+      if (validation_message !== null) {
         return Promise.reject(validation_message);
       }
       let cloned_events = this.events.slice(0);
@@ -87,18 +75,16 @@ export default {
       return this.getDayEvents(cloned_events)
         .then(res => {
           this.updateEvents(cloned_events);
-          //this.events = cloned_events;
-          console.log('Rendered events!');
         });
     },
     checkEventValidity(payload) {
       let { from, to } = payload;
       let isoFrom = new Date(from).toISOString();
       let isoTo = new Date(to).toISOString();
-      if(isoFrom !== from) {
+      if (isoFrom !== from) {
         return 'From date is not UTC format';
       }
-      if(isoTo !== to) {
+      if (isoTo !== to) {
         return 'To date is not UTC format';
       }
       return null;
@@ -107,22 +93,24 @@ export default {
       let clonedEvents = events.map(event => cloneObject(event));
       console.log('Events:', clonedEvents);
       return myWorker.send('constructDayEvents', {
-          events: clonedEvents,
-          day: this.day.value
+        events: clonedEvents,
+        day: this.day.value
       }).then(constructed_events => {
-        console.log('Constructed events:', constructed_events);
         this.day_events = constructed_events;
       })
     },
     clearCreatingLeftovers() {
-      for(let key in this.day_events){
+      for (let key in this.day_events) {
         let hasPending = this.day_events[key].some(event => {
           return event.status === 'popup-initiated' || event.status === 'creating';
         });
-        if(hasPending) {
+        if (hasPending) {
           let completed = this.day_events[key]
             .filter(event => event.status === 'completed');
           this.$set(this.day_events, key, completed);
+          if (completed.length === 0) {
+            delete this.day_events[key];
+          }
         }
       }
     },
@@ -131,19 +119,41 @@ export default {
       this.creator = {
         creating: false,
         starting_cell: null,
+        original_starting_cell: null,
         current_cell: null,
         ending_cell: null,
         status: null,
+        temporary_id: null
       };
+      this.temporary_event = null;
     },
     updateCreator(payload) {
-      console.log('Updated creator:', payload);
-      this.creator = payload;
-      this.selectCell(payload);
+      this.creator = this.validateSelection(payload);
+      this.selectCell();
     },
-    selectCell(status) {
+    validateSelection(event) {
+      let { original_starting_cell, starting_cell, current_cell } = event;
+      if(event.direction === 'reverse'
+        && original_starting_cell.index > current_cell.index) {
+        return {
+          ...event,
+          starting_cell: current_cell,
+          ending_cell: original_starting_cell
+        }
+      }
+      return event;
+    },
+    selectCell() {
       if (!this.creator.creating) return;
-      let { creating, ending_cell, current_cell, starting_cell } = this.creator;
+      let { creating, 
+        ending_cell, 
+        current_cell, 
+        starting_cell, 
+        original_starting_cell
+      } = this.creator;
+
+      let real_ending_cell_index = ending_cell.index + 1;
+      ending_cell = this.day_cells[real_ending_cell_index];
 
       const diffInMs = new Date(ending_cell.value) - new Date(starting_cell.value);
       const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
@@ -151,7 +161,8 @@ export default {
       let startDate = new Date(starting_cell.value);
       let endDate = new Date(ending_cell.value);
 
-      let constructedEvent = {
+      let distance = diffMins + (diffInHrs * 60);
+      this.temporary_event = {
         start: {
           masked_value: startDate.toISOString(),
           value: startDate.toISOString(),
@@ -164,20 +175,22 @@ export default {
           rounded: false,
           round_offset: null
         },
-        distance: diffMins + (diffInHrs * 60),
+        distance: distance,
         status: 'creating'
       };
-      this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
     },
     initiatePopup() {
-      let { creating, ending_cell, current_cell, starting_cell } = this.creator;
+      let { creating, ending_cell, current_cell, starting_cell, original_starting_cell } = this.creator;
+      let real_ending_cell_index = ending_cell.index + 1;
+      ending_cell = this.day_cells[real_ending_cell_index];
+
       const diffInMs = new Date(ending_cell.value) - new Date(starting_cell.value);
       const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
       const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
       let startDate = new Date(starting_cell.value);
       let endDate = new Date(ending_cell.value);
 
-      let constructedEvent = {
+      let finalEvent = {
         start: {
           masked_value: startDate.toISOString(),
           value: startDate.toISOString(),
@@ -193,9 +206,15 @@ export default {
         distance: diffMins + (diffInHrs * 60),
         status: 'popup-initiated'
       };
-      this.$set(this.day_events, starting_cell.value, [constructedEvent]); 
-      this.creator = { ...this.creator, ['creating']: false };
+
+      let updated_events = this.day_events[starting_cell.value];
+      if(!updated_events) updated_events = [];
+      updated_events.push(finalEvent);
+
+      this.$set(this.day_events, starting_cell.value, updated_events);
+      this.resetEvents();
     },
+
     scrollView() {
       let topoffset = this.$refs.nowIndicator.offsetTop;
       setTimeout(() => {
@@ -210,6 +229,7 @@ ul.kalendar-day {
   position: relative;
   background-color: white;
   max-width: 400px;
+
   &.is-weekend {
     background-color: var(--weekend-color);
   }

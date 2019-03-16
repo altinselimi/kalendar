@@ -1,13 +1,14 @@
 <template>
-  <li @mouseover.self="mouseMove($event)" 
+  <li @mouseover.self="mouseMove()" 
       @mousedown.self="mouseDown()" 
-      @mouseup.self="mouseUp()" 
+      @mouseup="mouseUp()" 
+      class="kalendar-cell"
       :class="{
 			'selected': selected, 
 			'is-an-hour': (index+1)%(60/10) === 0,
       'has-events': cell_events && cell_events.length > 0
 			}" :style="`height: ${kalendar_options.cell_height}px`">
-    <div class="created-events" v-if="cell_events">
+    <div class="created-events" v-if="cell_events && cell_events.length">
     	<KalendarEvent v-for="(event, index) in cell_events" 
 	    	:event="event" 
 	    	:key="index" 
@@ -20,20 +21,25 @@
 <script>
 const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 const { cloneObject } = window.kalendarHelpers;
+import { generateUUID } from './utils';
 
 export default {
-  props: ['creator', 'index', 'cellData', 'constructedEvents'],
+  props: ['creator', 'index', 'cellData', 'constructedEvents', 'temporaryEvent'],
   inject: ['kalendar_options', 'events'],
   components: {
-    kalendarEventpopup: () =>
-      import('./kalendar-eventpopup.vue'),
     KalendarEvent: () => import('./kalendar-event.vue'),
   },
   computed: {
     cell_events() {
-      return !!this.constructedEvents &&
-        this.constructedEvents.hasOwnProperty(this.cellData.value) &&
-        this.constructedEvents[this.cellData.value];
+      let key = this.cellData.value;
+      let cellEvents = this.constructedEvents || {};
+      cellEvents = cellEvents[key];
+      if(!cellEvents) cellEvents = [];
+
+      if(this.temporaryEvent && this.temporaryEvent.start.value === this.cellData.value) {
+        cellEvents.push(this.temporaryEvent);
+      }
+      return cellEvents;
     },
     selected() {
       return this.cell_events && this.cell_events.length > 0;
@@ -42,33 +48,30 @@ export default {
   methods: {
     mouseDown() {
       if (this.kalendar_options.read_only) return;
-      // this.clearPopups('popup-initiated');
-      // this.kalendar_options.currently_working_on_date = this.cellData.value;
 
       let payload = {
         creating: true,
+        original_starting_cell: cloneObject(this.cellData),
         starting_cell: cloneObject(this.cellData),
         current_cell: cloneObject(this.cellData),
-        ending_cell: cloneObject(this.cellData),
-        event_id: this.cellData.value,
+        ending_cell: cloneObject(this.cellData)
       };
       this.$emit('select', payload);
     },
-    mouseMove(event) {
+    mouseMove() {
       if (this.kalendar_options.read_only) return;
       if (this.creator && !this.creator.creating) return;
-            console.log('Moving on', this.cellData.value);
-
-      let { starting_cell, ending_cell, creating } = cloneObject(this.creator);
-      if (this.cellData.index < starting_cell.index) {
-        ending_cell = starting_cell;
-        starting_cell = cloneObject(this.cellData);
-      }
+      let { starting_cell, original_starting_cell, creating } = this.creator;
+      let going_down = this.cellData.index >= starting_cell.index
+        && starting_cell.index === original_starting_cell.index;
+      //console.log('OriginalSindex', original_starting_cell.index);
+      //console.log('Sindex:', starting_cell.index);
       if (creating) {
-        let payload = { ...this.creator,
-          current_cell: cloneObject(this.cellData),
-          starting_cell: starting_cell,
-          ending_cell: cloneObject(this.cellData),
+        let payload = { 
+          ...this.creator,
+          current_cell: this.cellData,
+          ending_cell: this.cellData,
+          direction: going_down ? 'normal' : 'reverse'
         };
         this.$emit('select', payload);
       }
@@ -81,11 +84,6 @@ export default {
     },
     resetCreator() {
       this.$emit('reset');
-    },
-    generateUUID() {
-      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-      )
     },
     clearPopups(status) {
       this.kalendar_options.currently_working_on_date = null;
@@ -106,6 +104,15 @@ $creator-content: white;
 li {
   font-size: 13px;
   position: relative;
+}
+
+.created-events {
+  width: 100%;
+  height: 100%;
+}
+
+.kalendar-cell:last-child {
+  display: none;
 }
 
 ul.building-blocks {

@@ -12,13 +12,16 @@
 <script>
 export default {
   props: ['event', 'total', 'index'],
-  inject: ['kalendarAddEvent', 'kalendarClearPopups'],
+  inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options'],
   computed: {
     card_width() {
       return 100 / this.total;
     },
     distance() {
-      return this.event && this.event.distance;
+      if(!this.event) return;
+      let multiplier = this.kalendar_options.cell_height/10;
+      // 0.5 * multiplier for an offset so next cell is easily selected
+      return (this.event.distance * multiplier) - (0.5 * multiplier);
     },
     status() {
       return this.event && this.event.status;
@@ -64,9 +67,14 @@ $creator-content: white;
 .event-card {
   display: flex;
   flex-direction: column;
-
+  height:100%;
+  width: 100%;
   >* {
     flex: 1;
+  }
+
+  &.creating {
+    z-index: -1;
   }
 
   position: absolute;
@@ -77,7 +85,6 @@ $creator-content: white;
   bottom: 0; //z-index: 20!important;
   //background-color: rgba($creator-bg, .85);
   color: $creator-content;
-  width: 100%;
   user-select: none;
   will-change: height; //padding: 4px 6px;
 

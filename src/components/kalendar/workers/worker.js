@@ -1,5 +1,7 @@
 import registerPromiseWorker from 'promise-worker/register'
 import { addMinutes, getMinutes, addDays, getDay } from 'date-fns'
+import Utils from '../utils.js';
+const { generateUUID } = Utils;
 
 registerPromiseWorker((message) => {
   const { type, data } = message;
@@ -51,7 +53,7 @@ const getDayCells = (dayString) => {
   const day = new Date(dayString);
   day.setUTCHours(0, 0, 0, 0);
   let cells = [];
-  for (let idx = 0; idx < 6 * 24; idx++) {
+  for (let idx = 0; idx < (6 * 24) + 1; idx++) {
     cells.push({
       value: idx > 0 ? new Date(addMinutes(day, idx * 10)).toISOString() : day.toISOString(),
       selected: false,
@@ -119,6 +121,7 @@ const constructDayEvents = (day, existing_events) => {
       start: fromData,
       end: toData,
       data: event.data,
+      id: generateUUID(),
       distance: diffMins + (diffInHrs * 60),
       status: 'completed'
     };
