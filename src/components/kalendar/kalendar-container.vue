@@ -17,9 +17,9 @@
     </div>
     <kalendar-week-view />
     <portal to="event-creation" class="slotable">
-      <div slot-scope="event" class="new-event">
-        <!-- <slot name="creating-card" :appointment_props="appointment_props">
-        </slot> -->
+      <div slot-scope="information" class="new-event">
+        <slot name="creating-card" :information="information">
+        </slot>
       </div>
     </portal>
     <portal to="event-popup-form" class="slotable">
@@ -66,6 +66,11 @@ export default {
     KalendarWeekView: () =>
       import('./kalendar-weekview.vue'),
   },
+  created() {
+    if(!!this.events && this.events.length > 0) {
+      this.kalendar_events = this.events;
+    }
+  },
   props: {
     events: {
       required: true,
@@ -99,6 +104,7 @@ export default {
     },
     new_appointment: {},
     scrollable: true,
+    kalendar_events: []
   }),
   computed: {
     kalendar_options() {
@@ -145,14 +151,17 @@ export default {
       enumerable: true,
       get: () => this.kalendar_options,
     });
-    Object.defineProperty(provider, 'events', {
+    Object.defineProperty(provider, 'kalendar_events', {
       enumerable: true,
-      get: () => this.events,
+      get: () => this.kalendar_events
     });
-    provider.updateEvents = (payload) => {
-      console.log('Updating events:', payload);
-      this.$emit('update:events', payload);
+    provider.addNewEvent = (payload) => {
+      console.log('gon add shit');
+      this.kalendar_events.push(payload);
     };
+    provider.updateEvents = (payload) => {
+      this.$emit('update:events', payload);
+    }
     return provider;
   },
   methods: {

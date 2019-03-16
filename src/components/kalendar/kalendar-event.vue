@@ -1,6 +1,6 @@
 <template>
   <div class="event-card" :style="`height: ${distance}px; width: ${card_width}%; left: ${index * card_width}%`">
-    <portal-target v-if="status === 'creating' || status === 'popup-initiated'" name="event-creation" :slot-props="event" slim></portal-target>
+    <portal-target v-if="status === 'creating' || status === 'popup-initiated'" :slot-props="information" name="event-creation" slim></portal-target>
     <portal-target v-else name="event-details" :slot-props="event.data" slim>
     </portal-target>
     <div v-if="status === 'popup-initiated'" class="popup-wrapper">
@@ -26,6 +26,14 @@ export default {
     status() {
       return this.event && this.event.status;
     },
+    information() {
+      let { start, end, data } = this.event;
+      return {
+        start_time: start.value,
+        end_time: end.value,
+        data
+      }
+    },
   },
   methods: {
     saveEvent(payload) {
@@ -45,13 +53,7 @@ export default {
         status: 'hello'
       };
 
-      // information
-      let { start, end, data } = this.event;
-      const information = {
-        start_time: start.value,
-        end_time: end.value,
-        data
-      }
+      const information = this.information;
       return {
         events,
         information
@@ -122,11 +124,7 @@ $creator-content: white;
   border-radius: 4px;
   box-shadow: 0px 2px 12px -3px rgba(black, .3);
   padding: 10px;
-
-  >* {
-    user-select: all;
-  }
-
+  
   h4 {
     color: black;
     font-weight: 400;

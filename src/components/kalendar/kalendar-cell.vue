@@ -25,7 +25,7 @@ import { generateUUID } from './utils';
 
 export default {
   props: ['creator', 'index', 'cellData', 'constructedEvents', 'temporaryEvent'],
-  inject: ['kalendar_options', 'events'],
+  inject: ['kalendar_options', 'kalendar_events'],
   components: {
     KalendarEvent: () => import('./kalendar-event.vue'),
   },

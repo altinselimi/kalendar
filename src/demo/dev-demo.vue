@@ -1,12 +1,15 @@
 <template>
   <div>
+    <input type="number" v-model.number="calendar_settings.cell_height" placeholder="Cell Height">
     <kalendar :configuration="calendar_settings" :events.sync="events" class="generate-shadow">
-      <div slot="creating-card" slot-scope="{appointment_props}">
+      <div slot="creating-card" slot-scope="{ information }">
         <h4 class="appointment-title" style="text-align: left;">
           New Appointment
         </h4>
         <span class="time">
-          {{getHours(appointment_props.start_value.value, appointment_props.end_value.value)}}
+          {{information.start_time | formatUTCDate('HH:mm')}}
+          -
+          {{information.end_time | formatUTCDate('HH:mm')}}
         </span>
       </div>
       <div slot="popup-form" slot-scope="{ popup_events, popup_information }" style="display: flex; flex-direction: column;">
@@ -62,16 +65,16 @@ const existing_events = [{
     "from": today_from.toISOString(),
     "to": today_to.toISOString(),
     "data": {
-      "title": "Barber Checkin",
-      "description": "Lorem ipsum dolor sit amet."
+      "title": "Truth",
+      "description": "Look."
     }
   },
   {
     "from": today_from2.toISOString(),
     "to": today_to2.toISOString(),
     "data": {
-      "title": "Barber Checkin2",
-      "description": "Lorem ipsum dolor sit amet.2"
+      "title": "Side",
+      "description": "Look.2"
     }
   }
 ]
@@ -119,7 +122,7 @@ export default {
     events: existing_events,
     calendar_settings: {
       view_type: 'Month',
-      split_value: 20,
+      cell_height: 10,
       scrollToNow: false,
       current_day: new Date(),
       military_time: false,

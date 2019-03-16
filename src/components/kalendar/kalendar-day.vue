@@ -1,5 +1,5 @@
 <template>
-  <ul style="position: relative;" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': kalendar_options.currently_working_on_date === day.date}" class="kalendar-day">
+  <ul style="position: relative;" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': creator.creating || creator.status === 'popup-initiated'}" class="kalendar-day">
     <kalendar-cell v-for="(cell, index) in day_cells" :constructed-events="day_events" :key="`${index}`" :creator="creator" :cell-data="cell" :index="index" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" :temporary-event="temporary_event"/>
     <div ref="nowIndicator" :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
       <span class="line" v-show="kalendar_options.style === 'material_design'"></span>
@@ -23,7 +23,7 @@ export default {
     }).then(reply => {
       console.log('Got day cells:', reply);
       this.day_cells = reply;
-      return this.getDayEvents(this.events);
+      return this.getDayEvents(this.kalendar_events);
     });
   },
   components: {
@@ -36,7 +36,7 @@ export default {
       kalendarClearPopups: this.clearCreatingLeftovers
     };
   },
-  inject: ['kalendar_options', 'events', 'updateEvents'],
+  inject: ['kalendar_options', 'kalendar_events', 'addNewEvent', 'updateEvents'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -70,11 +70,11 @@ export default {
       if (validation_message !== null) {
         return Promise.reject(validation_message);
       }
-      let cloned_events = this.events.slice(0);
-      cloned_events.push(payload);
-      return this.getDayEvents(cloned_events)
+      this.addNewEvent(payload);
+      let clonedEvents = this.kalendar_events.slice(0);
+      return this.getDayEvents(clonedEvents)
         .then(res => {
-          this.updateEvents(cloned_events);
+          this.updateEvents(clonedEvents);
         });
     },
     checkEventValidity(payload) {
@@ -113,6 +113,7 @@ export default {
           }
         }
       }
+      this.resetEvents();
     },
     resetEvents() {
       if (!this.creator.creating && this.creator.status === null) return;
@@ -212,7 +213,12 @@ export default {
       updated_events.push(finalEvent);
 
       this.$set(this.day_events, starting_cell.value, updated_events);
-      this.resetEvents();
+      this.temporary_event = null;
+      this.creator = {
+        ...this.creator,
+        status:'popup-initiated', 
+        creating: false
+      };
     },
 
     scrollView() {
@@ -246,7 +252,7 @@ ul.kalendar-day {
     font-size: 10px;
   }
 
-  .creating {
+  &.creating {
     z-index: 3;
   }
 }
