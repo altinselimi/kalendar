@@ -18,8 +18,8 @@ export default {
       return 100 / this.total;
     },
     distance() {
-      if(!this.event) return;
-      let multiplier = this.kalendar_options.cell_height/10;
+      if (!this.event) return;
+      let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
       return (this.event.distance * multiplier) - (0.5 * multiplier);
     },
@@ -69,14 +69,20 @@ $creator-content: white;
 .event-card {
   display: flex;
   flex-direction: column;
-  height:100%;
+  height: 100%;
   width: 100%;
+
   >* {
     flex: 1;
   }
 
   &.creating {
     z-index: -1;
+  }
+
+  >*:not(.popup-wrapper) {
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+    transition: opacity 100ms linear;
   }
 
   position: absolute;
@@ -124,7 +130,7 @@ $creator-content: white;
   border-radius: 4px;
   box-shadow: 0px 2px 12px -3px rgba(black, .3);
   padding: 10px;
-  
+
   h4 {
     color: black;
     font-weight: 400;

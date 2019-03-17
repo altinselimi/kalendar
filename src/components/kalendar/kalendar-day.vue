@@ -9,8 +9,6 @@
 <script>
 import isWeekend from 'date-fns/is_weekend';
 import isToday from 'date-fns/is_today';
-import format from 'date-fns/format';
-import addMinutes from 'date-fns/add_minutes';
 const { cloneObject } = window.kalendarHelpers;
 
 import myWorker from '@/components/kalendar/workers';

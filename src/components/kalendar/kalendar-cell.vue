@@ -1,20 +1,12 @@
 <template>
-  <li @mouseover.self="mouseMove()" 
-      @mousedown.self="mouseDown()" 
-      @mouseup="mouseUp()" 
-      class="kalendar-cell"
-      :class="{
-			'selected': selected, 
-			'is-an-hour': (index+1)%(60/10) === 0,
-      'has-events': cell_events && cell_events.length > 0
-			}" :style="`height: ${kalendar_options.cell_height}px`">
+  <li @mouseover.self="mouseMove()" @mousedown.self="mouseDown()" @mouseup="mouseUp()" class="kalendar-cell" :class="{
+      'selected': selected, 
+      'is-an-hour': (index+1)%(60/10) === 0,
+      'has-events': cell_events && cell_events.length > 0,
+      'being-created': !!beingCreated
+      }" :style="`height: ${kalendar_options.cell_height}px;`">
     <div class="created-events" v-if="cell_events && cell_events.length">
-    	<KalendarEvent v-for="(event, index) in cell_events" 
-	    	:event="event" 
-	    	:key="index" 
-	    	:total="cell_events.length"
-	    	:index="index"
-	  	/>
+      <KalendarEvent v-for="(event, index) in cell_events" :event="event" :key="index" :total="cell_events.length" :index="index" />
     </div>
   </li>
 </template>
@@ -31,15 +23,24 @@ export default {
   },
   computed: {
     cell_events() {
-      let key = this.cellData.value;
-      let cellEvents = this.constructedEvents || {};
-      cellEvents = cellEvents[key];
-      if(!cellEvents) cellEvents = [];
-
-      if(this.temporaryEvent && this.temporaryEvent.start.value === this.cellData.value) {
-        cellEvents.push(this.temporaryEvent);
+      let all_events = [];
+      if (this.completedEvents) {
+        all_events = all_events.concat(this.completedEvents);
       }
-      return cellEvents;
+      if (this.beingCreated) {
+        all_events = all_events.concat(this.beingCreated);
+      }
+      return all_events;
+    },
+    completedEvents() {
+      return this.constructedEvents &&
+        this.constructedEvents.hasOwnProperty(this.cellData.value) &&
+        this.constructedEvents[this.cellData.value];
+    },
+    beingCreated() {
+      return this.temporaryEvent &&
+        this.temporaryEvent.start.value === this.cellData.value &&
+        this.temporaryEvent;
     },
     selected() {
       return this.cell_events && this.cell_events.length > 0;
@@ -62,12 +63,12 @@ export default {
       if (this.kalendar_options.read_only) return;
       if (this.creator && !this.creator.creating) return;
       let { starting_cell, original_starting_cell, creating } = this.creator;
-      let going_down = this.cellData.index >= starting_cell.index
-        && starting_cell.index === original_starting_cell.index;
+      let going_down = this.cellData.index >= starting_cell.index &&
+        starting_cell.index === original_starting_cell.index;
       //console.log('OriginalSindex', original_starting_cell.index);
       //console.log('Sindex:', starting_cell.index);
       if (creating) {
-        let payload = { 
+        let payload = {
           ...this.creator,
           current_cell: this.cellData,
           ending_cell: this.cellData,
@@ -107,7 +108,7 @@ li {
 }
 
 .created-events {
-  width: 100%;
+  //width: 100%;
   height: 100%;
 }
 
@@ -125,10 +126,6 @@ ul.building-blocks {
       opacity: 1; //z-index:0;
     }
 
-    &.is-active {
-      z-index: 3;
-    }
-
     &.is-an-hour {
       border-bottom: solid 1px var(--table-cell-border-color);
     }
@@ -136,8 +133,13 @@ ul.building-blocks {
     &.has-events {
       z-index: 2;
     }
+
+    &.being-created {
+      z-index: 3;
+    }
   }
 }
+
 div.creator_block {
 
   h4,
