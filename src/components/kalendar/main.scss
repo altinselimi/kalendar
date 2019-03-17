@@ -15,6 +15,7 @@
   --lightg: #9e9e9e;
   --card-bgcolor: #4285f4;
   --card-color: white;
+
   &.gstyle {
     --hour-row-color: #212121;
     --main-color: #4285f4;
@@ -23,54 +24,68 @@
     --table-cell-border-color: #e0e0e0;
     --odd-cell-border-color: transparent;
     font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+
     .week-navigator {
       background: white;
       border-bottom: none;
       padding: 20px;
       color: rgba(black, .54);
+
       button {
         color: rgba(black, .54);
       }
     }
-    .new-event,
-    .existing-event {
+
+    .creating-event,
+    .created-event {
       background-color: var(--card-bgcolor);
       color: var(--card-color);
       text-shadow: none;
+
       >* {
         text-shadow: none;
       }
+
       border-left: none;
       border-radius: 2px;
       opacity: 1;
     }
-    .existing-event {
+
+    .created-event {
       width: 96%;
+
       .time {
         right: 12px;
       }
     }
+
     .sticky-top .days {
       margin-left: 0;
       padding-left: 50px;
     }
+
     .all-day {
       display: none;
     }
+
     ul.building-blocks li,
     .hours {
       border-right: solid 1px var(--table-cell-border-color);
     }
+
     .hours li {
       font-size: 80%;
     }
+
     .hour-indicator-line>span.line {
       height: 2px;
       background-color: #db4437;
     }
+
     .days {
       border-top: solid 1px var(--table-cell-border-color);
       position: relative;
+
       &:before {
         content: '';
         position: absolute;
@@ -81,6 +96,7 @@
         background-color: var(--table-cell-border-color);
       }
     }
+
     .day-indicator {
       display: flex;
       flex-direction: column;
@@ -89,18 +105,23 @@
       font-size: 13px;
       padding-left: 16px;
       border-right: solid 1px var(--table-cell-border-color);
+
       &.is-before {
         color: #757575;
       }
+
       .number-date {
         order: 2;
         font-size: 40px;
       }
+
       .letters-date {
         font-weight: 500;
       }
+
       &:first-child {
         position: relative;
+
         &::before {
           content: '';
           position: absolute;
@@ -112,35 +133,43 @@
         }
       }
     }
+
+    .creating-event, .popup-wrapper {
+      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+      transition: opacity 100ms linear;
+    }
   }
-  &.non-desktop .building-blocks{
+
+  &.non-desktop .building-blocks {
     pointer-events: none;
   }
 }
 
 
-.new-event,
-.existing-event {
+.creating-event,
+.created-event {
   padding: 4px 6px;
   cursor: default;
   word-break: break-word;
   height: 100%;
   width: 100%;
   font-size: 14px;
+
   h4 {
     font-weight: 400;
   }
 }
 
-.new-event {
+.creating-event {
   background-color: #34aadc;
   opacity: .9;
+
   >* {
     text-shadow: 0 0 7px rgba(black, .25);
   }
 }
 
-.existing-event {
+.created-event {
   background-color: #bfecff;
   opacity: .74;
   border-left: solid 3px #34aadc;
@@ -153,6 +182,7 @@
   background: linear-gradient(#fdfdfd, #f9f9f9);
   border-bottom: solid 1px #EC4D3D;
   padding: 10px 20px;
+
   .nav-wrapper {
     display: flex;
     align-items: center;
@@ -162,6 +192,7 @@
     max-width: 30ch;
     margin: 0 auto;
   }
+
   button {
     background: transparent;
     border: none;
@@ -194,12 +225,14 @@
   align-items: center;
   pointer-events: none;
   user-select: none;
+
   >span.line {
     background-color: var(--main-color);
     height: 1px;
     display: block;
     flex: 1;
   }
+
   >span.time-value {
     font-size: 14px;
     width: 48px;
@@ -220,4 +253,3 @@
   pointer-events: none;
   user-select: none;
 }
-

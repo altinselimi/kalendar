@@ -2,19 +2,36 @@
   <div>
     <input type="number" v-model.number="calendar_settings.cell_height" placeholder="Cell Height">
     <kalendar :configuration="calendar_settings" :events.sync="events" class="generate-shadow">
-      <div slot="creating-card" slot-scope="{ information }">
+      <!-- CREATED CARD SLOT -->
+      <div slot="details-card" slot-scope="{ event_information }" class="details-card">
+        <h4 class="appointment-title">{{event_information.data.title}}</h4>
+        <small>
+          {{event_information.data.description}}
+        </small>
+        <span class="time">{{event_information.start_time | formatUTCDate('HH:mm')}} - {{event_information.end_time | formatUTCDate('HH:mm')}}</span>
+        <button @click="removeAppointment(event_information)" class="cancel">
+          <svg class="feather feather-x-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </button>
+      </div>
+      <!-- CREATING CARD SLOT -->
+      <div slot="creating-card" slot-scope="{ event_information }">
         <h4 class="appointment-title" style="text-align: left;">
-          New Appointment
+          New Appointment h3
         </h4>
         <span class="time">
-          {{information.start_time | formatUTCDate('HH:mm')}}
+          {{event_information.start_time | formatUTCDate('HH:mm')}}
           -
-          {{information.end_time | formatUTCDate('HH:mm')}}
+          {{event_information.end_time | formatUTCDate('HH:mm')}}
         </span>
       </div>
-      <div slot="popup-form" slot-scope="{ popup_events, popup_information }" style="display: flex; flex-direction: column;">
+      <!-- POPUP CARD SLOT -->
+      <div slot="popup-form" slot-scope="{ popup_information, popup_events }" style="display: flex; flex-direction: column;">
         <h4 style="margin-bottom: 10px">
-          New Appointment {{popup_events.status || 'not3rin'}}
+          New Appointment
         </h4>
         <input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
         <textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
@@ -26,18 +43,6 @@
             Save
           </button>
         </div>
-      </div>
-      <div slot="details-card" slot-scope="{appointment_props}" class="details-card">
-        <h4 class="appointment-title">{{appointment_props.data.title}}</h4>
-        <small v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
-        <span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
-        <button @click="removeAppointment(appointment_props)" class="cancel">
-          <svg class="feather feather-x-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-          </svg>
-        </button>
       </div>
     </kalendar>
   </div>
@@ -146,6 +151,7 @@ export default {
       return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
     },
     completeAppointment(popup_info, popup_events) {
+      console.log({ popup_info });
       let payload = {
         data: {
           title: this.new_appointment.title,
@@ -195,3 +201,44 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+$green: #00F0B5;
+$red: #F61067;
+.details-card {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  height: 100%;
+
+  button {
+    margin: 0;
+    border: none;
+    color: #4c4b4b;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    background: transparent;
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+  }
+}
+
+.popup-event .buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.popup-event .buttons button {
+  border: none;
+  color: #29771c;
+  background-color: rgba($green, .04);
+  padding: 5px 10px;
+  &.cancel {
+    background-color: rgba($red, .04);
+    color: $red;
+  }
+}
+</style>

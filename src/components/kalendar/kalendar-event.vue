@@ -1,7 +1,13 @@
 <template>
-  <div class="event-card" :style="`height: ${distance}px; width: ${card_width}%; left: ${index * card_width}%`">
+  <div class="event-card" 
+    :style="`
+      height: ${distance}px; width: ${card_width}%; 
+      left: calc(${index * card_width}% + ${overlaps * 5}px)
+    `" 
+    :class="{'overlaps': overlaps > 0}"
+  >
     <portal-target v-if="status === 'creating' || status === 'popup-initiated'" :slot-props="information" name="event-creation" slim></portal-target>
-    <portal-target v-else name="event-details" :slot-props="event.data" slim>
+    <portal-target v-else name="event-details" :slot-props="information" slim>
     </portal-target>
     <div v-if="status === 'popup-initiated'" class="popup-wrapper">
       <portal-target name="event-popup-form" slim :slot-props="getPopupProps()">
@@ -11,7 +17,7 @@
 </template>
 <script>
 export default {
-  props: ['event', 'total', 'index'],
+  props: ['event', 'total', 'index', 'overlaps'],
   inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options'],
   computed: {
     card_width() {
@@ -31,6 +37,8 @@ export default {
       return {
         start_time: start.value,
         end_time: end.value,
+        start_index: start.index,
+        end_index: end.index,
         data
       }
     },
@@ -80,9 +88,8 @@ $creator-content: white;
     z-index: -1;
   }
 
-  >*:not(.popup-wrapper) {
-    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
-    transition: opacity 100ms linear;
+  &.overlaps > * {
+    border: solid 1px white !important;
   }
 
   position: absolute;

@@ -1,13 +1,28 @@
 <template>
-  <li @mouseover.self="mouseMove()" @mousedown.self="mouseDown()" @mouseup="mouseUp()" class="kalendar-cell" :class="{
+  <li 
+    @mouseover.self="mouseMove()" 
+    @mousedown.self="mouseDown()" 
+    @mouseup="mouseUp()" 
+    class="kalendar-cell" 
+    :class="{
       'selected': selected, 
       'is-an-hour': (index+1)%(60/10) === 0,
       'has-events': cell_events && cell_events.length > 0,
       'being-created': !!beingCreated
-      }" :style="`height: ${kalendar_options.cell_height}px;`">
-    <div class="created-events" v-if="cell_events && cell_events.length">
-      <KalendarEvent v-for="(event, index) in cell_events" :event="event" :key="index" :total="cell_events.length" :index="index" />
-    </div>
+    }" 
+    :style="`
+      height: ${kalendar_options.cell_height}px;
+    `"
+  >
+    <KalendarEvent 
+        v-if="cell_events && cell_events.length"
+        v-for="(event, index) in cell_events" 
+        :event="event" 
+        :key="index" 
+        :total="cell_events.length" 
+        :index="index" 
+        :overlaps="overlappingEvents.length"
+      />
   </li>
 </template>
 <script>
@@ -41,6 +56,21 @@ export default {
       return this.temporaryEvent &&
         this.temporaryEvent.start.value === this.cellData.value &&
         this.temporaryEvent;
+    },
+    overlappingEvents() {
+      if (!this.constructedEvents || this.cell_events.length < 1) return [];
+      return Object.keys(this.constructedEvents)
+        .map(evKey => {
+          return this.constructedEvents[evKey]
+        })
+        .flat()
+        .filter(event => {
+          let cellDate = new Date(this.cellData.value);
+          let eventStarts = new Date(event.start.value);
+          let eventEnds = new Date(event.end.value);
+          return eventStarts < cellDate && eventEnds > cellDate;
+        });
+
     },
     selected() {
       return this.cell_events && this.cell_events.length > 0;

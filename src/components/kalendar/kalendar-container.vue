@@ -17,13 +17,13 @@
     </div>
     <kalendar-week-view />
     <portal to="event-creation" class="slotable">
-      <div slot-scope="information" class="new-event">
-        <slot name="creating-card" :information="information">
+      <div slot-scope="information" class="creating-event">
+        <slot name="creating-card" :event_information="information">
         </slot>
       </div>
     </portal>
     <portal to="event-popup-form" class="slotable">
-      <div slot-scope="{ events, information }" class="event-popup">
+      <div slot-scope="{ events, information }" class="popup-event">
         <slot name="popup-form" :popup_events="events" :popup_information="information">
           <input type="text" placeholder="Event Name">
           <textarea></textarea>
@@ -31,13 +31,11 @@
       </div>
     </portal>
     <portal to="event-details" class="slotable">
-      <div slot-scope="event_data" class="existing-event">
-        <!--         <slot name="details-card" :appointment_props="event_data">
- -->
-        <h4 style="margin-bottom: 5px">{{event_data.title}}</h4>
-        <p>{{event_data.description}}</p>
-        <!--         </slot>
- -->
+      <div slot-scope="information" class="created-event">
+        <slot name="details-card" :event_information="information">
+          <h4 style="margin-bottom: 5px">{{information.title}}</h4>
+          <p>{{information.description}}</p>
+        </slot>
       </div>
     </portal>
   </div>

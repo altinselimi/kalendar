@@ -10,8 +10,6 @@ import Filters from './filters.js';
 export function install(Vue) {
 	for(let key in Filters) {
 		Vue.filter(key, Filters[key]);
-		console.log('Reigstered:', key);
-		console.log('Which had ufnciton:', Filters[key]);
 	}
 	//Vue.filter("normalizeDate", (date, format_type = 'YYYY-MM-DD') => format(date, format_type));
 	Vue.component('kalendar', Kalendar);
