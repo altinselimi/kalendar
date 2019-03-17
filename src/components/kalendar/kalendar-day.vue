@@ -249,9 +249,12 @@ ul.kalendar-day {
     right: 0;
     font-size: 10px;
   }
-
+  
   &.creating {
     z-index: 3;
+    .created-event {
+      pointer-events: none;
+    }
   }
 }
 </style>

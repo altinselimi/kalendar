@@ -2,7 +2,7 @@
   <div class="event-card" 
     :style="`
       height: ${distance}px; width: ${card_width}%; 
-      left: calc(${index * card_width}% + ${overlaps * 5}px)
+      left: calc(${index * card_width}% + ${overlaps * 10}px)
     `" 
     :class="{'overlaps': overlaps > 0}"
   >
@@ -79,7 +79,11 @@ $creator-content: white;
   flex-direction: column;
   height: 100%;
   width: 100%;
-
+  h4,
+  p,
+  span {
+    margin: 0px;
+  }
   >* {
     flex: 1;
   }
@@ -130,7 +134,7 @@ $creator-content: white;
   left: calc(100% + 5px);
   display: flex;
   flex-direction: column;
-  pointer-events: auto;
+  pointer-events: all;
   user-select: none;
   background-color: white;
   border: solid 1px rgba(black, .08);
@@ -152,6 +156,10 @@ $creator-content: white;
     padding: 5px 8px;
     margin-bottom: 5px;
   }
+}
+
+.created-event {
+  pointer-events: all;
 }
 
 ul:last-child .popup-wrapper {

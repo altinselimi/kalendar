@@ -169,13 +169,4 @@ ul.building-blocks {
     }
   }
 }
-
-div.creator_block {
-
-  h4,
-  p,
-  span {
-    margin: 0px;
-  }
-}
 </style>
