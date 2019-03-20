@@ -79,6 +79,7 @@ export default {
   methods: {
     mouseDown() {
       if (this.kalendar_options.read_only) return;
+      this.$kalendar.closePopups();
 
       let payload = {
         creating: true,
@@ -95,8 +96,7 @@ export default {
       let { starting_cell, original_starting_cell, creating } = this.creator;
       let going_down = this.cellData.index >= starting_cell.index &&
         starting_cell.index === original_starting_cell.index;
-      //console.log('OriginalSindex', original_starting_cell.index);
-      //console.log('Sindex:', starting_cell.index);
+        
       if (creating) {
         let payload = {
           ...this.creator,

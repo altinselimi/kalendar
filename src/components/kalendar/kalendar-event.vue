@@ -33,12 +33,12 @@ export default {
       return this.event && this.event.status;
     },
     information() {
-      let { start, end, data } = this.event;
+      let { start, end, data, id, key } = this.event;
       return {
         start_time: start.value,
         end_time: end.value,
-        start_index: start.index,
-        end_index: end.index,
+        kalendar_id: id,
+        key,
         data
       }
     },

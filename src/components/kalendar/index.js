@@ -8,10 +8,10 @@ import Filters from './filters.js';
 
 // Install the components
 export function install(Vue) {
+	Vue.prototype.$kalendar = {};
 	for(let key in Filters) {
 		Vue.filter(key, Filters[key]);
 	}
-	//Vue.filter("normalizeDate", (date, format_type = 'YYYY-MM-DD') => format(date, format_type));
 	Vue.component('kalendar', Kalendar);
 	Vue.component('kalendar-cell', KalendarCell);
 	Vue.component('kalendar-day', KalendarDay);

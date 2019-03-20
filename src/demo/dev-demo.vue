@@ -1,6 +1,7 @@
 <template>
   <div>
     <input type="number" v-model.number="calendar_settings.cell_height" placeholder="Cell Height">
+    <button @click="addManually()">ADD AN EVENT MANUALLY</button>
     <kalendar :configuration="calendar_settings" :events.sync="events" class="generate-shadow">
       <!-- CREATED CARD SLOT -->
       <div slot="details-card" slot-scope="{ event_information }" class="details-card">
@@ -9,7 +10,7 @@
           {{event_information.data.description}}
         </small>
         <span class="time">{{event_information.start_time | formatUTCDate('HH:mm')}} - {{event_information.end_time | formatUTCDate('HH:mm')}}</span>
-        <button @click="removeAppointment(event_information)" class="cancel">
+        <button @click="removeEvent(event_information)" class="cancel">
           <svg class="feather feather-x-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="15" y1="9" x2="9" y2="15"></line>
@@ -29,17 +30,17 @@
         </span>
       </div>
       <!-- POPUP CARD SLOT -->
-      <div slot="popup-form" slot-scope="{ popup_information, popup_events }" style="display: flex; flex-direction: column;">
+      <div slot="popup-form" slot-scope="{ popup_information }" style="display: flex; flex-direction: column;">
         <h4 style="margin-bottom: 10px">
           New Appointment
         </h4>
         <input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
         <textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
         <div class="buttons">
-          <button class="cancel" @click="popup_events.closePopup()">
+          <button class="cancel" @click="closePopups()">
             Cancel
           </button>
-          <button @click="completeAppointment(popup_information, popup_events)">
+          <button @click="addAppointment(popup_information)">
             Save
           </button>
         </div>
@@ -62,8 +63,8 @@ today_to2.setUTCHours(4, 20, 0, 0);
 let tomorrow_from = new Date();
 tomorrow_from.setDate(tomorrow_from.getDate() + 1);
 let tomorrow_to = new Date(tomorrow_from.getTime());
-tomorrow_from.setUTCHours(10, 17, 0, 0);
-tomorrow_to.setUTCHours(10, 19, 0, 0);
+tomorrow_from.setUTCHours(4, 17, 0, 0);
+tomorrow_to.setUTCHours(6, 19, 0, 0);
 
 
 const existing_events = [{
@@ -150,8 +151,7 @@ export default {
     getHours(start, end) {
       return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
     },
-    completeAppointment(popup_info, popup_events) {
-      console.log({ popup_info });
+    addAppointment(popup_info) {
       let payload = {
         data: {
           title: this.new_appointment.title,
@@ -160,14 +160,15 @@ export default {
         from: popup_info.start_time,
         to: popup_info.end_time,
       };
-      //this.events(payload);
-      console.log('Payload:', payload);
-      popup_events.saveEvent(payload).then(res => {
-        this.clearFormData();
-        popup_events.closePopup();
-      }).catch(err => {
-        throw err;
-      });
+
+      this.$kalendar.addNewEvent(
+        payload,
+      );
+      this.$kalendar.closePopups();
+      this.clearFormData();
+    },
+    closePopups() {
+      this.$kalendar.closePopups();
     },
     clearFormData() {
       this.new_appointment = {
@@ -181,22 +182,28 @@ export default {
       };
     },
     addManually() {
-      let { title, description, from, to, date } = this.manual_form;
-      from = `${date}T${from}:00`;
-      to = `${date}T${to}:00`;
+      let title = 'New one';
+      let description = 'Lorem dsr';
+      let from = tomorrow_from.toISOString();
+      let to = tomorrow_to.toISOString();
       let payload = {
         data: { title, description },
         from,
-        to,
-        date: format(from, 'YYYY-MM-DD'),
+        to
       };
-      this.events(payload);
-      this.manual_form = JSON.parse(JSON.stringify(manual_appointment_model));
-      this.adding_manually = false;
+      console.log('Payload:', payload);
+      this.$kalendar.addNewEvent(
+        payload,
+      );
     },
-    removeAppointment(appointment) {
-      let index = this.appointments.findIndex(item => item.from === appointment.start_value.value);
-      this.appointments.splice(index, 1);
+    removeEvent(kalendarEvent) {
+      let day = kalendarEvent.start_time.toISOString().slice(0,10);
+      this.$kalendar.removeEvent({
+        day,
+        key: kalendarEvent.key,
+        id: kalendarEvent.kalendar_id,
+      })
+      console.log('Event:', kalendarEvent);
     },
   },
 };

@@ -29,7 +29,7 @@
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :passed-time="passedtime.percentage">
+        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :passed-time="passedtime.percentage" :ref="day.value.slice(0,10)">
         </kalendar-days>
       </div>
     </div>
@@ -49,13 +49,14 @@ export default {
   },
   inject: ['kalendar_options'],
   created() {
+    this.addHelperMethods();
     setInterval(() => this.kalendar_options.now = new Date, 1000 * 60);
     const date = format(this.kalendar_options.current_day, 'YYYY-MM-DD');
     myWorker.send('getDays', {
       day: date
     }).then(reply => {
       console.log('Got days:', reply);
-      this.days = reply;//.slice(0,1);
+      this.days = reply; //.slice(0,1);
     });
     myWorker.send('getHours').then(reply => {
       // Handle the reply
@@ -106,6 +107,41 @@ export default {
     },
     isBefore(day) {
       return isBefore(day, this.kalendar_options.now);
+    },
+    showRefs() {
+      console.log('REFS:', this.$refs);
+    },
+    addHelperMethods() {
+      this.$kalendar.addNewEvent = (payload) => {
+        if(!payload) return Promise.reject('No payload');
+        let targetRef = payload.from.slice(0,10);
+        this.$refs[targetRef][0].addEvent(payload)
+      };
+
+      this.$kalendar.removeEvent = (options) => {
+        let { day, key, id } = options;
+        if(day.length > 10) {
+          day = day.slice(0,10);
+        }
+        console.log('Options:', options);
+        if (!day)
+          return Promise.reject('Day wasn\'t provided');
+        if (!id)
+          return Promise.reject('No ID was provided');
+        if (!key)
+          return Promise.reject('No key was provided in the object');
+        let targetRef = day;
+        this.$refs[targetRef][0].removeEvent({id, key});
+      };
+
+      this.$kalendar.closePopups = () => {
+        console.log('REFS:', this.$refs);
+        let refs = this.days.map(day => day.value.slice(0,10));
+        console.log('Refs:', refs);
+        refs.forEach(ref => {
+          this.$refs[ref][0].clearCreatingLeftovers();
+        });
+      }
     },
   },
 };

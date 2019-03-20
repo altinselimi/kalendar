@@ -1,8 +1,34 @@
 <template>
-  <ul style="position: relative;" :class="{'is-weekend': isWeekend, 'is-today': isToday, 'creating': creator.creating || creator.status === 'popup-initiated'}" class="kalendar-day">
-    <kalendar-cell v-for="(cell, index) in day_cells" :constructed-events="day_events" :key="`${index}`" :creator="creator" :cell-data="cell" :index="index" @select="updateCreator" @reset="resetEvents()" @initiatePopup="initiatePopup()" :temporary-event="temporary_event"/>
-    <div ref="nowIndicator" :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" v-if="isToday" :style="`top:calc(${passedTime}% - 5px)`">
-      <span class="line" v-show="kalendar_options.style === 'material_design'"></span>
+  <ul 
+    style="position: relative;" 
+    :class="{
+      'is-weekend': isWeekend, 
+      'is-today': isToday, 
+      'creating': creator.creating || creator.status === 'popup-initiated'
+    }" 
+    class="kalendar-day"
+    :ref="day.value + '-reference'"
+  >
+    <kalendar-cell 
+      v-for="(cell, index) in day_cells" 
+      :constructed-events="day_events" 
+      :key="`${index}`" 
+      :creator="creator" 
+      :cell-data="cell" 
+      :index="index" 
+      @select="updateCreator" 
+      @reset="resetEvents()" 
+      @initiatePopup="initiatePopup()" 
+      :temporary-event="temporary_event"
+    />
+    <div ref="nowIndicator" 
+      :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" 
+      v-if="isToday" 
+      :style="`top:calc(${passedTime}% - 5px)`"
+    >
+      <span class="line" 
+        v-show="kalendar_options.style === 'material_design'"
+      ></span>
     </div>
   </ul>
 </template>
@@ -34,7 +60,7 @@ export default {
       kalendarClearPopups: this.clearCreatingLeftovers
     };
   },
-  inject: ['kalendar_options', 'kalendar_events', 'addNewEvent', 'updateEvents'],
+  inject: ['kalendar_options', 'kalendar_events', 'updateEvents'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -64,19 +90,37 @@ export default {
   }),
   methods: {
     addEvent(payload) {
+      //validation
       let validation_message = this.checkEventValidity(payload);
       if (validation_message !== null) {
         return Promise.reject(validation_message);
       }
-      this.addNewEvent(payload);
-      let clonedEvents = this.kalendar_events.slice(0);
-      return this.getDayEvents(clonedEvents)
-        .then(res => {
-          this.updateEvents(clonedEvents);
-        });
+
+      return myWorker.send('constructNewEvent', {
+        event: payload
+      }).then(constructed_event => {
+        let { key } = constructed_event;
+        if(this.day_events.hasOwnProperty(key)) {
+          this.day_events[key].push(constructed_event);
+        } else {
+          // must use $set since key wasnt present in the object
+          // vue will fail to render it
+          this.$set(this.day_events, key, [constructed_event]);
+        }
+        let events = this.kalendar_events.slice(0);
+        events.push(payload);
+        this.updateEvents(events);
+      });
+    },
+    removeEvent(payload) {
+      let index = this.day_events[payload.key]
+        .findIndex(event => event.id === payload.id);
+      this.day_events[payload.key].splice(index, 1);
+      return Promise.resolve();
     },
     checkEventValidity(payload) {
       let { from, to } = payload;
+      if(!from || !to) return 'No dates were provided in the payload';
       let isoFrom = new Date(from).toISOString();
       let isoTo = new Date(to).toISOString();
       if (isoFrom !== from) {

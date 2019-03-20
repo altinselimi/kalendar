@@ -45,7 +45,6 @@ import Vue from 'vue';
 import PortalVue from 'portal-vue';
 
 import Utils from "./utils.js";
-console.log(Utils);
 window.kalendarHelpers = {};
 for (let util of Object.keys(Utils)) {
   window.kalendarHelpers[util] = Utils[util];
@@ -63,11 +62,6 @@ export default {
   components: {
     KalendarWeekView: () =>
       import('./kalendar-weekview.vue'),
-  },
-  created() {
-    if(!!this.events && this.events.length > 0) {
-      this.kalendar_events = this.events;
-    }
   },
   props: {
     events: {
@@ -102,9 +96,14 @@ export default {
     },
     new_appointment: {},
     scrollable: true,
-    kalendar_events: []
   }),
   computed: {
+    kalendar_events() {
+      return this.events.map(event => ({
+        ...event,
+        raw_id: kalendarHelpers.generateUUID()
+      }))
+    },
     kalendar_options() {
       let options = this.default_options;
       let provided_props = this.configuration;
@@ -153,10 +152,10 @@ export default {
       enumerable: true,
       get: () => this.kalendar_events
     });
-    provider.addNewEvent = (payload) => {
-      console.log('gon add shit');
+    /*provider.addNewEvent = (payload) => {
+      console.log('gon add new event');
       this.kalendar_events.push(payload);
-    };
+    };*/
     provider.updateEvents = (payload) => {
       this.$emit('update:events', payload);
     }

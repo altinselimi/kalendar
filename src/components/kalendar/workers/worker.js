@@ -18,6 +18,8 @@ registerPromiseWorker((message) => {
       return getDayCells(data.day, data.day_events, data.day_hours);
     case 'constructDayEvents':
       return constructDayEvents(data.day, data.events);
+    case 'constructNewEvent':
+      return constructNewEvent(data.event)
   }
 })
 
@@ -77,60 +79,63 @@ const constructDayEvents = (day, existing_events) => {
   if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
   events_for_this_day.forEach(event => {
-    let { from, to } = event;
-    from = new Date(from);
-    to = new Date(to);
-    from.setUTCSeconds(0, 0);
-    to.setUTCSeconds(0, 0);
-    const fromData = {
-      value: from,
-      masked_value: new Date(from.getTime()),
-      rounded: false,
-      round_offset: null
-    };
-    const toData = {
-      value: to,
-      masked_value: new Date(to.getTime()),
-      rounded: false,
-      round_offset: null
-    };
-
-    let multipleOf10 = (dateStr) => new Date(dateStr).getMinutes() % 10;
-
-    if (multipleOf10(fromData.value) !== 0) {
-      fromData.rounded = true;
-      fromData.round_offset = multipleOf10(fromData.value);
-      let minutes = new Date(fromData.value).getMinutes();
-      let maskedMinutes = (Math.floor(minutes / 10) * 10);
-      fromData.masked_value.setMinutes(maskedMinutes);
-    }
-
-    const equalHours = (c1, c2) => {
-      return new Date(c1.value).valueOf() === new Date(c2).valueOf();
-    }
-
-    let eventKey = fromData.masked_value.toISOString();
-
-    // 1 minute equals 1 pixel in our view. That means we need to find the length
-    // of the event by finding out the difference in minutes 
-    const diffInMs = toData.value - fromData.value;
-    const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
-    const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
-
-    let constructedEvent = {
-      start: fromData,
-      end: toData,
-      data: event.data,
-      id: generateUUID(),
-      distance: diffMins + (diffInHrs * 60),
-      status: 'completed'
-    };
-
-    if (filtered_events.hasOwnProperty(eventKey)) {
-      filtered_events[eventKey].push(constructedEvent);
+    const constructedEvent = constructNewEvent(event);
+    let { key } = constructedEvent;
+    if (filtered_events.hasOwnProperty(key)) {
+      filtered_events[key].push(constructedEvent);
     } else {
-      filtered_events[eventKey] = [constructedEvent];
+      filtered_events[key] = [constructedEvent];
     }
   });
   return filtered_events;
+}
+
+const constructNewEvent = (event) => {
+  let { from, to } = event;
+  from = new Date(from);
+  to = new Date(to);
+  from.setUTCSeconds(0, 0);
+  to.setUTCSeconds(0, 0);
+  const fromData = {
+    value: from,
+    masked_value: new Date(from.getTime()),
+    rounded: false,
+    round_offset: null
+  };
+  const toData = {
+    value: to,
+    masked_value: new Date(to.getTime()),
+    rounded: false,
+    round_offset: null
+  };
+
+  let multipleOf10 = (dateStr) => new Date(dateStr).getMinutes() % 10;
+
+  if (multipleOf10(fromData.value) !== 0) {
+    fromData.rounded = true;
+    fromData.round_offset = multipleOf10(fromData.value);
+    let minutes = new Date(fromData.value).getMinutes();
+    let maskedMinutes = (Math.floor(minutes / 10) * 10);
+    fromData.masked_value.setMinutes(maskedMinutes);
+  }
+
+  let eventKey = fromData.masked_value.toISOString();
+
+  // 1 minute equals 1 pixel in our view. That means we need to find the length
+  // of the event by finding out the difference in minutes 
+  const diffInMs = toData.value - fromData.value;
+  const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
+  const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
+
+  let constructedEvent = {
+    start: fromData,
+    end: toData,
+    data: event.data,
+    id: generateUUID(),
+    distance: diffMins + (diffInHrs * 60),
+    status: 'completed',
+    key: eventKey
+  };
+
+  return constructedEvent;
 }
