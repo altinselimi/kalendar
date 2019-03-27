@@ -107,8 +107,12 @@ export default {
           // vue will fail to render it
           this.$set(this.day_events, key, [constructed_event]);
         }
+        console.log('ID:', constructed_event.id);
         let events = this.kalendar_events.slice(0);
-        events.push(payload);
+        events.push({
+          ...payload,
+          id: constructed_event.id
+        });
         this.updateEvents(events);
       });
     },
@@ -116,6 +120,10 @@ export default {
       let index = this.day_events[payload.key]
         .findIndex(event => event.id === payload.id);
       this.day_events[payload.key].splice(index, 1);
+      let events = this.kalendar_events.slice(0);
+      let eventIndex = events.find(event => event.id === payload.id);
+      events.splice(eventIndex, 1);
+      this.updateEvents(events);
       return Promise.resolve();
     },
     checkEventValidity(payload) {
@@ -223,7 +231,12 @@ export default {
       };
     },
     initiatePopup() {
-      let { creating, ending_cell, current_cell, starting_cell, original_starting_cell } = this.creator;
+      this.creator = {
+        ...this.creator,
+        status:'popup-initiated', 
+        creating: false
+      };
+      let { ending_cell, current_cell, starting_cell, original_starting_cell } = this.creator;
       let real_ending_cell_index = ending_cell.index + 1;
       ending_cell = this.day_cells[real_ending_cell_index];
 
@@ -256,11 +269,6 @@ export default {
 
       this.$set(this.day_events, starting_cell.value, updated_events);
       this.temporary_event = null;
-      this.creator = {
-        ...this.creator,
-        status:'popup-initiated', 
-        creating: false
-      };
     },
 
     scrollView() {

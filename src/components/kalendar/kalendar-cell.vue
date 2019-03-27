@@ -2,7 +2,7 @@
   <li 
     @mouseover.self="mouseMove()" 
     @mousedown.self="mouseDown()" 
-    @mouseup="mouseUp()" 
+    @mouseup="mouseUp()"
     class="kalendar-cell" 
     :class="{
       'selected': selected, 
@@ -14,13 +14,14 @@
       height: ${kalendar_options.cell_height}px;
     `"
   >
-    <KalendarEvent 
+    <KalendarEvent
+        :style="`z-index: 100`"
         v-if="cell_events && cell_events.length"
-        v-for="(event, index) in cell_events" 
+        v-for="(event, eventIndex) in cell_events"
         :event="event" 
-        :key="index" 
+        :key="eventIndex" 
         :total="cell_events.length" 
-        :index="index" 
+        :index="eventIndex" 
         :overlaps="overlappingEvents.length"
       />
   </li>
@@ -161,7 +162,7 @@ ul.building-blocks {
     }
 
     &.has-events {
-      z-index: 2;
+      z-index: unset;
     }
 
     &.being-created {

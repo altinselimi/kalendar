@@ -131,7 +131,7 @@ const constructNewEvent = (event) => {
     start: fromData,
     end: toData,
     data: event.data,
-    id: generateUUID(),
+    id: event.id || generateUUID(),
     distance: diffMins + (diffInHrs * 60),
     status: 'completed',
     key: eventKey

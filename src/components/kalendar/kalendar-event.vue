@@ -1,11 +1,12 @@
 <template>
-  <div class="event-card" 
-    :style="`
-      height: ${distance}px; width: ${card_width}%; 
-      left: calc(${index * card_width}% + ${overlaps * 10}px)
-    `" 
-    :class="{'overlaps': overlaps > 0}"
-  >
+  <div class="event-card" :style="`
+      height: ${distance}; 
+      width: calc(${width_value}); 
+      left: calc(${left_offset});
+    `" @click="inspecting = true" @mouseleave="inspecting = false" :class="{
+      'overlaps': overlaps > 0,
+      'inspecting': !!inspecting
+    }">
     <portal-target v-if="status === 'creating' || status === 'popup-initiated'" :slot-props="information" name="event-creation" slim></portal-target>
     <portal-target v-else name="event-details" :slot-props="information" slim>
     </portal-target>
@@ -19,15 +20,21 @@
 export default {
   props: ['event', 'total', 'index', 'overlaps'],
   inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options'],
+  data: () => ({
+    inspecting: false,
+  }),
   computed: {
-    card_width() {
-      return 100 / this.total;
+    width_value() {
+      return `${100/this.total}% - ${this.overlaps * 50 / this.total}px`;
+    },
+    left_offset() {
+      return `(${this.index} * (${this.width_value})) + ${this.overlaps * 50}px`;
     },
     distance() {
       if (!this.event) return;
       let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
-      return (this.event.distance * multiplier) - (0.5 * multiplier);
+      return `${(this.event.distance * multiplier) - (0.5 * multiplier)}px`;
     },
     status() {
       return this.event && this.event.status;
@@ -79,11 +86,13 @@ $creator-content: white;
   flex-direction: column;
   height: 100%;
   width: 100%;
+
   h4,
   p,
   span {
     margin: 0px;
   }
+
   >* {
     flex: 1;
   }
@@ -92,8 +101,17 @@ $creator-content: white;
     z-index: -1;
   }
 
-  &.overlaps > * {
+  &.overlaps>* {
     border: solid 1px white !important;
+  }
+
+  &.inspecting {
+    z-index: 101 !important;
+
+    .created-event {
+      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+      transition: opacity 100ms linear;
+    }
   }
 
   position: absolute;

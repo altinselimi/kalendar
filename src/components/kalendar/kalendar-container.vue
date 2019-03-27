@@ -94,16 +94,11 @@ export default {
       day_starts_at: '0000',
       day_ends_at: '2400'
     },
+    kalendar_events: null,
     new_appointment: {},
     scrollable: true,
   }),
   computed: {
-    kalendar_events() {
-      return this.events.map(event => ({
-        ...event,
-        raw_id: kalendarHelpers.generateUUID()
-      }))
-    },
     kalendar_options() {
       let options = this.default_options;
       let provided_props = this.configuration;
@@ -142,6 +137,12 @@ export default {
       return options;
     },
   },
+  created() {
+    this.kalendar_events = this.events.map(event => ({
+      ...event,
+      id: event.id || kalendarHelpers.generateUUID()
+    }));
+  },
   provide() {
     const provider = {}
     Object.defineProperty(provider, 'kalendar_options', {
@@ -152,20 +153,19 @@ export default {
       enumerable: true,
       get: () => this.kalendar_events
     });
-    /*provider.addNewEvent = (payload) => {
-      console.log('gon add new event');
-      this.kalendar_events.push(payload);
-    };*/
     provider.updateEvents = (payload) => {
-      this.$emit('update:events', payload);
+      this.kalendar_events = payload;
+      this.$emit('update:events', payload.map(event => ({
+        from: event.from,
+        to: event.to,
+        data: event.data
+      })));
     }
     return provider;
   },
   methods: {
-    previousWeek() {
-    },
-    nextWeek() {
-    }
+    previousWeek() {},
+    nextWeek() {}
   }
 }
 </script>
