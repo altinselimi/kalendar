@@ -34,7 +34,7 @@ export default {
       if (!this.event) return;
       let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
-      return `${(this.event.distance * multiplier) - (0.5 * multiplier)}px`;
+      return `${(this.event.distance * multiplier) - (1 * multiplier)}px`;
     },
     status() {
       return this.event && this.event.status;
