@@ -19,7 +19,7 @@
                    :key="eventIndex"
                    :total="cell_events.length"
                    :index="eventIndex"
-                   :overlaps="overlappingEvents.length" />
+                   :overlaps="overlapValue" />
   </li>
 </template>
 <script>
@@ -67,6 +67,10 @@ export default {
           return eventStarts < cellDate && eventEnds > cellDate;
         });
 
+    },
+    overlapValue() {
+      let length = this.overlappingEvents.length;
+      return length > 2 ? 2 : length;
     },
     selected() {
       return this.cell_events && this.cell_events.length > 0;

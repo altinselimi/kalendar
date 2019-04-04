@@ -9,7 +9,7 @@
         <small>
           {{event_information.data.description}}
         </small>
-        <span class="time">{{event_information.start_time | formatUTCDate('HH:mm')}} - {{event_information.end_time | formatUTCDate('HH:mm')}}</span>
+        <span class="time">{{event_information.start_time | formatDate('HH:mm')}} - {{event_information.end_time | formatDate('HH:mm')}}</span>
         <button @click="removeEvent(event_information)" class="cancel">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
             <circle cx="12" cy="12" r="10"></circle>
@@ -24,9 +24,9 @@
           New Appointment h3
         </h4>
         <span class="time">
-          {{event_information.start_time | formatUTCDate('HH:mm')}}
+          {{event_information.start_time | formatDate('HH:mm')}}
           -
-          {{event_information.end_time | formatUTCDate('HH:mm')}}
+          {{event_information.end_time | formatDate('HH:mm')}}
         </span>
       </div>
       <!-- POPUP CARD SLOT -->
@@ -91,9 +91,6 @@ import Vue from 'vue';
 import VueHighlightJS from 'vue-highlightjs'
 Vue.use(VueHighlightJS)
 
-import myWorker from '@/components/kalendar/workers';
-/* ... */
-
 import format from 'date-fns/format';
 import getTime from 'date-fns/get_time';
 
@@ -109,6 +106,11 @@ locale.use(lang);
 import HowTo from './how-to.vue';
 
 export default {
+  created() {
+    Vue.filter('formatDate', (value, how) => {
+      return format(value, how);
+    });
+  },
   components: {
     Kalendar,
     options: () =>
@@ -141,13 +143,6 @@ export default {
     input_value: '',
   }),
   methods: {
-    sendMessageToWorker() {
-      myWorker.send(this.input_value)
-        .then(reply => {
-          // Handle the reply
-          console.log('Got a reply:', reply);
-        })
-    },
     getHours(start, end) {
       return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
     },

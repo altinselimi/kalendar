@@ -190,6 +190,9 @@
     width: 25ch;
     max-width: 30ch;
     margin: 0 auto;
+    span {
+      white-space: nowrap;
+    }
   }
 
   button {

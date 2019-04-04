@@ -72,6 +72,7 @@ const constructDayEvents = (day, existing_events) => {
     to.setUTCHours(0, 0, 0, 0);
     return from.valueOf() === new Date(day).valueOf();
   });
+  console.log('Events for this day:', events_for_this_day);
   if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
   events_for_this_day.forEach(event => {

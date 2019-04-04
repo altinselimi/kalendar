@@ -64,6 +64,9 @@ for (let util of Object.keys(Utils)) {
   window.kalendarHelpers[util] = Utils[util];
 }
 
+Vue.filter('startOfWeek', Utils.startOfWeek);
+Vue.filter('endOfWeek', Utils.endOfWeek);
+
 const { generateUUID } = Utils;
 
 Vue.use(PortalVue);
@@ -95,7 +98,6 @@ export default {
       },
     },
   },
-  inject: ['kalendar_events', 'kalendar_options'],
   data: () => ({
     default_options: {
       dark: false,
@@ -109,58 +111,63 @@ export default {
       military_time: true,
       read_only: false,
       day_starts_at: '0000',
-      day_ends_at: '2400'
+      day_ends_at: '2400',
+      formatLeftHours: (date) => {
+        this.formatDate(date, 'HH:mm');
+      },
+      formatDayTitle: (date) => {
+        
+      },
+      formatWeekNavigator: ({ start, end }) => {
+        return `${start} - ${end}`
+      }
     },
     kalendar_events: null,
     new_appointment: {},
     scrollable: true,
   }),
   computed: {
-    kalendar_options: {
-      get() {
-        let options = this.default_options;
-        let provided_props = this.configuration;
-        if (!isNaN(Date.parse(provided_props.current_day))) {
-          provided_props.current_day.setUTCHours(0, 0, 0, 0);
-        } else {
-          let today = new Date();
-          today.setUTCHours(0, 0, 0, 0);
-          options.current_day = today;
-        }
+    kalendar_options() {
+      let options = this.default_options;
+      let provided_props = this.configuration;
+      if (!isNaN(Date.parse(provided_props.current_day))) {
+        provided_props.current_day.setUTCHours(0, 0, 0, 0);
+      } else {
+        let today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        options.current_day = today;
+      }
 
-        let conditions = {
-          //dark: (val) => typeof val === 'boolean',
-          scrollToNow: (val) => typeof val === 'boolean',
-          current_week: (val) => val === null,
-          current_day: (val) => !isNaN(Date.parse(val)),
-          view_type: (val) => ['Month', 'Day'].includes(val),
-          cell_height: (val) => !isNaN(val),
-          style: (val) => ['material_design', 'flat_design'].includes(val),
-          military_time: (val) => typeof val === 'boolean',
-          read_only: (val) => typeof val === 'boolean',
-          day_starts_at: (val) => {
-            return typeof val === 'string' &&
-              val.length === 4 &&
-              !isNaN(val)
-          },
-          day_ends_at: (val) => {
-            return typeof val === 'string' &&
-              val.length === 4 &&
-              !isNaN(val)
-          }
-        };
-        for (let key in provided_props) {
-          if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
-            options[key] = provided_props[key];
-          }
+      let conditions = {
+        //dark: (val) => typeof val === 'boolean',
+        scrollToNow: (val) => typeof val === 'boolean',
+        current_week: (val) => val === null,
+        current_day: (val) => !isNaN(Date.parse(val)),
+        view_type: (val) => ['Month', 'Day'].includes(val),
+        cell_height: (val) => !isNaN(val),
+        style: (val) => ['material_design', 'flat_design'].includes(val),
+        military_time: (val) => typeof val === 'boolean',
+        read_only: (val) => typeof val === 'boolean',
+        day_starts_at: (val) => {
+          return typeof val === 'string' &&
+            val.length === 4 &&
+            !isNaN(val)
+        },
+        day_ends_at: (val) => {
+          return typeof val === 'string' &&
+            val.length === 4 &&
+            !isNaN(val)
         }
-        console.log('config got updated');
-        return options;
-      },
-    },
+      };
+      for (let key in provided_props) {
+        if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
+          options[key] = provided_props[key];
+        }
+      }
+      return options;
+    }
   },
   created() {
-    this.kalendar_events = [];
     let events_going_two_days = this.events.filter(event => {
 
     });
@@ -169,7 +176,6 @@ export default {
       id: event.id || kalendarHelpers.generateUUID()
     }));
     this.kalendar_events = this.kalendar_events;
-    this.kalendar_options = this.kalendar_options;
     this.$kalendar.updateEvents = (payload) => {
       this.kalendar_events = payload.map(event => ({
         ...event,
@@ -182,10 +188,21 @@ export default {
       })));
     };
   },
+  provide() {
+    const provider = {}
+    Object.defineProperty(provider, 'kalendar_options', {
+      enumerable: true,
+      get: () => this.kalendar_options,
+    });
+    Object.defineProperty(provider, 'kalendar_events', {
+      enumerable: true,
+      get: () => this.kalendar_events,
+    });
+    return provider;
+  },
   methods: {
     previousWeek() {
       let { current_day } = this.kalendar_options;
-      console.log('curr day:', current_day);
       let nextWeek = new Date(current_day);
       nextWeek.setDate(nextWeek.getDate() - 7);
       nextWeek.setUTCHours(0, 0, 0, 0);
@@ -203,7 +220,6 @@ export default {
     },
     nextWeek() {
       let { current_day } = this.kalendar_options;
-      console.log('curr day:', current_day);
       let nextWeek = new Date(current_day);
       nextWeek.setDate(nextWeek.getDate() + 7);
       nextWeek.setUTCHours(0, 0, 0, 0);

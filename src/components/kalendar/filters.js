@@ -9,12 +9,6 @@ export default {
   formatDate(value, how) {
     return format(value, how);
   },
-  startOfWeek(value) {
-    return startOfWeek(value);
-  },
-  endOfWeek(value) {
-    return endOfWeek(value);
-  }
 }
 
 const getUTCDate = (dateString = Date.now()) => {
