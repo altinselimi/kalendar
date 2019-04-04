@@ -1,35 +1,56 @@
 <template>
-  <div class="calendar-wrap" :style="`--space-between-cols: ${colsSpace}`">
+  <div class="calendar-wrap"
+       :style="`--space-between-cols: ${colsSpace}`">
     <div class="sticky-top">
       <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
-        <li class="day-indicator" :key="index" v-for="({value}, index) in (days || [])" :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
+        <li class="day-indicator"
+            :key="index"
+            v-for="({value}, index) in (days || [])"
+            :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
           <span class="letters-date">{{value | formatDate('ddd')}}</span>
           <span class="number-date">{{value | formatDate('DD')}}</span>
         </li>
       </ul>
       <ul class="all-day">
         <span>All Day</span>
-        <li :key="index" v-for="(date, index) in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${kalendar_options.cell_height + 5}px`"></li>
+        <li :key="index"
+            v-for="(date, index) in (days || [])"
+            :class="{'all-today': _isToday(date), 'is-all-day': false}"
+            :style="`height:${kalendar_options.cell_height + 5}px`"></li>
       </ul>
     </div>
-    <div class="dummy-row" v-if="false">
+    <div class="dummy-row"
+         v-if="false">
       <ul class="dummy-days">
-        <li :key="index" v-for="(day, index) in (days || [])" :style="`height:${kalendar_options.cell_height}px`"></li>
+        <li :key="index"
+            v-for="(day, index) in (days || [])"
+            :style="`height:${kalendar_options.cell_height}px`"></li>
       </ul>
     </div>
-    <div class="blocks" v-if="hours">
+    <div class="blocks"
+         v-if="hours">
       <div class="calendar-blocks">
         <ul class="hours">
-          <li class="hour-row-identifier" :key="index" v-for="(hour, index) in (hours || [])" :style="`height:${hourHeight}px`">
+          <li class="hour-row-identifier"
+              :key="index"
+              v-for="(hour, index) in (hours || [])"
+              :style="`height:${hourHeight}px`">
             <span>{{hour.value | formatUTCDate(hour_format)}}</span>
           </li>
         </ul>
-        <div v-show="kalendar_options.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
+        <div v-show="kalendar_options.style !== 'material_design'"
+             class="hour-indicator-line"
+             :style="`top:calc(${passedtime.percentage}% - 5px)`">
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :passed-time="passedtime.percentage" :ref="day.value.slice(0,10)">
+        <kalendar-days :day="day"
+                       class="building-blocks"
+                       :key="day.value.slice(0,10)"
+                       v-for="(day, index) in days"
+                       :passed-time="passedtime.percentage"
+                       :ref="day.value.slice(0,10)">
         </kalendar-days>
       </div>
     </div>
@@ -47,23 +68,12 @@ export default {
   components: {
     KalendarDays,
   },
-  inject: ['kalendar_options'],
   created() {
     this.addHelperMethods();
     setInterval(() => this.kalendar_options.now = new Date, 1000 * 60);
-    const date = format(this.kalendar_options.current_day, 'YYYY-MM-DD');
-    myWorker.send('getDays', {
-      day: date
-    }).then(reply => {
-      console.log('Got days:', reply);
-      this.days = reply; //.slice(0,1);
-    });
-    myWorker.send('getHours').then(reply => {
-      // Handle the reply
-      console.log('Got hours:', reply);
-      this.hours = reply;
-    });
+    this.constructWeek();
   },
+  inject: ['kalendar_options', 'kalendar_events'],
   data: () => ({
     hours: null,
     days: []
@@ -108,20 +118,43 @@ export default {
     isBefore(day) {
       return isBefore(day, this.kalendar_options.now);
     },
-    showRefs() {
-      console.log('REFS:', this.$refs);
+    constructWeek() {
+      const date = this.kalendar_options.current_day.toISOString().slice(0, 10);
+      return Promise.all([myWorker.send('getDays', {
+          day: date
+        }).then(reply => {
+          console.log('Got week days:', reply);
+          this.days = reply; //.slice(0,1);
+        }),
+        myWorker.send('getHours').then(reply => {
+          // Handle the reply
+          console.log('Got calendar hours:', reply);
+          this.hours = reply;
+        })
+      ]);
     },
     addHelperMethods() {
+      this.$kalendar.buildWeek = () => {
+        this.constructWeek();
+      };
       this.$kalendar.addNewEvent = (payload) => {
-        if(!payload) return Promise.reject('No payload');
-        let targetRef = payload.from.slice(0,10);
-        this.$refs[targetRef][0].addEvent(payload)
+        if (!payload) return Promise.reject('No payload');
+        let targetRef = payload.from.slice(0, 10);
+        const refObject = this.$refs[targetRef];
+        if (refObject) {
+          refObject[0].addEvent(payload);
+        } else {
+          // appointment is not in this view
+          let events = this.kalendar_events.slice(0);
+          events.push(payload);
+          this.$kalendar.updateEvents(events);
+        }
       };
 
       this.$kalendar.removeEvent = (options) => {
         let { day, key, id } = options;
-        if(day.length > 10) {
-          day = day.slice(0,10);
+        if (day.length > 10) {
+          day = day.slice(0, 10);
         }
         console.log('Options:', options);
         if (!day)
@@ -131,12 +164,12 @@ export default {
         if (!key)
           return Promise.reject('No key was provided in the object');
         let targetRef = day;
-        this.$refs[targetRef][0].removeEvent({id, key});
+        this.$refs[targetRef][0].removeEvent({ id, key });
       };
 
       this.$kalendar.closePopups = () => {
         console.log('REFS:', this.$refs);
-        let refs = this.days.map(day => day.value.slice(0,10));
+        let refs = this.days.map(day => day.value.slice(0, 10));
         console.log('Refs:', refs);
         refs.forEach(ref => {
           this.$refs[ref][0].clearCreatingLeftovers();
@@ -173,7 +206,7 @@ $theme-color: #e5e5e5;
 .sticky-top {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   background-color: white;
 
   .days {

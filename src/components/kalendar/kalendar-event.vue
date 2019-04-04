@@ -1,17 +1,31 @@
 <template>
-  <div class="event-card" :style="`
+  <div class="event-card"
+       :style="`
       height: ${distance}; 
       width: calc(${width_value}); 
       left: calc(${left_offset});
-    `" @click="inspecting = true" @mouseleave="inspecting = false" :class="{
+      top: ${top_offset};
+    `"
+       @click="inspecting = true"
+       @mouseleave="inspecting = false"
+       :class="{
       'overlaps': overlaps > 0,
       'inspecting': !!inspecting
     }">
-    <portal-target v-if="status === 'creating' || status === 'popup-initiated'" :slot-props="information" name="event-creation" slim></portal-target>
-    <portal-target v-else name="event-details" :slot-props="information" slim>
+    <portal-target v-if="status === 'creating' || status === 'popup-initiated'"
+                   :slot-props="information"
+                   name="event-creation"
+                   slim></portal-target>
+    <portal-target v-else
+                   name="event-details"
+                   :slot-props="information"
+                   slim>
     </portal-target>
-    <div v-if="status === 'popup-initiated'" class="popup-wrapper">
-      <portal-target name="event-popup-form" slim :slot-props="getPopupProps()">
+    <div v-if="status === 'popup-initiated'"
+         class="popup-wrapper">
+      <portal-target name="event-popup-form"
+                     slim
+                     :slot-props="getPopupProps()">
       </portal-target>
     </div>
   </div>
@@ -19,7 +33,7 @@
 <script>
 export default {
   props: ['event', 'total', 'index', 'overlaps'],
-  inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options'],
+  inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options', 'kalendar_events'],
   data: () => ({
     inspecting: false,
   }),
@@ -30,11 +44,14 @@ export default {
     left_offset() {
       return `(${this.index} * (${this.width_value})) + ${this.overlaps * 50}px`;
     },
+    top_offset() {
+      return `${this.event.start.round_offset}px`;
+    },
     distance() {
       if (!this.event) return;
       let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
-      return `${(this.event.distance * multiplier) - (1 * multiplier)}px`;
+      return `${(this.event.distance * multiplier) - (0.2 * multiplier)}px`;
     },
     status() {
       return this.event && this.event.status;
@@ -106,7 +123,7 @@ $creator-content: white;
   }
 
   &.inspecting {
-    z-index: 101 !important;
+    z-index: 11 !important;
 
     .created-event {
       box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);

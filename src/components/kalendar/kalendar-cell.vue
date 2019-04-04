@@ -1,39 +1,34 @@
 <template>
-  <li 
-    @mouseover.self="mouseMove()" 
-    @mousedown.self="mouseDown()" 
-    @mouseup="mouseUp()"
-    class="kalendar-cell" 
-    :class="{
+  <li @mouseover.self="mouseMove()"
+      @mousedown.self="mouseDown()"
+      @mouseup="mouseUp()"
+      class="kalendar-cell"
+      :class="{
       'selected': selected, 
       'is-an-hour': (index+1)%(60/10) === 0,
       'has-events': cell_events && cell_events.length > 0,
       'being-created': !!beingCreated
-    }" 
-    :style="`
+    }"
+      :style="`
       height: ${kalendar_options.cell_height}px;
-    `"
-  >
-    <KalendarEvent
-        :style="`z-index: 100`"
-        v-if="cell_events && cell_events.length"
-        v-for="(event, eventIndex) in cell_events"
-        :event="event" 
-        :key="eventIndex" 
-        :total="cell_events.length" 
-        :index="eventIndex" 
-        :overlaps="overlappingEvents.length"
-      />
+    `">
+    <KalendarEvent :style="`z-index: 10`"
+                   v-if="cell_events && cell_events.length"
+                   v-for="(event, eventIndex) in cell_events"
+                   :event="event"
+                   :key="eventIndex"
+                   :total="cell_events.length"
+                   :index="eventIndex"
+                   :overlaps="overlappingEvents.length" />
   </li>
 </template>
 <script>
-const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 const { cloneObject } = window.kalendarHelpers;
 import { generateUUID } from './utils';
 
 export default {
   props: ['creator', 'index', 'cellData', 'constructedEvents', 'temporaryEvent'],
-  inject: ['kalendar_options', 'kalendar_events'],
+  inject: ['kalendar_events', 'kalendar_options'],
   components: {
     KalendarEvent: () => import('./kalendar-event.vue'),
   },
@@ -79,6 +74,12 @@ export default {
   },
   methods: {
     mouseDown() {
+      // user mouse got depressed while outside kalendar-cells
+      // came back in and clicked while the creator was on
+      if (!!this.creator.creating) {
+        this.mouseUp();
+        return;
+      }
       if (this.kalendar_options.read_only) return;
       this.$kalendar.closePopups();
 
@@ -97,7 +98,7 @@ export default {
       let { starting_cell, original_starting_cell, creating } = this.creator;
       let going_down = this.cellData.index >= starting_cell.index &&
         starting_cell.index === original_starting_cell.index;
-        
+
       if (creating) {
         let payload = {
           ...this.creator,
@@ -166,7 +167,7 @@ ul.building-blocks {
     }
 
     &.being-created {
-      z-index: 3;
+      z-index: 11;
     }
   }
 }

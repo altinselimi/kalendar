@@ -2,7 +2,7 @@
   <div>
     <input type="number" v-model.number="calendar_settings.cell_height" placeholder="Cell Height">
     <button @click="addManually()">ADD AN EVENT MANUALLY</button>
-    <kalendar :configuration="calendar_settings" :events.sync="events" class="generate-shadow">
+    <kalendar :configuration.sync="calendar_settings" :events.sync="events" class="generate-shadow">
       <!-- CREATED CARD SLOT -->
       <div slot="details-card" slot-scope="{ event_information }" class="details-card">
         <h4 class="appointment-title">{{event_information.data.title}}</h4>
@@ -11,7 +11,7 @@
         </small>
         <span class="time">{{event_information.start_time | formatUTCDate('HH:mm')}} - {{event_information.end_time | formatUTCDate('HH:mm')}}</span>
         <button @click="removeEvent(event_information)" class="cancel">
-          <svg class="feather feather-x-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="15" y1="9" x2="9" y2="15"></line>
             <line x1="9" y1="9" x2="15" y2="15"></line>

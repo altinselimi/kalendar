@@ -1,34 +1,28 @@
 <template>
-  <ul 
-    style="position: relative;" 
-    :class="{
+  <ul style="position: relative;"
+      :class="{
       'is-weekend': isWeekend, 
       'is-today': isToday, 
       'creating': creator.creating || creator.status === 'popup-initiated'
-    }" 
-    class="kalendar-day"
-    :ref="day.value + '-reference'"
-  >
-    <kalendar-cell 
-      v-for="(cell, index) in day_cells" 
-      :constructed-events="day_events" 
-      :key="`${index}`" 
-      :creator="creator" 
-      :cell-data="cell" 
-      :index="index" 
-      @select="updateCreator" 
-      @reset="resetEvents()" 
-      @initiatePopup="initiatePopup()" 
-      :temporary-event="temporary_event"
-    />
-    <div ref="nowIndicator" 
-      :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'" 
-      v-if="isToday" 
-      :style="`top:calc(${passedTime}% - 5px)`"
-    >
-      <span class="line" 
-        v-show="kalendar_options.style === 'material_design'"
-      ></span>
+    }"
+      class="kalendar-day"
+      :ref="day.value + '-reference'">
+    <kalendar-cell v-for="(cell, index) in day_cells"
+                   :constructed-events="day_events"
+                   :key="`${index}`"
+                   :creator="creator"
+                   :cell-data="cell"
+                   :index="index"
+                   @select="updateCreator"
+                   @reset="resetEvents()"
+                   @initiatePopup="initiatePopup()"
+                   :temporary-event="temporary_event" />
+    <div ref="nowIndicator"
+         :class="kalendar.preferences.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'"
+         v-if="isToday"
+         :style="`top:calc(${passedTime}% - 5px)`">
+      <span class="line"
+            v-show="kalendar.preferences.style === 'material_design'"></span>
     </div>
   </ul>
 </template>
@@ -42,13 +36,7 @@ import myWorker from '@/components/kalendar/workers';
 export default {
   props: ['day', 'passedTime'],
   created() {
-    myWorker.send('getDayCells', {
-      day: this.day.value
-    }).then(reply => {
-      console.log('Got day cells:', reply);
-      this.day_cells = reply;
-      return this.getDayEvents(this.kalendar_events);
-    });
+    this.renderDay();
   },
   components: {
     kalendarCell: () =>
@@ -60,7 +48,7 @@ export default {
       kalendarClearPopups: this.clearCreatingLeftovers
     };
   },
-  inject: ['kalendar_options', 'kalendar_events', 'updateEvents'],
+  inject: ['kalendar_events', 'kalendar_options'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -72,7 +60,7 @@ export default {
       return isToday(this.day.date);
     },
     currentDay() {
-      return this.kalendar_options.current_day;
+      return this.kalendar.preferences.current_day;
     },
   },
   data: () => ({
@@ -89,6 +77,16 @@ export default {
     day_events: null,
   }),
   methods: {
+    renderDay() {
+      myWorker.send('getDayCells', {
+        day: this.day.value
+      }).then(reply => {
+        console.log('Got day cells:', reply);
+        this.day_cells = reply;
+        return this.getDayEvents(this.kalendar_events);
+      });
+    },
+
     addEvent(payload) {
       //validation
       let validation_message = this.checkEventValidity(payload);
@@ -100,7 +98,7 @@ export default {
         event: payload
       }).then(constructed_event => {
         let { key } = constructed_event;
-        if(this.day_events.hasOwnProperty(key)) {
+        if (this.day_events.hasOwnProperty(key)) {
           this.day_events[key].push(constructed_event);
         } else {
           // must use $set since key wasnt present in the object
@@ -113,7 +111,7 @@ export default {
           ...payload,
           id: constructed_event.id
         });
-        this.updateEvents(events);
+        this.$kalendar.updateEvents(events);
       });
     },
     removeEvent(payload) {
@@ -123,12 +121,12 @@ export default {
       let events = this.kalendar_events.slice(0);
       let eventIndex = events.find(event => event.id === payload.id);
       events.splice(eventIndex, 1);
-      this.updateEvents(events);
+      this.$kalendar.updateEvents(events);
       return Promise.resolve();
     },
     checkEventValidity(payload) {
       let { from, to } = payload;
-      if(!from || !to) return 'No dates were provided in the payload';
+      if (!from || !to) return 'No dates were provided in the payload';
       let isoFrom = new Date(from).toISOString();
       let isoTo = new Date(to).toISOString();
       if (isoFrom !== from) {
@@ -184,8 +182,8 @@ export default {
     },
     validateSelection(event) {
       let { original_starting_cell, starting_cell, current_cell } = event;
-      if(event.direction === 'reverse'
-        && original_starting_cell.index > current_cell.index) {
+      if (event.direction === 'reverse' &&
+        original_starting_cell.index > current_cell.index) {
         return {
           ...event,
           starting_cell: current_cell,
@@ -196,10 +194,11 @@ export default {
     },
     selectCell() {
       if (!this.creator.creating) return;
-      let { creating, 
-        ending_cell, 
-        current_cell, 
-        starting_cell, 
+      let {
+        creating,
+        ending_cell,
+        current_cell,
+        starting_cell,
         original_starting_cell
       } = this.creator;
 
@@ -233,7 +232,7 @@ export default {
     initiatePopup() {
       this.creator = {
         ...this.creator,
-        status:'popup-initiated', 
+        status: 'popup-initiated',
         creating: false
       };
       let { ending_cell, current_cell, starting_cell, original_starting_cell } = this.creator;
@@ -264,7 +263,7 @@ export default {
       };
 
       let updated_events = this.day_events[starting_cell.value];
-      if(!updated_events) updated_events = [];
+      if (!updated_events) updated_events = [];
       updated_events.push(finalEvent);
 
       this.$set(this.day_events, starting_cell.value, updated_events);
@@ -301,9 +300,10 @@ ul.kalendar-day {
     right: 0;
     font-size: 10px;
   }
-  
+
   &.creating {
-    z-index: 3;
+    z-index: 11;
+
     .created-event {
       pointer-events: none;
     }

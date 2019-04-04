@@ -1,7 +1,6 @@
 import registerPromiseWorker from 'promise-worker/register'
-import { addMinutes, getMinutes, addDays, getDay } from 'date-fns'
 import Utils from '../utils.js';
-const { generateUUID } = Utils;
+const { generateUUID, addDays, addMinutes, addHours } = Utils;
 
 registerPromiseWorker((message) => {
   const { type, data } = message;
@@ -24,13 +23,14 @@ registerPromiseWorker((message) => {
 })
 
 function getDays(dayString) {
+  console.log('DayString:', dayString);
   let date = new Date(dayString);
   date.setUTCHours(0, 0, 0, 0);
-  let day_of_week = getDay(date);
+  let day_of_week = date.getDay();
   let days = [];
   for (let idx = 0; idx < 7; idx++) {
     days.push({
-      value: new Date(addDays(date, idx - day_of_week)).toISOString(),
+      value: addDays(date, idx - day_of_week).toISOString(),
       index: idx
     });
   }
@@ -50,7 +50,6 @@ function getHours() {
   return hours;
 }
 
-
 const getDayCells = (dayString) => {
   const day = new Date(dayString);
   day.setUTCHours(0, 0, 0, 0);
@@ -58,10 +57,7 @@ const getDayCells = (dayString) => {
   for (let idx = 0; idx < (6 * 24) + 1; idx++) {
     cells.push({
       value: idx > 0 ? new Date(addMinutes(day, idx * 10)).toISOString() : day.toISOString(),
-      selected: false,
-      isInBetween: false,
       index: idx,
-      starter: false,
     })
   }
   return cells;
@@ -138,4 +134,19 @@ const constructNewEvent = (event) => {
   };
 
   return constructedEvent;
+}
+
+ /**
+ * @param {int} The month number, 0 based
+ * @param {int} The year, not zero based, required to account for leap years
+ * @return {Date[]} List with date objects for each day of the month
+ */
+const getDaysInMonth = (month, year) => {
+     var date = new Date(year, month, 1);
+     var days = [];
+     while (date.getMonth() === month) {
+        days.push(new Date(date));
+        date.setDate(date.getDate() + 1);
+     }
+     return days;
 }

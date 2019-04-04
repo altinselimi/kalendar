@@ -1,9 +1,12 @@
 <template>
-  <div class="kalendar-wrapper" :class="{
+  <div class="kalendar-wrapper"
+       :class="{
             'no-scroll': !scrollable, 
             'is-day-view': kalendar_options.view_type === 'Day', 
             'gstyle': kalendar_options.style === 'material_design', 
-    }" @touchstart="scrollable = false" @touchend="scrollable = true">
+    }"
+       @touchstart="scrollable = false"
+       @touchend="scrollable = true">
     <div class="week-navigator">
       <div class="nav-wrapper">
         <button @click="previousWeek()">PREV</button>
@@ -16,23 +19,34 @@
       </div>
     </div>
     <kalendar-week-view />
-    <portal to="event-creation" class="slotable">
-      <div slot-scope="information" class="creating-event">
-        <slot name="creating-card" :event_information="information">
+    <portal to="event-creation"
+            class="slotable">
+      <div slot-scope="information"
+           class="creating-event">
+        <slot name="creating-card"
+              :event_information="information">
         </slot>
       </div>
     </portal>
-    <portal to="event-popup-form" class="slotable">
-      <div slot-scope="{ events, information }" class="popup-event">
-        <slot name="popup-form" :popup_events="events" :popup_information="information">
-          <input type="text" placeholder="Event Name">
+    <portal to="event-popup-form"
+            class="slotable">
+      <div slot-scope="{ events, information }"
+           class="popup-event">
+        <slot name="popup-form"
+              :popup_events="events"
+              :popup_information="information">
+          <input type="text"
+                 placeholder="Event Name">
           <textarea></textarea>
         </slot>
       </div>
     </portal>
-    <portal to="event-details" class="slotable">
-      <div slot-scope="information" class="created-event">
-        <slot name="details-card" :event_information="information">
+    <portal to="event-details"
+            class="slotable">
+      <div slot-scope="information"
+           class="created-event">
+        <slot name="details-card"
+              :event_information="information">
           <h4 style="margin-bottom: 5px">{{information.title}}</h4>
           <p>{{information.description}}</p>
         </slot>
@@ -49,6 +63,8 @@ window.kalendarHelpers = {};
 for (let util of Object.keys(Utils)) {
   window.kalendarHelpers[util] = Utils[util];
 }
+
+const { generateUUID } = Utils;
 
 Vue.use(PortalVue);
 
@@ -79,6 +95,7 @@ export default {
       },
     },
   },
+  inject: ['kalendar_events', 'kalendar_options'],
   data: () => ({
     default_options: {
       dark: false,
@@ -99,74 +116,111 @@ export default {
     scrollable: true,
   }),
   computed: {
-    kalendar_options() {
-      let options = this.default_options;
-      let provided_props = this.configuration;
-      if (!isNaN(Date.parse(provided_props.current_day))) {
-        provided_props.current_day.setUTCHours(0, 0, 0, 0);
-      }
-      let today = new Date();
-      today.setUTCHours(0, 0, 0, 0);
-      options.current_day = today;
-      let conditions = {
-        //dark: (val) => typeof val === 'boolean',
-        scrollToNow: (val) => typeof val === 'boolean',
-        current_week: (val) => val === null,
-        current_day: (val) => !isNaN(Date.parse(val)),
-        view_type: (val) => ['Month', 'Day'].includes(val),
-        cell_height: (val) => !isNaN(val),
-        style: (val) => ['material_design', 'flat_design'].includes(val),
-        military_time: (val) => typeof val === 'boolean',
-        read_only: (val) => typeof val === 'boolean',
-        day_starts_at: (val) => {
-          return typeof val === 'string' &&
-            val.length === 4 &&
-            !isNaN(val)
-        },
-        day_ends_at: (val) => {
-          return typeof val === 'string' &&
-            val.length === 4 &&
-            !isNaN(val)
+    kalendar_options: {
+      get() {
+        let options = this.default_options;
+        let provided_props = this.configuration;
+        if (!isNaN(Date.parse(provided_props.current_day))) {
+          provided_props.current_day.setUTCHours(0, 0, 0, 0);
+        } else {
+          let today = new Date();
+          today.setUTCHours(0, 0, 0, 0);
+          options.current_day = today;
         }
-      };
-      for (let key in provided_props) {
-        if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
-          options[key] = provided_props[key];
+
+        let conditions = {
+          //dark: (val) => typeof val === 'boolean',
+          scrollToNow: (val) => typeof val === 'boolean',
+          current_week: (val) => val === null,
+          current_day: (val) => !isNaN(Date.parse(val)),
+          view_type: (val) => ['Month', 'Day'].includes(val),
+          cell_height: (val) => !isNaN(val),
+          style: (val) => ['material_design', 'flat_design'].includes(val),
+          military_time: (val) => typeof val === 'boolean',
+          read_only: (val) => typeof val === 'boolean',
+          day_starts_at: (val) => {
+            return typeof val === 'string' &&
+              val.length === 4 &&
+              !isNaN(val)
+          },
+          day_ends_at: (val) => {
+            return typeof val === 'string' &&
+              val.length === 4 &&
+              !isNaN(val)
+          }
+        };
+        for (let key in provided_props) {
+          if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
+            options[key] = provided_props[key];
+          }
         }
-      }
-      return options;
+        console.log('config got updated');
+        return options;
+      },
     },
   },
   created() {
+    this.kalendar_events = [];
+    let events_going_two_days = this.events.filter(event => {
+
+    });
     this.kalendar_events = this.events.map(event => ({
       ...event,
       id: event.id || kalendarHelpers.generateUUID()
     }));
-  },
-  provide() {
-    const provider = {}
-    Object.defineProperty(provider, 'kalendar_options', {
-      enumerable: true,
-      get: () => this.kalendar_options,
-    });
-    Object.defineProperty(provider, 'kalendar_events', {
-      enumerable: true,
-      get: () => this.kalendar_events
-    });
-    provider.updateEvents = (payload) => {
-      this.kalendar_events = payload;
+    this.kalendar_events = this.kalendar_events;
+    this.kalendar_options = this.kalendar_options;
+    this.$kalendar.updateEvents = (payload) => {
+      this.kalendar_events = payload.map(event => ({
+        ...event,
+        id: event.id || generateUUID()
+      }));
       this.$emit('update:events', payload.map(event => ({
         from: event.from,
         to: event.to,
         data: event.data
       })));
-    }
-    return provider;
+    };
   },
   methods: {
-    previousWeek() {},
-    nextWeek() {}
+    previousWeek() {
+      let { current_day } = this.kalendar_options;
+      console.log('curr day:', current_day);
+      let nextWeek = new Date(current_day);
+      nextWeek.setDate(nextWeek.getDate() - 7);
+      nextWeek.setUTCHours(0, 0, 0, 0);
+
+      let config = kalendarHelpers.cloneObject(this.configuration);
+      config = {
+        ...config,
+        current_day: nextWeek
+      };
+
+      this.$emit('update:configuration', config);
+      setTimeout(() => {
+        this.$kalendar.buildWeek();
+      });
+    },
+    nextWeek() {
+      let { current_day } = this.kalendar_options;
+      console.log('curr day:', current_day);
+      let nextWeek = new Date(current_day);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      nextWeek.setUTCHours(0, 0, 0, 0);
+
+      let config = kalendarHelpers.cloneObject(this.configuration);
+      config = {
+        ...config,
+        current_day: nextWeek
+      };
+
+      this.$emit('update:configuration', config);
+      setTimeout(() => {
+        this.$kalendar.buildWeek();
+      });
+    }
   }
 }
 </script>
-<style lang="scss" src="./main.scss"></style>
+<style lang="scss"
+       src="./main.scss"></style>
