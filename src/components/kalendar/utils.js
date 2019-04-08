@@ -29,17 +29,16 @@ const addHours = (date, hours) => {
 };
 
 const startOfWeek = (date) => {
-  let dateObj = new Date(date);
-  dateObj.setUTCHours(0, 0, 0, 0);
-  let toSubstract = dateObj.getDay() * -1;
-  return addDays(dateObj, toSubstract);
+  let d = new Date(date);
+  let day = d.getDay(),
+      diff = d.getDate() - day;
+  return new Date(d.setDate(diff));
 };
 
 const endOfWeek = (date) => {
   let dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
-  let toAdd = 7 - dateObj.getDay();
-  console.log(`Gonna add ${toAdd} days`)
+  let toAdd = 6 - dateObj.getDay();
   return addDays(dateObj, toAdd);
 };
 
@@ -56,7 +55,8 @@ const generateUUID = () => {
 };
 
 const formatDate = (value, how) => {
-  return format(value, how);
+  console.log('Called formatdate');
+  return format(getUTCDate(value), how);
 }
 
 const cloneObject = (object) => {

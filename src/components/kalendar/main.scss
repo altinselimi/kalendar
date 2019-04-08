@@ -60,11 +60,21 @@
 
     .sticky-top .days {
       margin-left: 0;
-      padding-left: 50px;
+      padding-left: 55px;
     }
 
     .all-day {
       display: none;
+    }
+
+    ul.building-blocks li.is-an-hour::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: -10px;
+      width: 10px;
+      height: 1px;
+      background-color: var(--table-cell-border-color);
     }
 
     ul.building-blocks li,
@@ -89,7 +99,7 @@
         content: '';
         position: absolute;
         height: 1px;
-        width: 50px;
+        width: 55px;
         left: 0;
         bottom: 0;
         background-color: var(--table-cell-border-color);

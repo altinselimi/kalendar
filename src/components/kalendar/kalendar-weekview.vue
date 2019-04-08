@@ -8,8 +8,8 @@
             :key="index"
             v-for="({value}, index) in (days || [])"
             :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
-          <span class="letters-date">{{value | formatDate('ddd')}}</span>
-          <span class="number-date">{{value | formatDate('DD')}}</span>
+          <span class="letters-date">{{kalendar_options.formatDayTitle(value)[0]}}</span>
+          <span class="number-date">{{kalendar_options.formatDayTitle(value)[1]}}</span>
         </li>
       </ul>
       <ul class="all-day">
@@ -35,8 +35,9 @@
           <li class="hour-row-identifier"
               :key="index"
               v-for="(hour, index) in (hours || [])"
+              v-if="hour.visible"
               :style="`height:${hourHeight}px`">
-            <span>{{hour.value | formatUTCDate(hour_format)}}</span>
+            <span>{{kalendar_options.formatLeftHours(hour.value)}}</span>
           </li>
         </ul>
         <div v-show="kalendar_options.style !== 'material_design'"
@@ -100,7 +101,7 @@ export default {
     },
     hour_format() {
       return this.kalendar_options.military_time ? 'HH:mm' : 'h A';
-    }
+    },
   },
   methods: {
     _isToday(day) {
@@ -121,12 +122,17 @@ export default {
     constructWeek() {
       const date = this.kalendar_options.current_day.toISOString().slice(0, 10);
       return Promise.all([myWorker.send('getDays', {
-          day: date
+          day: date,
+          min_hour: this.kalendar_options.day_starts_at,
+          max_hour: this.kalendar_options.day_ends_at
         }).then(reply => {
           console.log('Got week days:', reply);
           this.days = reply; //.slice(0,1);
         }),
-        myWorker.send('getHours').then(reply => {
+        myWorker.send('getHours', {
+          min_hour: this.kalendar_options.day_starts_at,
+          max_hour: this.kalendar_options.day_ends_at
+        }).then(reply => {
           // Handle the reply
           console.log('Got calendar hours:', reply);
           this.hours = reply;
@@ -212,7 +218,7 @@ $theme-color: #e5e5e5;
   .days {
     margin: 0px;
     display: flex;
-    margin-left: 50px;
+    margin-left: 55px;
 
     li {
       display: inline-flex;
@@ -264,7 +270,7 @@ $theme-color: #e5e5e5;
       display: flex;
       align-items: center;
       padding: 0px 5px;
-      width: 50px;
+      width: 55px;
       font-weight: 500;
       font-size: .8rem;
       color: darken($grey, 5);
@@ -284,7 +290,7 @@ $theme-color: #e5e5e5;
 
 .dummy-row {
   display: flex;
-  padding-left: 50px;
+  padding-left: 55px;
 
   ul {
     display: flex;
@@ -330,7 +336,7 @@ $theme-color: #e5e5e5;
   color: darken($grey, 5);
   font-weight: 500;
   font-size: .85rem;
-  width: 50px;
+  width: 55px;
   height: 100%;
   margin-bottom: 0px;
 
@@ -340,7 +346,7 @@ $theme-color: #e5e5e5;
     padding-left: 8px;
 
     span {
-      margin-top: -10px;
+      margin-top: -8px;
     }
 
     &:first-child span {

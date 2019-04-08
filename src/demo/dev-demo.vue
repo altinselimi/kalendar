@@ -1,43 +1,81 @@
 <template>
   <div>
-    <input type="number" v-model.number="calendar_settings.cell_height" placeholder="Cell Height">
+    <input type="number"
+           v-model.number="calendar_settings.cell_height"
+           placeholder="Cell Height">
     <button @click="addManually()">ADD AN EVENT MANUALLY</button>
-    <kalendar :configuration.sync="calendar_settings" :events.sync="events" class="generate-shadow">
+    <kalendar :configuration.sync="calendar_settings"
+              :events.sync="events"
+              class="generate-shadow">
       <!-- CREATED CARD SLOT -->
-      <div slot="details-card" slot-scope="{ event_information }" class="details-card">
+      <div slot="details-card"
+           slot-scope="{ event_information }"
+           class="details-card">
         <h4 class="appointment-title">{{event_information.data.title}}</h4>
         <small>
           {{event_information.data.description}}
         </small>
-        <span class="time">{{event_information.start_time | formatDate('HH:mm')}} - {{event_information.end_time | formatDate('HH:mm')}}</span>
-        <button @click="removeEvent(event_information)" class="cancel">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
+        <span class="time">{{event_information.start_time | formatToHours}} - {{event_information.end_time |
+          formatToHours}}</span>
+        <button @click="removeEvent(event_information)"
+                class="cancel">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               width="24"
+               height="24"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+               aria-hidden="true"
+               data-reactid="1326">
+            <circle cx="12"
+                    cy="12"
+                    r="10"></circle>
+            <line x1="15"
+                  y1="9"
+                  x2="9"
+                  y2="15"></line>
+            <line x1="9"
+                  y1="9"
+                  x2="15"
+                  y2="15"></line>
           </svg>
         </button>
       </div>
       <!-- CREATING CARD SLOT -->
-      <div slot="creating-card" slot-scope="{ event_information }">
-        <h4 class="appointment-title" style="text-align: left;">
-          New Appointment h3
+      <div slot="creating-card"
+           slot-scope="{ event_information }">
+        <h4 class="appointment-title"
+            style="text-align: left;">
+          New Appointment
         </h4>
         <span class="time">
-          {{event_information.start_time | formatDate('HH:mm')}}
+          {{event_information.start_time | formatToHours}}
           -
-          {{event_information.end_time | formatDate('HH:mm')}}
+          {{event_information.end_time | formatToHours}}
         </span>
       </div>
       <!-- POPUP CARD SLOT -->
-      <div slot="popup-form" slot-scope="{ popup_information }" style="display: flex; flex-direction: column;">
+      <div slot="popup-form"
+           slot-scope="{ popup_information }"
+           style="display: flex; flex-direction: column;">
         <h4 style="margin-bottom: 10px">
           New Appointment
         </h4>
-        <input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
-        <textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
+        <input v-model="new_appointment['title']"
+               type="text"
+               name="title"
+               placeholder="Title">
+        <textarea v-model="new_appointment['description']"
+                  type="text"
+                  name="description"
+                  placeholder="Description"
+                  rows="2"></textarea>
         <div class="buttons">
-          <button class="cancel" @click="closePopups()">
+          <button class="cancel"
+                  @click="closePopups()">
             Cancel
           </button>
           <button @click="addAppointment(popup_information)">
@@ -88,60 +126,44 @@ const existing_events = [{
 
 import Vue from 'vue';
 
-import VueHighlightJS from 'vue-highlightjs'
-Vue.use(VueHighlightJS)
-
-import format from 'date-fns/format';
-import getTime from 'date-fns/get_time';
-
 import Kalendar from '../components/kalendar/kalendar-container.vue';
-//import { Kalendar } from 'kalendar-vue';
-//import 'kalendar-vue/dist/kalendar-vue.css';
-
-import { DatePicker, TimePicker, Select, Input, TimeSelect, Option, Checkbox } from 'element-ui';
-import lang from 'element-ui/lib/locale/lang/en';
-import locale from 'element-ui/lib/locale';
-locale.use(lang);
-
-import HowTo from './how-to.vue';
+import { DateTime } from 'luxon';
 
 export default {
   created() {
-    Vue.filter('formatDate', (value, how) => {
-      return format(value, how);
+    Vue.filter('formatToHours', (value, how) => {
+      let dt = DateTime.fromISO(value, { zone: "utc" });
+      return dt.toLocaleString(DateTime.TIME_24_SIMPLE);
     });
   },
   components: {
     Kalendar,
     options: () =>
       import('./options.vue'),
-    quickIntro: () =>
-      import('./quick-intro.vue'),
-    elInput: Input,
-    elSelect: Select,
-    elTimePicker: TimePicker,
-    elDatePicker: DatePicker,
-    elTimeSelect: TimeSelect,
-    elOption: Option,
-    elCheckbox: Checkbox,
-    HowTo,
   },
-  data: () => ({
-    events: existing_events,
-    calendar_settings: {
-      view_type: 'Month',
-      cell_height: 10,
-      scrollToNow: false,
-      current_day: new Date(),
-      military_time: false,
-      read_only: false
-    },
-    outline_slots: false,
-    new_appointment: {},
-    manual_form: {},
-    adding_manually: false,
-    input_value: '',
-  }),
+  data() {
+    return {
+      events: existing_events,
+      calendar_settings: {
+        view_type: 'Month',
+        cell_height: 10,
+        scrollToNow: false,
+        current_day: new Date(),
+        military_time: false,
+        read_only: false,
+        formatLeftHours: (date) => {
+          console.log('data')
+          let dt = DateTime.fromISO(date, { zone: "utc" });
+          return dt.toFormat("hh a");
+        },
+      },
+      outline_slots: false,
+      new_appointment: {},
+      manual_form: {},
+      adding_manually: false,
+      input_value: '',
+    };
+  },
   methods: {
     getHours(start, end) {
       return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
@@ -192,7 +214,7 @@ export default {
       );
     },
     removeEvent(kalendarEvent) {
-      let day = kalendarEvent.start_time.toISOString().slice(0,10);
+      let day = kalendarEvent.start_time.toISOString().slice(0, 10);
       this.$kalendar.removeEvent({
         day,
         key: kalendarEvent.key,
@@ -206,6 +228,7 @@ export default {
 <style lang="scss">
 $green: #00F0B5;
 $red: #F61067;
+
 .details-card {
   display: flex;
   flex-direction: column;
@@ -221,6 +244,7 @@ $red: #F61067;
     right: 5px;
     cursor: pointer;
     background: transparent;
+
     svg {
       width: 18px;
       height: 18px;
@@ -233,11 +257,13 @@ $red: #F61067;
   display: flex;
   justify-content: space-between;
 }
+
 .popup-event .buttons button {
   border: none;
   color: #29771c;
   background-color: rgba($green, .04);
   padding: 5px 10px;
+
   &.cancel {
     background-color: rgba($red, .04);
     color: $red;

@@ -79,7 +79,9 @@ export default {
   methods: {
     renderDay() {
       myWorker.send('getDayCells', {
-        day: this.day.value
+        day: this.day.value,
+        min_hour: this.kalendar_options.day_starts_at,
+        max_hour: this.kalendar_options.day_ends_at
       }).then(reply => {
         console.log('Got day cells:', reply);
         this.day_cells = reply;

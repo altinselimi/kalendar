@@ -11,9 +11,7 @@
       <div class="nav-wrapper">
         <button @click="previousWeek()">PREV</button>
         <div>
-          <span>{{ kalendar_options.current_day | startOfWeek | formatDate('MMM DD') }}</span>
-          <span syle="margin:0px 5px;">-</span>
-          <span>{{ kalendar_options.current_day | endOfWeek | formatDate('MMM DD, YYYY') }}</span>
+          <span>{{ kalendar_options.formatWeekNavigator(kalendar_options.current_day) }}</span>
         </div>
         <button @click="nextWeek()">NEXT</button>
       </div>
@@ -25,19 +23,45 @@
            class="creating-event">
         <slot name="creating-card"
               :event_information="information">
+          <h4 class="appointment-title"
+              style="text-align: left;">
+            New Appointment
+          </h4>
+          <span class="time">
+            {{getTime(information.start_time)}}
+            -
+            {{getTime(information.end_time)}}
+          </span>
         </slot>
       </div>
     </portal>
     <portal to="event-popup-form"
             class="slotable">
-      <div slot-scope="{ events, information }"
+      <div slot-scope="{ information }"
            class="popup-event">
         <slot name="popup-form"
-              :popup_events="events"
               :popup_information="information">
-          <input type="text"
-                 placeholder="Event Name">
-          <textarea></textarea>
+          <h4 style="margin-bottom: 10px">
+            New Appointment
+          </h4>
+          <input v-model="new_appointment['title']"
+                 type="text"
+                 name="title"
+                 placeholder="Title">
+          <textarea v-model="new_appointment['description']"
+                    type="text"
+                    name="description"
+                    placeholder="Description"
+                    rows="2"></textarea>
+          <div class="buttons">
+            <button class="cancel"
+                    @click="closePopups()">
+              Cancel
+            </button>
+            <button @click="addAppointment(information)">
+              Save
+            </button>
+          </div>
         </slot>
       </div>
     </portal>
@@ -63,9 +87,6 @@ window.kalendarHelpers = {};
 for (let util of Object.keys(Utils)) {
   window.kalendarHelpers[util] = Utils[util];
 }
-
-Vue.filter('startOfWeek', Utils.startOfWeek);
-Vue.filter('endOfWeek', Utils.endOfWeek);
 
 const { generateUUID } = Utils;
 
@@ -110,16 +131,25 @@ export default {
       now: new Date,
       military_time: true,
       read_only: false,
-      day_starts_at: '0000',
-      day_ends_at: '2400',
+      day_starts_at: 0,
+      day_ends_at: 24,
       formatLeftHours: (date) => {
-        this.formatDate(date, 'HH:mm');
+        return 4;
+        let isoDate = new Date(date).toISOString();
+        return isoDate.split("T")[1].slice(0, 2).padStart(2,0);
       },
       formatDayTitle: (date) => {
-        
+        let isoDate = new Date(date);
+        let dayName = isoDate.toUTCString().slice(0, 3);
+        let dayNumber = isoDate.getUTCDate();
+        return [dayName, dayNumber];
       },
-      formatWeekNavigator: ({ start, end }) => {
-        return `${start} - ${end}`
+      formatWeekNavigator: (isoDate) => {
+        let startDate = Utils.startOfWeek(isoDate);
+        let endDate = Utils.endOfWeek(isoDate);
+        let startString = startDate.toUTCString().slice(5, 11);
+        let endString = endDate.toUTCString().slice(5, 11);
+        return `${startString} - ${endString}`;
       }
     },
     kalendar_events: null,
@@ -149,15 +179,16 @@ export default {
         military_time: (val) => typeof val === 'boolean',
         read_only: (val) => typeof val === 'boolean',
         day_starts_at: (val) => {
-          return typeof val === 'string' &&
-            val.length === 4 &&
-            !isNaN(val)
+          return typeof val === 'number'
+            && val >= 0
+            && val <= 24;
         },
         day_ends_at: (val) => {
-          return typeof val === 'string' &&
-            val.length === 4 &&
-            !isNaN(val)
-        }
+          return typeof val === 'number'
+            && val >= 0
+            && val <= 24;
+        },
+        formatLeftHours: (func) => typeof func(new Date().toISOString()) === 'string'
       };
       for (let key in provided_props) {
         if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {
@@ -234,7 +265,38 @@ export default {
       setTimeout(() => {
         this.$kalendar.buildWeek();
       });
-    }
+    },
+    getTime(date) {
+      let dateObj = new Date(date);
+      let minutes = dateObj.getUTCHours().toString().padStart(2, 0);
+      let seconds = dateObj.getUTCMinutes().toString().padStart(2, 0);
+      return `${minutes}:${seconds}`;
+    },
+    addAppointment(popup_info) {
+      let payload = {
+        data: {
+          title: this.new_appointment.title,
+          description: this.new_appointment.description,
+        },
+        from: popup_info.start_time,
+        to: popup_info.end_time,
+      };
+
+      this.$kalendar.addNewEvent(
+        payload,
+      );
+      this.$kalendar.closePopups();
+      this.clearFormData();
+    },
+    clearFormData() {
+      this.new_appointment = {
+        description: null,
+        title: null,
+      };
+    },
+    closePopups() {
+      this.$kalendar.closePopups();
+    },
   }
 }
 </script>

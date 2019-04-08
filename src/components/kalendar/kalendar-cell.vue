@@ -1,5 +1,6 @@
 <template>
-  <li @mouseover.self="mouseMove()"
+  <li v-if="cellData.visible"
+      @mouseover.self="mouseMove()"
       @mousedown.self="mouseDown()"
       @mouseup="mouseUp()"
       class="kalendar-cell"
@@ -148,7 +149,7 @@ li {
   height: 100%;
 }
 
-.kalendar-cell:last-child {
+.kalendar-cell:nth-child(144) {
   display: none;
 }
 

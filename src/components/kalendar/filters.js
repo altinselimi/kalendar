@@ -7,7 +7,7 @@ export default {
     return format(getUTCDate(value), how);
   },
   formatDate(value, how) {
-    return format(value, how);
+    return format(getUTCDate(value), how);
   },
 }
 
