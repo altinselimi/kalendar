@@ -92,7 +92,7 @@ $dark: #3C3C3B;
 	flex-direction: column;
 	padding: 15px;
 	>* {
-		margin-bottom: 20px;
+		margin-bottom: 10px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;

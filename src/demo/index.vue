@@ -81,6 +81,12 @@
 			<label>Read only
 				<el-checkbox size="small" v-model="calendar_settings['read_only']"></el-checkbox>
 			</label>
+			<label>Start hour
+				<el-input size="small" type="number" v-model.number="calendar_settings['start_hour']" />
+			</label>
+			<label>End hour
+				<el-input size="small" type="number" v-model.number="calendar_settings['end_hour']" />
+			</label>
 		</options>
 		<div class="calendar-component" :class="{'show-slots': outline_slots}">
 			<kalendar :configuration="calendar_settings" :appointments="appointments" class="generate-shadow">
@@ -200,7 +206,9 @@ export default {
 			scrollToNow: false,
 			current_day: new Date(),
 			military_time: false,
-			read_only: false
+			read_only: false,
+			start_hour: 0,
+			end_hour: 23,
 		},
 		outline_slots: false,
 		new_appointment: JSON.parse(JSON.stringify(new_appointment_model)),
