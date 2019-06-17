@@ -108,6 +108,7 @@ const addTimezoneInfo = (ISOdate) => {
 }
 
 const removeTimezoneInfo = (ISOdate) => {
+  console.log(`${ISOdate} to ${ISOdate.slice(0,19)}.000Z`);
   return `${ISOdate.slice(0,19)}.000Z`;
 }
 
@@ -121,6 +122,7 @@ export default {
   generateUUID,
   cloneObject,
   addTimezoneInfo,
+  removeTimezoneInfo,
   getISODate,
   getYearMonthDay,
   getRelativeRepresentation,

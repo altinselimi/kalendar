@@ -127,8 +127,8 @@ const existing_events = [{
 
   // Event created in GMT+2 (Europe)
   {
-    "from": addTimezoneInfo(today_from2.toISOString()).slice(0,19) + '+02:00',
-    "to": addTimezoneInfo(today_to2.toISOString()).slice(0,19) + '+02:00',
+    "from": addTimezoneInfo(today_from2.toISOString()).slice(0, 19) + '+02:00',
+    "to": addTimezoneInfo(today_to2.toISOString()).slice(0, 19) + '+02:00',
     "data": {
       "title": "Main",
       "description": "Right.2"
@@ -138,8 +138,8 @@ const existing_events = [{
 
 let today = new Date();
 let year = today.getFullYear() + '',
-  month = ((today.getMonth() + 1) + '').padStart(2,0),
-  day = (today.getDate() + '').padStart(2,0);
+  month = ((today.getMonth() + 1) + '').padStart(2, 0),
+  day = (today.getDate() + '').padStart(2, 0);
 
 const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
 
@@ -151,7 +151,7 @@ import { DateTime } from 'luxon';
 export default {
   created() {
     Vue.filter('formatToHours', (value, how) => {
-      let dt = DateTime.fromISO(value, { zone: "utc" });
+      let dt = DateTime.fromISO(value);
       return dt.toLocaleString(DateTime.TIME_24_SIMPLE);
     });
   },

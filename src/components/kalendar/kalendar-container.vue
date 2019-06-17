@@ -88,8 +88,6 @@ for (let util of Object.keys(Utils)) {
   window.kalendarHelpers[util] = Utils[util];
 }
 
-const { generateUUID } = Utils;
-
 Vue.use(PortalVue);
 
 const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
@@ -126,7 +124,6 @@ export default {
         dark: false,
         cell_height: 10,
         scrollToNow: false,
-        currently_working_on_date: null,
         current_day: today,
         view_type: 'Month',
         style: 'material_design',
@@ -210,7 +207,7 @@ export default {
     this.$kalendar.updateEvents = (payload) => {
       this.kalendar_events = payload.map(event => ({
         ...event,
-        id: event.id || generateUUID()
+        id: event.id || kalendarHelpers.generateUUID()
       }));
       this.$emit('update:events', payload.map(event => ({
         from: event.from,
