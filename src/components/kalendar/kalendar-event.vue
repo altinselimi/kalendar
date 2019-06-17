@@ -10,7 +10,10 @@
        @mouseleave="inspecting = false"
        :class="{
       'overlaps': overlaps > 0,
-      'inspecting': !!inspecting
+      'two-in-one': total > 1, 
+      'inspecting': !!inspecting,
+      'event-card__mini': event.distance <= 10,
+      'event-card__small': (event.distance > 10 && event.distance < 40) || (overlaps > 1) 
     }">
     <portal-target v-if="status === 'creating' || status === 'popup-initiated'"
                    :slot-props="information"
@@ -25,15 +28,16 @@
          class="popup-wrapper">
       <portal-target name="event-popup-form"
                      slim
-                     :slot-props="getPopupProps()">
+                     :slot-props="information">
       </portal-target>
     </div>
   </div>
 </template>
 <script>
+
 export default {
   props: ['event', 'total', 'index', 'overlaps'],
-  inject: ['kalendarAddEvent', 'kalendarClearPopups', 'kalendar_options', 'kalendar_events'],
+  inject: ['kalendar_options'],
   data: () => ({
     inspecting: false,
   }),
@@ -45,7 +49,7 @@ export default {
       return `(${this.index} * (${this.width_value})) + ${this.overlaps * 50}px`;
     },
     top_offset() {
-      return `${this.event.start.round_offset}px`;
+      return this.event.start.round_offset ? `${this.event.start.round_offset}px` : `0px`;
     },
     distance() {
       if (!this.event) return;
@@ -58,39 +62,15 @@ export default {
     },
     information() {
       let { start, end, data, id, key } = this.event;
-      return {
-        start_time: start.value,
-        end_time: end.value,
+      let payload = {
+        start_time: kalendarHelpers.addTimezoneInfo(start.value),
+        end_time: kalendarHelpers.addTimezoneInfo(end.value),
         kalendar_id: id,
         key,
         data
       }
+      return payload;
     },
-  },
-  methods: {
-    saveEvent(payload) {
-      if (this.event.data) {
-        return this.kalendarAddEvent(payload);
-      } else {
-        return this.kalendarAddEvent(payload);
-      }
-    },
-    closePopup() {
-      return this.kalendarClearPopups();
-    },
-    getPopupProps() {
-      const events = {
-        saveEvent: this.saveEvent,
-        closePopup: this.closePopup,
-        status: 'hello'
-      };
-
-      const information = this.information;
-      return {
-        events,
-        information
-      }
-    }
   }
 }
 </script>
@@ -103,6 +83,7 @@ $creator-content: white;
   flex-direction: column;
   height: 100%;
   width: 100%;
+
   h4,
   p,
   span {
@@ -128,6 +109,27 @@ $creator-content: white;
       box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
       transition: opacity 100ms linear;
     }
+  }
+
+  &__mini {
+    .appointment-title,
+    .time {
+      position: absolute;
+      top: 0;
+      font-size: 9px;
+    }
+  }
+  &__small {
+    .appointment-title {
+      font-size: 80%;
+    }
+    .time {
+      font-size: 70%;
+    }
+  }
+
+  &.two-in-one .details-card > * {
+    font-size: 60%;
   }
 
   position: absolute;

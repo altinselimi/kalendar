@@ -1,8 +1,31 @@
 // remove this dependency once you have internet
 import format from 'date-fns/format';
 
-const getUTCDate = (dateString = Date.now()) => {
-  const date = new Date(dateString);
+let creators_offset = new Date().getTimezoneOffset() / 60;
+if (creators_offset * -1 >= 0) {
+  creators_offset *= -1;
+  creators_offset = `${(creators_offset + '').padStart(2, '0')}:00`;
+  creators_offset = `+${creators_offset}`;
+} else {
+  creators_offset = `${(creators_offset + '').padStart(2, '0')}:00`;
+  creators_offset = `-${creators_offset}`;
+}
+
+const getISODate = (date_string) => {
+  let today = date_string ? new Date(date_string) : new Date();
+  let year = today.getFullYear() + '',
+    month = ((today.getMonth() + 1) + '').padStart(2, 0),
+    day = (today.getDate() + '').padStart(2, 0);
+
+  return `${year}-${month}-${day}T00:00:00.000Z`;
+};
+
+const getYearMonthDay = (date_string) => {
+  return getISODate(date_string).slice(0, 10);
+}
+
+const getUTCDate = (date_string = Date.now()) => {
+  const date = new Date(date_string);
   return new Date(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -31,7 +54,7 @@ const addHours = (date, hours) => {
 const startOfWeek = (date) => {
   let d = new Date(date);
   let day = d.getDay(),
-      diff = d.getDate() - day;
+    diff = d.getDate() - day;
   return new Date(d.setDate(diff));
 };
 
@@ -55,7 +78,6 @@ const generateUUID = () => {
 };
 
 const formatDate = (value, how) => {
-  console.log('Called formatdate');
   return format(getUTCDate(value), how);
 }
 
@@ -70,6 +92,25 @@ const getDayDateID = (date) => {
   return `${year}-${month}-${day}`;
 }
 
+const getRelativeRepresentation = (dateString) => {
+  let date = new Date(dateString);
+  return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+}
+
+const getAbsoluteRepresentation = (dateString) => {
+  let date = new Date(dateString.slice(0,19) + '.000Z');
+  return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+};
+
+const addTimezoneInfo = (ISOdate) => {
+  if (new Date(ISOdate).toISOString() !== ISOdate) return;
+  return `${ISOdate.slice(0,19)}${creators_offset}`;
+}
+
+const removeTimezoneInfo = (ISOdate) => {
+  return `${ISOdate.slice(0,19)}.000Z`;
+}
+
 export default {
   addDays,
   addMinutes,
@@ -78,5 +119,10 @@ export default {
   endOfWeek,
   isMobile,
   generateUUID,
-  cloneObject
+  cloneObject,
+  addTimezoneInfo,
+  getISODate,
+  getYearMonthDay,
+  getRelativeRepresentation,
+  getAbsoluteRepresentation
 };

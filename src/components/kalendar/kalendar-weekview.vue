@@ -120,13 +120,12 @@ export default {
       return isBefore(day, this.kalendar_options.now);
     },
     constructWeek() {
-      const date = this.kalendar_options.current_day.toISOString().slice(0, 10);
+      const date = this.kalendar_options.current_day.slice(0, 10);
       return Promise.all([myWorker.send('getDays', {
           day: date,
           min_hour: this.kalendar_options.day_starts_at,
           max_hour: this.kalendar_options.day_ends_at
         }).then(reply => {
-          console.log('Got week days:', reply);
           this.days = reply; //.slice(0,1);
         }),
         myWorker.send('getHours', {
@@ -134,7 +133,6 @@ export default {
           max_hour: this.kalendar_options.day_ends_at
         }).then(reply => {
           // Handle the reply
-          console.log('Got calendar hours:', reply);
           this.hours = reply;
         })
       ]);
@@ -147,11 +145,11 @@ export default {
         if (!payload) return Promise.reject('No payload');
         let targetRef = payload.from.slice(0, 10);
         const refObject = this.$refs[targetRef];
-        if (refObject) {
+        if (refObject && refObject[0]) {
           refObject[0].addEvent(payload);
         } else {
           // appointment is not in this view
-          let events = this.kalendar_events.slice(0);
+          let events = this.$kalendar.getEvents();
           events.push(payload);
           this.$kalendar.updateEvents(events);
         }

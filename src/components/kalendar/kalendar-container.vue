@@ -37,7 +37,7 @@
     </portal>
     <portal to="event-popup-form"
             class="slotable">
-      <div slot-scope="{ information }"
+      <div slot-scope="information"
            class="popup-event">
         <slot name="popup-form"
               :popup_information="information">
@@ -119,54 +119,50 @@ export default {
       },
     },
   },
-  data: () => ({
-    default_options: {
-      dark: false,
-      cell_height: 10,
-      scrollToNow: false,
-      currently_working_on_date: null,
-      current_day: null,
-      view_type: 'Month',
-      style: 'material_design',
-      now: new Date,
-      military_time: true,
-      read_only: false,
-      day_starts_at: 0,
-      day_ends_at: 24,
-      formatLeftHours: (date) => {
-        return 4;
-        let isoDate = new Date(date).toISOString();
-        return isoDate.split("T")[1].slice(0, 2).padStart(2,0);
+  data() {
+    let today = kalendarHelpers.getISODate();
+    return {
+      default_options: {
+        dark: false,
+        cell_height: 10,
+        scrollToNow: false,
+        currently_working_on_date: null,
+        current_day: today,
+        view_type: 'Month',
+        style: 'material_design',
+        now: new Date,
+        military_time: true,
+        read_only: false,
+        day_starts_at: 0,
+        day_ends_at: 24,
+        time_mode: 'relative',
+        formatLeftHours: (date) => {
+          let isoDate = new Date(date).toISOString();
+          return isoDate.split("T")[1].slice(0, 2).padStart(2, 0);
+        },
+        formatDayTitle: (date) => {
+          let isoDate = new Date(date);
+          let dayName = isoDate.toUTCString().slice(0, 3);
+          let dayNumber = isoDate.getUTCDate();
+          return [dayName, dayNumber];
+        },
+        formatWeekNavigator: (isoDate) => {
+          let startDate = Utils.startOfWeek(isoDate);
+          let endDate = Utils.endOfWeek(isoDate);
+          let startString = startDate.toUTCString().slice(5, 11);
+          let endString = endDate.toUTCString().slice(5, 11);
+          return `${startString} - ${endString}`;
+        }
       },
-      formatDayTitle: (date) => {
-        let isoDate = new Date(date);
-        let dayName = isoDate.toUTCString().slice(0, 3);
-        let dayNumber = isoDate.getUTCDate();
-        return [dayName, dayNumber];
-      },
-      formatWeekNavigator: (isoDate) => {
-        let startDate = Utils.startOfWeek(isoDate);
-        let endDate = Utils.endOfWeek(isoDate);
-        let startString = startDate.toUTCString().slice(5, 11);
-        let endString = endDate.toUTCString().slice(5, 11);
-        return `${startString} - ${endString}`;
-      }
-    },
-    kalendar_events: null,
-    new_appointment: {},
-    scrollable: true,
-  }),
+      kalendar_events: null,
+      new_appointment: {},
+      scrollable: true,
+    }
+  },
   computed: {
     kalendar_options() {
       let options = this.default_options;
       let provided_props = this.configuration;
-      if (!isNaN(Date.parse(provided_props.current_day))) {
-        provided_props.current_day.setUTCHours(0, 0, 0, 0);
-      } else {
-        let today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
-        options.current_day = today;
-      }
 
       let conditions = {
         //dark: (val) => typeof val === 'boolean',
@@ -179,14 +175,14 @@ export default {
         military_time: (val) => typeof val === 'boolean',
         read_only: (val) => typeof val === 'boolean',
         day_starts_at: (val) => {
-          return typeof val === 'number'
-            && val >= 0
-            && val <= 24;
+          return typeof val === 'number' &&
+            val >= 0 &&
+            val <= 24;
         },
         day_ends_at: (val) => {
-          return typeof val === 'number'
-            && val >= 0
-            && val <= 24;
+          return typeof val === 'number' &&
+            val >= 0 &&
+            val <= 24;
         },
         formatLeftHours: (func) => typeof func(new Date().toISOString()) === 'string'
       };
@@ -199,14 +195,18 @@ export default {
     }
   },
   created() {
-    let events_going_two_days = this.events.filter(event => {
+    /*let events_going_two_days = this.events.filter(event => {
 
-    });
+    });*/
     this.kalendar_events = this.events.map(event => ({
       ...event,
       id: event.id || kalendarHelpers.generateUUID()
     }));
-    this.kalendar_events = this.kalendar_events;
+
+    this.$kalendar.getEvents = () => {
+      return this.kalendar_events.slice(0);
+    }
+
     this.$kalendar.updateEvents = (payload) => {
       this.kalendar_events = payload.map(event => ({
         ...event,
@@ -241,7 +241,7 @@ export default {
       let config = kalendarHelpers.cloneObject(this.configuration);
       config = {
         ...config,
-        current_day: nextWeek
+        current_day: nextWeek.toISOString()
       };
 
       this.$emit('update:configuration', config);
@@ -258,7 +258,7 @@ export default {
       let config = kalendarHelpers.cloneObject(this.configuration);
       config = {
         ...config,
-        current_day: nextWeek
+        current_day: nextWeek.toISOString()
       };
 
       this.$emit('update:configuration', config);

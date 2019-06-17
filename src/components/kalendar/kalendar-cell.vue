@@ -8,7 +8,7 @@
       'selected': selected, 
       'is-an-hour': (index+1)%(60/10) === 0,
       'has-events': cell_events && cell_events.length > 0,
-      'being-created': !!beingCreated
+      'being-created': !!beingCreated || hasPopups
     }"
       :style="`
       height: ${kalendar_options.cell_height}px;
@@ -29,7 +29,7 @@ import { generateUUID } from './utils';
 
 export default {
   props: ['creator', 'index', 'cellData', 'constructedEvents', 'temporaryEvent'],
-  inject: ['kalendar_events', 'kalendar_options'],
+  inject: ['kalendar_options'],
   components: {
     KalendarEvent: () => import('./kalendar-event.vue'),
   },
@@ -50,9 +50,9 @@ export default {
         this.constructedEvents[this.cellData.value];
     },
     beingCreated() {
-      return this.temporaryEvent &&
+      return (this.temporaryEvent &&
         this.temporaryEvent.start.value === this.cellData.value &&
-        this.temporaryEvent;
+        this.temporaryEvent);
     },
     overlappingEvents() {
       if (!this.constructedEvents || this.cell_events.length < 1) return [];
@@ -67,7 +67,6 @@ export default {
           let eventEnds = new Date(event.end.value);
           return eventStarts < cellDate && eventEnds > cellDate;
         });
-
     },
     overlapValue() {
       let length = this.overlappingEvents.length;
@@ -75,6 +74,9 @@ export default {
     },
     selected() {
       return this.cell_events && this.cell_events.length > 0;
+    },
+    hasPopups() {
+      return this.selected && !!this.cell_events.find(ev => ev.status === 'popup-initiated');
     }
   },
   methods: {
@@ -149,7 +151,7 @@ li {
   height: 100%;
 }
 
-.kalendar-cell:nth-child(144) {
+.kalendar-cell:last-child {
   display: none;
 }
 

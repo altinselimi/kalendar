@@ -18,7 +18,7 @@
         <span class="time">{{event_information.start_time | formatToHours}} - {{event_information.end_time |
           formatToHours}}</span>
         <button @click="removeEvent(event_information)"
-                class="cancel">
+                class="remove">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="24"
                height="24"
@@ -87,6 +87,9 @@
   </div>
 </template>
 <script>
+import Utils from '../components/kalendar/utils.js';
+const { addTimezoneInfo } = Utils;
+
 let today_from = new Date();
 let today_to = new Date();
 today_from.setUTCHours(3, 22, 0, 0);
@@ -106,23 +109,39 @@ tomorrow_to.setUTCHours(6, 19, 0, 0);
 
 
 const existing_events = [{
-    "from": today_from.toISOString(),
-    "to": today_to.toISOString(),
+    "from": addTimezoneInfo(today_from.toISOString()),
+    "to": addTimezoneInfo(today_to.toISOString()),
     "data": {
       "title": "Truth",
       "description": "Look."
     }
   },
   {
-    "from": today_from2.toISOString(),
-    "to": today_to2.toISOString(),
+    "from": addTimezoneInfo(today_from2.toISOString()),
+    "to": addTimezoneInfo(today_to2.toISOString()),
     "data": {
       "title": "Side",
       "description": "Look.2"
     }
+  },
+
+  // Event created in GMT+2 (Europe)
+  {
+    "from": addTimezoneInfo(today_from2.toISOString()).slice(0,19) + '+02:00',
+    "to": addTimezoneInfo(today_to2.toISOString()).slice(0,19) + '+02:00',
+    "data": {
+      "title": "Main",
+      "description": "Right.2"
+    }
   }
 ]
 
+let today = new Date();
+let year = today.getFullYear() + '',
+  month = ((today.getMonth() + 1) + '').padStart(2,0),
+  day = (today.getDate() + '').padStart(2,0);
+
+const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
 
 import Vue from 'vue';
 
@@ -148,14 +167,13 @@ export default {
         view_type: 'Month',
         cell_height: 10,
         scrollToNow: false,
-        current_day: new Date(),
+        current_day: currentDay,
         military_time: false,
         read_only: false,
-        formatLeftHours: (date) => {
-          console.log('data')
+        /*formatLeftHours: (date) => {
           let dt = DateTime.fromISO(date, { zone: "utc" });
           return dt.toFormat("hh a");
-        },
+        },*/
       },
       outline_slots: false,
       new_appointment: {},
@@ -214,7 +232,8 @@ export default {
       );
     },
     removeEvent(kalendarEvent) {
-      let day = kalendarEvent.start_time.toISOString().slice(0, 10);
+      console.log('KalendarEvent', kalendarEvent);
+      let day = kalendarEvent.start_time.slice(0, 10);
       this.$kalendar.removeEvent({
         day,
         key: kalendarEvent.key,
@@ -250,6 +269,15 @@ $red: #F61067;
       height: 18px;
       fill: white;
     }
+  }
+
+  .remove {
+    opacity: 0;
+    transition: opacity .15s;
+  }
+
+  &:hover .remove {
+    opacity: 1;
   }
 }
 

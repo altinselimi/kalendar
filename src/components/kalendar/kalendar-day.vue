@@ -9,7 +9,7 @@
       :ref="day.value + '-reference'">
     <kalendar-cell v-for="(cell, index) in day_cells"
                    :constructed-events="day_events"
-                   :key="`${index}`"
+                   :key="`cell-${index}`"
                    :creator="creator"
                    :cell-data="cell"
                    :index="index"
@@ -48,7 +48,7 @@ export default {
       kalendarClearPopups: this.clearCreatingLeftovers
     };
   },
-  inject: ['kalendar_events', 'kalendar_options'],
+  inject: ['kalendar_options'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
   },
@@ -58,9 +58,6 @@ export default {
     },
     isToday() {
       return isToday(this.day.date);
-    },
-    currentDay() {
-      return this.kalendar.preferences.current_day;
     },
   },
   data: () => ({
@@ -83,9 +80,8 @@ export default {
         min_hour: this.kalendar_options.day_starts_at,
         max_hour: this.kalendar_options.day_ends_at
       }).then(reply => {
-        console.log('Got day cells:', reply);
         this.day_cells = reply;
-        return this.getDayEvents(this.kalendar_events);
+        return this.getDayEvents(this.$kalendar.getEvents());
       });
     },
 
@@ -107,8 +103,7 @@ export default {
           // vue will fail to render it
           this.$set(this.day_events, key, [constructed_event]);
         }
-        console.log('ID:', constructed_event.id);
-        let events = this.kalendar_events.slice(0);
+        let events = this.$kalendar.getEvents();
         events.push({
           ...payload,
           id: constructed_event.id
@@ -117,34 +112,33 @@ export default {
       });
     },
     removeEvent(payload) {
+      let events = this.$kalendar.getEvents();
+      let eventIndex = events.findIndex(event => event.id === payload.id);
+      if (eventIndex < 0) return;
+      events.splice(eventIndex, 1);
       let index = this.day_events[payload.key]
         .findIndex(event => event.id === payload.id);
       this.day_events[payload.key].splice(index, 1);
-      let events = this.kalendar_events.slice(0);
-      let eventIndex = events.find(event => event.id === payload.id);
-      events.splice(eventIndex, 1);
       this.$kalendar.updateEvents(events);
       return Promise.resolve();
     },
     checkEventValidity(payload) {
       let { from, to } = payload;
       if (!from || !to) return 'No dates were provided in the payload';
-      let isoFrom = new Date(from).toISOString();
-      let isoTo = new Date(to).toISOString();
-      if (isoFrom !== from) {
-        return 'From date is not UTC format';
+      /*if (isoFrom !== from) {
+        return 'From date is not ISO format';
       }
       if (isoTo !== to) {
-        return 'To date is not UTC format';
-      }
+        return 'To date is not ISO format';
+      }*/
       return null;
     },
     getDayEvents(events) {
       let clonedEvents = events.map(event => cloneObject(event));
-      console.log('Events:', clonedEvents);
       return myWorker.send('constructDayEvents', {
         events: clonedEvents,
-        day: this.day.value
+        day: this.day.value,
+        time_mode: this.kalendar_options.time_mode
       }).then(constructed_events => {
         this.day_events = constructed_events;
       })
