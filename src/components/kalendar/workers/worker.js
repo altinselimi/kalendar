@@ -106,8 +106,7 @@ const constructDayEvents = (day, existing_events, time_mode) => {
         from,
         to
       }
-    })
-    .filter(({ from }) => {
+    }).filter(({ from }) => {
       return from.slice(0, 10) === day.slice(0, 10);
     });
 
@@ -127,6 +126,14 @@ const constructDayEvents = (day, existing_events, time_mode) => {
 
 const constructNewEvent = (event, time_mode) => {
   let { from, to } = event;
+  if (time_mode === 'absolute') {
+    from = getAbsoluteRepresentation(from);
+    to = getAbsoluteRepresentation(to);
+  } else {
+    from = getRelativeRepresentation(from);
+    to = getRelativeRepresentation(to);
+  }
+
   from = new Date(from);
   to = new Date(to);
 
