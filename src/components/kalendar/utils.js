@@ -109,8 +109,11 @@ const removeTimezoneInfo = (ISOdate) => {
 
 const isToday = (date) => {
   if (!date) return
-  let today = new Date().toISOString();
-  return date === today;
+  let today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  today = getAbsoluteRepresentation(today.toISOString());
+  return date.slice(0, 10) === today.slice(0, 10);
 }
 
 const isBefore = (date1, date2) => {
@@ -120,7 +123,7 @@ const isBefore = (date1, date2) => {
 
 const isWeekend = (date) => {
   if (!date) return;
-  let day = new Date(getAbsoluteRepresentation(date)).getDay;
+  let day = new Date(date).getDay();
   return day === 6 || day === 0;
 }
 

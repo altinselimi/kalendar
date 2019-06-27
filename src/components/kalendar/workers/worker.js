@@ -18,7 +18,7 @@ registerPromiseWorker((message) => {
 
   switch (type) {
     case 'getDays':
-      return getDays(data.day);
+      return getDays(data.day, data.options);
     case 'getHours':
       return getHours(data.hourOptions);
     case 'getDayCells':
@@ -30,7 +30,7 @@ registerPromiseWorker((message) => {
   }
 })
 
-function getDays(dayString) {
+function getDays(dayString, { hide_dates, hide_days }) {
   let date = new Date(dayString);
   date.setUTCHours(0, 0, 0, 0);
   let day_of_week = date.getDay();
@@ -38,7 +38,17 @@ function getDays(dayString) {
   for (let idx = 0; idx < 7; idx++) {
     days.push({
       value: addDays(date, idx - day_of_week).toISOString(),
-      index: idx
+      index: idx,
+    });
+  }
+  if (hide_dates && hide_dates.length > 0) {
+    days = days.filter(({ value }) => {
+      return hide_dates.indexOf(value.slice(0, 10)) < 0;
+    });
+  }
+  if (hide_days && hide_days.length > 0) {
+    days = days.filter(({ index }) => {
+      return hide_days.indexOf(index) < 0;
     });
   }
   return days;

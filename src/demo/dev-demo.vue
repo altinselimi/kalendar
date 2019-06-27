@@ -163,6 +163,9 @@ export default {
         day_starts_at: 0,
         day_ends_at: 24,
         overlap: false,
+        hide_dates: ['2019-08-09'],
+        hide_days: [6],
+        past_event_creation: false
       },
       outline_slots: false,
       new_appointment: {},

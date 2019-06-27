@@ -18,11 +18,11 @@
                    @initiatePopup="initiatePopup()"
                    :temporary-event="temporary_event" />
     <div ref="nowIndicator"
-         :class="kalendar.preferences.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'"
+         :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'"
          v-if="isToday"
          :style="`top:calc(${passedTime}% - 5px)`">
       <span class="line"
-            v-show="kalendar.preferences.style === 'material_design'"></span>
+            v-show="kalendar_options.style === 'material_design'"></span>
     </div>
   </ul>
 </template>
@@ -54,10 +54,10 @@ export default {
   },
   computed: {
     isWeekend() {
-      return isWeekend(this.day.date);
+      return isWeekend(this.day.value);
     },
     isToday() {
-      return isToday(this.day.date);
+      return isToday(this.day.value);
     },
   },
   data: () => ({

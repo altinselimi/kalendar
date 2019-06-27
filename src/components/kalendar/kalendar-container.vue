@@ -134,6 +134,7 @@ export default {
         day_ends_at: 24,
         time_mode: 'relative',
         overlap: true,
+        past_event_creation: true,
         formatLeftHours: (date) => {
           let isoDate = new Date(date).toISOString();
           return isoDate.split("T")[1].slice(0, 2).padStart(2, 0);
@@ -182,8 +183,10 @@ export default {
             val >= 0 &&
             val <= 24;
         },
-        formatLeftHours: (func) => typeof func(new Date().toISOString()) === 'string',
+        hide_dates: val => Array.isArray(val),
+        hide_days: val => Array.isArray(val) && !val.find(n => typeof n !== 'number'),
         overlap: val => typeof val === 'boolean',
+        past_event_creation: val => typeof val === 'boolean',
       };
       for (let key in provided_props) {
         if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {

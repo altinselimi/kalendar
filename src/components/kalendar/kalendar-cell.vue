@@ -87,7 +87,14 @@ export default {
         this.mouseUp();
         return;
       }
-      let { read_only, overlap } = this.kalendar_options;
+      let { read_only, overlap, past_event_creation } = this.kalendar_options;
+      if (past_event_creation === false) {
+        let now = kalendarHelpers.getAbsoluteRepresentation(new Date().toISOString());
+        if (new Date(now) > new Date(this.cellData.value)) {
+          this.mouseUp();
+          return;
+        }
+      }
       if (!overlap && this.cell_events.length > 0) return;
       this.$kalendar.closePopups();
 
@@ -107,7 +114,7 @@ export default {
       let { starting_cell, original_starting_cell, creating } = this.creator;
       let going_down = this.cellData.index >= starting_cell.index &&
         starting_cell.index === original_starting_cell.index;
-        
+
       if (!overlap && this.cell_events.length > 0) {
         this.mouseUp();
         return;

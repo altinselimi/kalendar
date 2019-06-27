@@ -122,10 +122,13 @@ export default {
     },
     constructWeek() {
       const date = this.kalendar_options.current_day.slice(0, 10);
+      const { hide_dates, hide_days } = this.kalendar_options;
       return Promise.all([myWorker.send('getDays', {
           day: date,
-          min_hour: this.kalendar_options.day_starts_at,
-          max_hour: this.kalendar_options.day_ends_at
+          options: {
+            hide_dates,
+            hide_days
+          }
         }).then(reply => {
           this.days = reply; //.slice(0,1);
         }),
