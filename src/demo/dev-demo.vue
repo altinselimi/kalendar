@@ -170,10 +170,9 @@ export default {
         current_day: currentDay,
         military_time: false,
         read_only: false,
-        /*formatLeftHours: (date) => {
-          let dt = DateTime.fromISO(date, { zone: "utc" });
-          return dt.toFormat("hh a");
-        },*/
+        day_starts_at: 2,
+        day_ends_at: 18,
+        overlap: false,
       },
       outline_slots: false,
       new_appointment: {},
@@ -183,9 +182,6 @@ export default {
     };
   },
   methods: {
-    getHours(start, end) {
-      return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
-    },
     addAppointment(popup_info) {
       let payload = {
         data: {

@@ -118,7 +118,7 @@ export default {
     },
   },
   data() {
-    let today = kalendarHelpers.getISODate();
+    let today = kalendarHelpers.getHourlessDate();
     return {
       default_options: {
         dark: false,
@@ -133,6 +133,7 @@ export default {
         day_starts_at: 0,
         day_ends_at: 24,
         time_mode: 'relative',
+        overlap: true,
         formatLeftHours: (date) => {
           let isoDate = new Date(date).toISOString();
           return isoDate.split("T")[1].slice(0, 2).padStart(2, 0);
@@ -181,7 +182,8 @@ export default {
             val >= 0 &&
             val <= 24;
         },
-        formatLeftHours: (func) => typeof func(new Date().toISOString()) === 'string'
+        formatLeftHours: (func) => typeof func(new Date().toISOString()) === 'string',
+        overlap: val => typeof val === 'boolean',
       };
       for (let key in provided_props) {
         if (conditions.hasOwnProperty(key) && conditions[key](provided_props[key])) {

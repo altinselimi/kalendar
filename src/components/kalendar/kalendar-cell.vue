@@ -87,7 +87,8 @@ export default {
         this.mouseUp();
         return;
       }
-      if (this.kalendar_options.read_only) return;
+      let { read_only, overlap } = this.kalendar_options;
+      if (!overlap && this.cell_events.length > 0) return;
       this.$kalendar.closePopups();
 
       let payload = {
@@ -100,11 +101,17 @@ export default {
       this.$emit('select', payload);
     },
     mouseMove() {
-      if (this.kalendar_options.read_only) return;
+      let { read_only, overlap } = this.kalendar_options;
+      if (read_only) return;
       if (this.creator && !this.creator.creating) return;
       let { starting_cell, original_starting_cell, creating } = this.creator;
       let going_down = this.cellData.index >= starting_cell.index &&
         starting_cell.index === original_starting_cell.index;
+        
+      if (!overlap && this.cell_events.length > 0) {
+        this.mouseUp();
+        return;
+      }
 
       if (creating) {
         let payload = {

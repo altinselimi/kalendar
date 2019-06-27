@@ -1,5 +1,4 @@
 // remove this dependency once you have internet
-import format from 'date-fns/format';
 
 let creators_offset = new Date().getTimezoneOffset() / 60;
 if (creators_offset * -1 >= 0) {
@@ -11,7 +10,7 @@ if (creators_offset * -1 >= 0) {
   creators_offset = `-${creators_offset}`;
 }
 
-const getISODate = (date_string) => {
+const getHourlessDate = (date_string) => {
   let today = date_string ? new Date(date_string) : new Date();
   let year = today.getFullYear() + '',
     month = ((today.getMonth() + 1) + '').padStart(2, 0),
@@ -21,7 +20,7 @@ const getISODate = (date_string) => {
 };
 
 const getYearMonthDay = (date_string) => {
-  return getISODate(date_string).slice(0, 10);
+  return getHourlessDate(date_string).slice(0, 10);
 }
 
 const getUTCDate = (date_string = Date.now()) => {
@@ -77,10 +76,6 @@ const generateUUID = () => {
   )
 };
 
-const formatDate = (value, how) => {
-  return format(getUTCDate(value), how);
-}
-
 const cloneObject = (object) => {
   return JSON.parse(JSON.stringify(object));
 };
@@ -98,7 +93,7 @@ const getRelativeRepresentation = (dateString) => {
 }
 
 const getAbsoluteRepresentation = (dateString) => {
-  let date = new Date(dateString.slice(0,19) + '.000Z');
+  let date = new Date(dateString.slice(0, 19) + '.000Z');
   return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
 };
 
@@ -112,6 +107,24 @@ const removeTimezoneInfo = (ISOdate) => {
   return `${ISOdate.slice(0,19)}.000Z`;
 }
 
+const isToday = (date) => {
+  if (!date) return
+  let today = new Date().toISOString();
+  return date === today;
+}
+
+const isBefore = (date1, date2) => {
+  console.log({ date1, date2 });
+  if (!date1 || !date2) return;
+  return new Date(date1) < new Date(date2);
+}
+
+const isWeekend = (date) => {
+  if (!date) return;
+  let day = new Date(getAbsoluteRepresentation(date)).getDay;
+  return day === 6 || day === 0;
+}
+
 export default {
   addDays,
   addMinutes,
@@ -123,8 +136,11 @@ export default {
   cloneObject,
   addTimezoneInfo,
   removeTimezoneInfo,
-  getISODate,
+  getHourlessDate,
   getYearMonthDay,
   getRelativeRepresentation,
-  getAbsoluteRepresentation
+  getAbsoluteRepresentation,
+  isToday,
+  isBefore,
+  isWeekend
 };

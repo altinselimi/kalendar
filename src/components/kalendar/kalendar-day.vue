@@ -27,9 +27,9 @@
   </ul>
 </template>
 <script>
-import isWeekend from 'date-fns/is_weekend';
-import isToday from 'date-fns/is_today';
 const { cloneObject } = window.kalendarHelpers;
+import Utils from './utils';
+const { isToday, isWeekend } = Utils;
 
 import myWorker from '@/components/kalendar/workers';
 
@@ -77,8 +77,10 @@ export default {
     renderDay() {
       myWorker.send('getDayCells', {
         day: this.day.value,
-        min_hour: this.kalendar_options.day_starts_at,
-        max_hour: this.kalendar_options.day_ends_at
+        hourOptions: {
+          start_hour: this.kalendar_options.day_starts_at,
+          end_hour: this.kalendar_options.day_ends_at
+        }
       }).then(reply => {
         this.day_cells = reply;
         return this.getDayEvents(this.$kalendar.getEvents());

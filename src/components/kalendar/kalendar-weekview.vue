@@ -16,7 +16,7 @@
         <span>All Day</span>
         <li :key="index"
             v-for="(date, index) in (days || [])"
-            :class="{'all-today': _isToday(date), 'is-all-day': false}"
+            :class="{'all-today': _isToday(date.value), 'is-all-day': false}"
             :style="`height:${kalendar_options.cell_height + 5}px`"></li>
       </ul>
     </div>
@@ -59,11 +59,10 @@
 </template>
 <script>
 import format from 'date-fns/format';
-import isToday from 'date-fns/is_today';
 import KalendarDays from './kalendar-day.vue';
-import isBefore from 'date-fns/is_before';
-
 import myWorker from '@/components/kalendar/workers';
+import Utils from './utils';
+const { isBefore, isToday, getAbsoluteRepresentation, getHourlessDate } = Utils;
 
 export default {
   components: {
@@ -117,7 +116,9 @@ export default {
       this.$emit('clear');
     },
     isBefore(day) {
-      return isBefore(day, this.kalendar_options.now);
+      let now = new Date(this.kalendar_options.now);
+      let formattedNow = getAbsoluteRepresentation(now.toISOString());
+      return isBefore(day, getHourlessDate(formattedNow));
     },
     constructWeek() {
       const date = this.kalendar_options.current_day.slice(0, 10);
@@ -129,8 +130,10 @@ export default {
           this.days = reply; //.slice(0,1);
         }),
         myWorker.send('getHours', {
-          min_hour: this.kalendar_options.day_starts_at,
-          max_hour: this.kalendar_options.day_ends_at
+          hourOptions: {
+            start_hour: this.kalendar_options.day_starts_at,
+            end_hour: this.kalendar_options.day_ends_at
+          }
         }).then(reply => {
           // Handle the reply
           this.hours = reply;
@@ -172,9 +175,7 @@ export default {
       };
 
       this.$kalendar.closePopups = () => {
-        console.log('REFS:', this.$refs);
         let refs = this.days.map(day => day.value.slice(0, 10));
-        console.log('Refs:', refs);
         refs.forEach(ref => {
           this.$refs[ref][0].clearCreatingLeftovers();
         });

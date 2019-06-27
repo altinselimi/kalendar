@@ -5,7 +5,6 @@ const {
   addDays,
   addMinutes,
   addHours,
-  getISODate,
   getYearMonthDay,
   getRelativeRepresentation
 } = Utils;
@@ -21,9 +20,9 @@ registerPromiseWorker((message) => {
     case 'getDays':
       return getDays(data.day);
     case 'getHours':
-      return getHours(data.min_hour, data.max_hour);
+      return getHours(data.hourOptions);
     case 'getDayCells':
-      return getDayCells(data.day, data.min_hour, data.max_hour);
+      return getDayCells(data.day, data.hourOptions);
     case 'constructDayEvents':
       return constructDayEvents(data.day, data.events, data.time_mode);
     case 'constructNewEvent':
@@ -33,6 +32,7 @@ registerPromiseWorker((message) => {
 
 function getDays(dayString) {
   let date = new Date(dayString);
+  date.setUTCHours(0,0,0,0);
   let day_of_week = date.getDay();
   let days = [];
   for (let idx = 0; idx < 7; idx++) {
@@ -44,10 +44,16 @@ function getDays(dayString) {
   return days;
 }
 
-function getHours() {
+function getHours(day_options) {
   let date = new Date();
+  date.setUTCHours(0,0,0,0);
   let iso_date = getYearMonthDay(date);
+
   let day_hours = hourUtils.getFullHours();
+  if (day_options) {
+    let { start_hour, end_hour } = day_options;
+    day_hours = day_hours.slice(start_hour, end_hour)
+  }
   let hours = [];
   for (let idx = 0; idx < day_hours.length; idx++) {
     let value = `${iso_date}T${day_hours[idx]}.000Z`;
@@ -60,7 +66,7 @@ function getHours() {
   return hours;
 }
 
-const getDayCells = (dayString) => {
+const getDayCells = (dayString, day_options) => {
   if (new Date(dayString).toISOString() !== dayString) {
     throw new Error('Unsupported dayString parameter provided');
   };
@@ -68,7 +74,10 @@ const getDayCells = (dayString) => {
   let cells = [];
   let date_part = dayString.slice(0, 10);
   let all_hours = hourUtils.getAllHours();
-
+  if (day_options) {
+    let { start_hour, end_hour } = day_options;
+    all_hours = all_hours.slice(start_hour * 6, end_hour * 6);
+  }
   for (let hourIdx = 0; hourIdx < all_hours.length; hourIdx++) {
     let hour = all_hours[hourIdx];
     let value = `${date_part}T${hour}.000Z`;
@@ -103,14 +112,12 @@ const constructDayEvents = (day, existing_events, time_mode) => {
 
 const constructNewEvent = (event, time_mode) => {
   let { from, to } = event;
-  console.log('Time Mode:', time_mode);
   if (time_mode === 'absolute') {
     from = getAbsoluteRepresentation(from);
     to = getAbsoluteRepresentation(to);
   } else {
     from = getRelativeRepresentation(from);
     to = getRelativeRepresentation(to);
-    console.log('Event time:', {from, to});
   }
   from = new Date(from);
   to = new Date(to);
