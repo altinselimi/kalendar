@@ -94,8 +94,22 @@ export default {
         return Promise.reject(validation_message);
       }
 
+      let { from, to } = payload;
+
+      if (this.kalendar_options.time_mode === 'absolute') {
+        from = kalendarHelpers.getAbsoluteRepresentation(from);
+        to = kalendarHelpers.getAbsoluteRepresentation(to);
+      } else {
+        from = kalendarHelpers.getRelativeRepresentation(from);
+        to = kalendarHelpers.getRelativeRepresentation(to);
+      }
+
       return myWorker.send('constructNewEvent', {
-        event: payload
+        event: {
+          ...payload,
+          from,
+          to
+        }
       }).then(constructed_event => {
         let { key } = constructed_event;
         if (this.day_events.hasOwnProperty(key)) {
@@ -106,6 +120,7 @@ export default {
           this.$set(this.day_events, key, [constructed_event]);
         }
         let events = this.$kalendar.getEvents();
+        console.log('Adding event to kalendar', payload);
         events.push({
           ...payload,
           id: constructed_event.id
