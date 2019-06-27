@@ -89,7 +89,8 @@ const getDayDateID = (date) => {
 
 const getRelativeRepresentation = (dateString) => {
   let date = new Date(dateString);
-  return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  let newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  return removeTimezoneInfo(newDate);
 }
 
 const getAbsoluteRepresentation = (dateString) => {
@@ -103,7 +104,6 @@ const addTimezoneInfo = (ISOdate) => {
 }
 
 const removeTimezoneInfo = (ISOdate) => {
-  console.log(`${ISOdate} to ${ISOdate.slice(0,19)}.000Z`);
   return `${ISOdate.slice(0,19)}.000Z`;
 }
 
@@ -114,7 +114,6 @@ const isToday = (date) => {
 }
 
 const isBefore = (date1, date2) => {
-  console.log({ date1, date2 });
   if (!date1 || !date2) return;
   return new Date(date1) < new Date(date2);
 }

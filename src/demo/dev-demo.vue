@@ -88,53 +88,43 @@
 </template>
 <script>
 import Utils from '../components/kalendar/utils.js';
-const { addTimezoneInfo } = Utils;
-
-let today_from = new Date();
-let today_to = new Date();
-today_from.setUTCHours(3, 22, 0, 0);
-today_to.setUTCHours(4, 55, 0, 0);
-
-let today_from2 = new Date();
-let today_to2 = new Date();
-today_from2.setUTCHours(3, 22, 0, 0);
-today_to2.setUTCHours(4, 20, 0, 0);
-
-
-let tomorrow_from = new Date();
-tomorrow_from.setDate(tomorrow_from.getDate() + 1);
-let tomorrow_to = new Date(tomorrow_from.getTime());
-tomorrow_from.setUTCHours(4, 17, 0, 0);
-tomorrow_to.setUTCHours(6, 19, 0, 0);
-
 
 const existing_events = [{
-    "from": addTimezoneInfo(today_from.toISOString()),
-    "to": addTimezoneInfo(today_to.toISOString()),
-    "data": {
-      "title": "Truth",
-      "description": "Look."
-    }
-  },
+  "from": "2019-06-27T04:00:00.300Z",
+  "to": "2019-06-27T04:10:00.300Z",
+  "data":
   {
-    "from": addTimezoneInfo(today_from2.toISOString()),
-    "to": addTimezoneInfo(today_to2.toISOString()),
-    "data": {
-      "title": "Side",
-      "description": "Look.2"
-    }
-  },
-
-  // Event created in GMT+2 (Europe)
-  {
-    "from": addTimezoneInfo(today_from2.toISOString()).slice(0, 19) + '+02:00',
-    "to": addTimezoneInfo(today_to2.toISOString()).slice(0, 19) + '+02:00',
-    "data": {
-      "title": "Main",
-      "description": "Right.2"
-    }
+    "title": "Right now",
+    "description": "Lorem ipsum"
   }
-]
+},
+{
+  "from": "2019-06-26T10:22:00-07:00",
+  "to": "2019-06-26T11:55:00-07:00",
+  "data":
+  {
+    "title": "Truth",
+    "description": "Look."
+  }
+},
+{
+  "from": "2019-06-26T10:22:00-07:00",
+  "to": "2019-06-26T11:20:00-07:00",
+  "data":
+  {
+    "title": "Side",
+    "description": "Look.2"
+  }
+},
+{
+  "from": "2019-06-26T10:22:00+02:00",
+  "to": "2019-06-26T11:20:00+02:00",
+  "data":
+  {
+    "title": "Europe",
+    "description": "Final Countdown"
+  }
+}];
 
 let today = new Date();
 let year = today.getFullYear() + '',
@@ -170,8 +160,8 @@ export default {
         current_day: currentDay,
         military_time: false,
         read_only: false,
-        day_starts_at: 2,
-        day_ends_at: 18,
+        day_starts_at: 0,
+        day_ends_at: 24,
         overlap: false,
       },
       outline_slots: false,

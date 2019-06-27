@@ -32,7 +32,7 @@ registerPromiseWorker((message) => {
 
 function getDays(dayString) {
   let date = new Date(dayString);
-  date.setUTCHours(0,0,0,0);
+  date.setUTCHours(0, 0, 0, 0);
   let day_of_week = date.getDay();
   let days = [];
   for (let idx = 0; idx < 7; idx++) {
@@ -46,7 +46,7 @@ function getDays(dayString) {
 
 function getHours(day_options) {
   let date = new Date();
-  date.setUTCHours(0,0,0,0);
+  date.setUTCHours(0, 0, 0, 0);
   let iso_date = getYearMonthDay(date);
 
   let day_hours = hourUtils.getFullHours();
@@ -91,10 +91,25 @@ const getDayCells = (dayString, day_options) => {
 }
 
 const constructDayEvents = (day, existing_events, time_mode) => {
-  let events_for_this_day = existing_events.filter(event => {
-    let { from } = event;
-    return from.slice(0, 10) === day.slice(0, 10);
-  });
+  let events_for_this_day = existing_events
+    .map(event => {
+      let { from, to } = event;
+      if (time_mode === 'absolute') {
+        from = getAbsoluteRepresentation(from);
+        to = getAbsoluteRepresentation(to);
+      } else {
+        from = getRelativeRepresentation(from);
+        to = getRelativeRepresentation(to);
+      }
+      return {
+        ...event,
+        from,
+        to
+      }
+    })
+    .filter(({ from }) => {
+      return from.slice(0, 10) === day.slice(0, 10);
+    });
 
   if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
@@ -112,13 +127,6 @@ const constructDayEvents = (day, existing_events, time_mode) => {
 
 const constructNewEvent = (event, time_mode) => {
   let { from, to } = event;
-  if (time_mode === 'absolute') {
-    from = getAbsoluteRepresentation(from);
-    to = getAbsoluteRepresentation(to);
-  } else {
-    from = getRelativeRepresentation(from);
-    to = getRelativeRepresentation(to);
-  }
   from = new Date(from);
   to = new Date(to);
 
