@@ -6,7 +6,7 @@ const {
   addMinutes,
   addHours,
   getYearMonthDay,
-  getRelativeRepresentation
+  getLocaleTime
 } = Utils;
 import hourUtils from '../hours.js';
 
@@ -24,7 +24,7 @@ registerPromiseWorker((message) => {
     case 'getDayCells':
       return getDayCells(data.day, data.hourOptions);
     case 'constructDayEvents':
-      return constructDayEvents(data.day, data.events, data.time_mode);
+      return constructDayEvents(data.day, data.events);
     case 'constructNewEvent':
       return constructNewEvent(data.event)
   }
@@ -100,17 +100,12 @@ const getDayCells = (dayString, day_options) => {
   return cells;
 }
 
-const constructDayEvents = (day, existing_events, time_mode) => {
+const constructDayEvents = (day, existing_events) => {
   let events_for_this_day = existing_events
     .map(event => {
       let { from, to } = event;
-      if (time_mode === 'absolute') {
-        from = getAbsoluteRepresentation(from);
-        to = getAbsoluteRepresentation(to);
-      } else {
-        from = getRelativeRepresentation(from);
-        to = getRelativeRepresentation(to);
-      }
+      from = getLocaleTime(from);
+      to = getLocaleTime(to);
       return {
         ...event,
         from,
@@ -123,7 +118,7 @@ const constructDayEvents = (day, existing_events, time_mode) => {
   if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
   events_for_this_day.forEach(event => {
-    const constructedEvent = constructNewEvent(event, time_mode);
+    const constructedEvent = constructNewEvent(event);
     let { key } = constructedEvent;
     if (filtered_events.hasOwnProperty(key)) {
       filtered_events[key].push(constructedEvent);
@@ -134,7 +129,7 @@ const constructDayEvents = (day, existing_events, time_mode) => {
   return filtered_events;
 }
 
-const constructNewEvent = (event, time_mode) => {
+const constructNewEvent = (event) => {
   let { from, to } = event;
 
   from = new Date(from);

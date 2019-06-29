@@ -89,7 +89,7 @@ export default {
       }
       let { read_only, overlap, past_event_creation } = this.kalendar_options;
       if (past_event_creation === false) {
-        let now = kalendarHelpers.getAbsoluteRepresentation(new Date().toISOString());
+        let now = kalendarHelpers.getLocaleTime(new Date());
         if (new Date(now) > new Date(this.cellData.value)) {
           this.mouseUp();
           return;

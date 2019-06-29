@@ -9,6 +9,7 @@
        @click="inspecting = true"
        @mouseleave="inspecting = false"
        :class="{
+        'is-past': isPast,
       'overlaps': overlaps > 0,
       'two-in-one': total > 1, 
       'inspecting': !!inspecting,
@@ -34,6 +35,8 @@
   </div>
 </template>
 <script>
+import Utils from './utils.js';
+const { isBefore, getLocaleTime } = Utils;
 
 export default {
   props: ['event', 'total', 'index', 'overlaps'],
@@ -42,6 +45,10 @@ export default {
     inspecting: false,
   }),
   computed: {
+    isPast() {
+      let now = getLocaleTime(new Date().toISOString());
+      return isBefore(this.event.start.value, now);
+    },
     width_value() {
       return `${100/this.total}% - ${this.overlaps * 50 / this.total}px`;
     },
@@ -112,6 +119,7 @@ $creator-content: white;
   }
 
   &__mini {
+
     .appointment-title,
     .time {
       position: absolute;
@@ -119,16 +127,18 @@ $creator-content: white;
       font-size: 9px;
     }
   }
+
   &__small {
     .appointment-title {
       font-size: 80%;
     }
+
     .time {
       font-size: 70%;
     }
   }
 
-  &.two-in-one .details-card > * {
+  &.two-in-one .details-card>* {
     font-size: 60%;
   }
 

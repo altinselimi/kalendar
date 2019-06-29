@@ -137,7 +137,7 @@ export default {
         past_event_creation: true,
         formatLeftHours: (date) => {
           let isoDate = new Date(date).toISOString();
-          return isoDate.split("T")[1].slice(0, 2).padStart(2, 0);
+          return kalendarHelpers.formatAMPM(new Date(date));
         },
         formatDayTitle: (date) => {
           let isoDate = new Date(date);

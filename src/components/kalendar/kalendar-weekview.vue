@@ -62,7 +62,7 @@ import format from 'date-fns/format';
 import KalendarDays from './kalendar-day.vue';
 import myWorker from '@/components/kalendar/workers';
 import Utils from './utils';
-const { isBefore, isToday, getAbsoluteRepresentation, getHourlessDate } = Utils;
+const { isBefore, isToday, getHourlessDate, getLocaleTime } = Utils;
 
 export default {
   components: {
@@ -117,7 +117,7 @@ export default {
     },
     isBefore(day) {
       let now = new Date(this.kalendar_options.now);
-      let formattedNow = getAbsoluteRepresentation(now.toISOString());
+      let formattedNow = getLocaleTime(now.toISOString());
       return isBefore(day, getHourlessDate(formattedNow));
     },
     constructWeek() {

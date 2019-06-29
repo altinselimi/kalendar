@@ -87,33 +87,24 @@ const getDayDateID = (date) => {
   return `${year}-${month}-${day}`;
 }
 
-const getRelativeRepresentation = (dateString) => {
-  let date = new Date(dateString);
-  let newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
-  return removeTimezoneInfo(newDate);
+const getLocaleTime = (dateString) => {
+  let [date, hour] = new Date(dateString).toLocaleString('en-GB')
+    .split(', ');
+  date = date.split('/').reverse().join('-');
+  return `${date}T${hour}.000Z`;
 }
-
-const getAbsoluteRepresentation = (dateString) => {
-  let date = new Date(dateString.slice(0, 19) + '.000Z');
-  return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
-};
 
 const addTimezoneInfo = (ISOdate) => {
   if (new Date(ISOdate).toISOString() !== ISOdate) return;
   return `${ISOdate.slice(0,19)}${creators_offset}`;
 }
 
-const removeTimezoneInfo = (ISOdate) => {
-  return `${ISOdate.slice(0,19)}.000Z`;
-}
-
 const isToday = (date) => {
   if (!date) return
-  let today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-
-  today = getAbsoluteRepresentation(today.toISOString());
-  return date.slice(0, 10) === today.slice(0, 10);
+  let today = getLocaleTime(new Date()).slice(0, 10);
+  console.log('TodaySS:', today);
+  console.log('DateSS:', date.slice(0, 10));
+  return date.slice(0, 10) === today;
 }
 
 const isBefore = (date1, date2) => {
@@ -127,6 +118,12 @@ const isWeekend = (date) => {
   return day === 6 || day === 0;
 }
 
+const formatAMPM = (date) => {
+  let hours = date.getUTCHours();
+  let result = `${hours % 12} ${hours >= 12 ? 'PM' : 'AM'}`;
+  return result;
+}
+
 export default {
   addDays,
   addMinutes,
@@ -137,12 +134,11 @@ export default {
   generateUUID,
   cloneObject,
   addTimezoneInfo,
-  removeTimezoneInfo,
   getHourlessDate,
   getYearMonthDay,
-  getRelativeRepresentation,
-  getAbsoluteRepresentation,
+  getLocaleTime,
   isToday,
   isBefore,
-  isWeekend
+  isWeekend,
+  formatAMPM
 };

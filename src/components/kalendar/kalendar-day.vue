@@ -2,7 +2,7 @@
   <ul style="position: relative;"
       :class="{
       'is-weekend': isWeekend, 
-      'is-today': isToday, 
+      'is-today': isToday,
       'creating': creator.creating || creator.status === 'popup-initiated'
     }"
       class="kalendar-day"
@@ -95,15 +95,8 @@ export default {
       }
 
       let { from, to } = payload;
-
-      if (this.kalendar_options.time_mode === 'absolute') {
-        from = kalendarHelpers.getAbsoluteRepresentation(from);
-        to = kalendarHelpers.getAbsoluteRepresentation(to);
-      } else {
-        from = kalendarHelpers.getRelativeRepresentation(from);
-        to = kalendarHelpers.getRelativeRepresentation(to);
-      }
-
+      from = kalendarHelpers.getLocaleTime(from);
+      to = kalendarHelpers.getLocaleTime(to);
       return myWorker.send('constructNewEvent', {
         event: {
           ...payload,
@@ -155,7 +148,6 @@ export default {
       return myWorker.send('constructDayEvents', {
         events: clonedEvents,
         day: this.day.value,
-        time_mode: this.kalendar_options.time_mode
       }).then(constructed_events => {
         this.day_events = constructed_events;
       })

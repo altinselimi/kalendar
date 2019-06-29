@@ -168,33 +168,15 @@
           <small>
             {{event_information.data.description}}
           </small>
-          <span class="time">{{event_information.start_time | formatDate('HH:mm')}} - {{event_information.end_time |
-            formatDate('HH:mm')}}</span>
+          <span class="time">{{event_information.start_time | formatToHours}} - {{event_information.end_time |
+            formatToHours}}</span>
           <button @click="removeEvent(event_information)"
-                  class="cancel">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 aria-hidden="true"
-                 data-reactid="1326">
-              <circle cx="12"
-                      cy="12"
-                      r="10"></circle>
-              <line x1="15"
-                    y1="9"
-                    x2="9"
-                    y2="15"></line>
-              <line x1="9"
-                    y1="9"
-                    x2="15"
-                    y2="15"></line>
-            </svg>
+                  class="remove">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
           </button>
         </div>
         <!-- CREATING CARD SLOT -->
@@ -202,12 +184,12 @@
              slot-scope="{ event_information }">
           <h4 class="appointment-title"
               style="text-align: left;">
-            New Appointment h3
+            New Appointment
           </h4>
           <span class="time">
-            {{event_information.start_time | formatDate('HH:mm')}}
+            {{event_information.start_time | formatToHours}}
             -
-            {{event_information.end_time | formatDate('HH:mm')}}
+            {{event_information.end_time | formatToHours}}
           </span>
         </div>
         <!-- POPUP CARD SLOT -->
@@ -242,50 +224,10 @@
   </div>
 </template>
 <script>
-let today_from = new Date();
-let today_to = new Date();
-today_from.setUTCHours(3, 22, 0, 0);
-today_to.setUTCHours(4, 55, 0, 0);
-
-let today_from2 = new Date();
-let today_to2 = new Date();
-today_from2.setUTCHours(3, 22, 0, 0);
-today_to2.setUTCHours(4, 20, 0, 0);
-
-
-let tomorrow_from = new Date();
-tomorrow_from.setDate(tomorrow_from.getDate() + 1);
-let tomorrow_to = new Date(tomorrow_from.getTime());
-tomorrow_from.setUTCHours(4, 17, 0, 0);
-tomorrow_to.setUTCHours(6, 19, 0, 0);
-
-
-const existing_events = [{
-    "from": today_from.toISOString(),
-    "to": today_to.toISOString(),
-    "data": {
-      "title": "Truth",
-      "description": "Look."
-    }
-  },
-  {
-    "from": today_from2.toISOString(),
-    "to": today_to2.toISOString(),
-    "data": {
-      "title": "Side",
-      "description": "Look.2"
-    }
-  }
-]
-
-
 import Vue from 'vue';
 
 import VueHighlightJS from 'vue-highlightjs'
 Vue.use(VueHighlightJS)
-
-import format from 'date-fns/format';
-import getTime from 'date-fns/get_time';
 
 import Kalendar from '../components/kalendar/kalendar-container.vue';
 //import { Kalendar } from 'kalendar-vue';
@@ -322,7 +264,13 @@ export default {
       scrollToNow: false,
       current_day: new Date(),
       military_time: false,
-      read_only: false
+      read_only: false,
+      day_starts_at: 0,
+      day_ends_at: 24,
+      overlap: true,
+      hide_dates: ['2019-08-09'],
+      hide_days: [6],
+      past_event_creation: false
     },
     outline_slots: false,
     new_appointment: {},
@@ -365,10 +313,10 @@ export default {
       };
     },
     addManually() {
-    	const { title, description } = this.manual_form;
-    	let { date, from, to } = this.manual_form;
-    	let formattedFrom = `${date}T${from}:00.000Z`;
-    	let formattedTo = `${date}T${to}:00.000Z`;
+      const { title, description } = this.manual_form;
+      let { date, from, to } = this.manual_form;
+      let formattedFrom = `${date}T${from}:00.000Z`;
+      let formattedTo = `${date}T${to}:00.000Z`;
       let payload = {
         data: { title, description },
         from: formattedFrom,
@@ -380,7 +328,7 @@ export default {
       this.adding_manually = false;
     },
     removeEvent(kalendarEvent) {
-      let day = kalendarEvent.start_time.toISOString().slice(0,10);
+      let day = kalendarEvent.start_time.toISOString().slice(0, 10);
       this.$kalendar.removeEvent({
         day,
         key: kalendarEvent.key,

@@ -1,9 +1,5 @@
 <template>
   <div>
-    <input type="number"
-           v-model.number="calendar_settings.cell_height"
-           placeholder="Cell Height">
-    <button @click="addManually()">ADD AN EVENT MANUALLY</button>
     <kalendar :configuration.sync="calendar_settings"
               :events.sync="events"
               class="generate-shadow">
@@ -19,28 +15,10 @@
           formatToHours}}</span>
         <button @click="removeEvent(event_information)"
                 class="remove">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="2"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               aria-hidden="true"
-               data-reactid="1326">
-            <circle cx="12"
-                    cy="12"
-                    r="10"></circle>
-            <line x1="15"
-                  y1="9"
-                  x2="9"
-                  y2="15"></line>
-            <line x1="9"
-                  y1="9"
-                  x2="15"
-                  y2="15"></line>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="1326">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
           </svg>
         </button>
       </div>
@@ -162,10 +140,10 @@ export default {
         read_only: false,
         day_starts_at: 0,
         day_ends_at: 24,
-        overlap: false,
+        overlap: true,
         hide_dates: ['2019-08-09'],
         hide_days: [6],
-        past_event_creation: false
+        past_event_creation: true
       },
       outline_slots: false,
       new_appointment: {},

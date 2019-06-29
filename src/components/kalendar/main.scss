@@ -16,6 +16,8 @@
   --card-bgcolor: #4285f4;
   --card-color: white;
   --max-hours: 10;
+  --previous-events: #c6dafc;
+  --previous-text-color: #727d8f;
 
   &.gstyle {
     --hour-row-color: #212121;
@@ -50,6 +52,13 @@
       border-left: none;
       border-radius: 2px;
       opacity: 1;
+    }
+
+    .is-past {
+      .creating-event, .created-event {
+        background-color: var(--previous-events);
+        color: var(--previous-text-color);
+      }
     }
 
     .created-event {
@@ -122,23 +131,37 @@
       }
 
       .number-date {
-        margin-left:0px;
-        margin-right:0px;
+        margin-left: 0px;
+        margin-right: 0px;
         order: 2;
         font-size: 25px;
         font-weight: 500;
         width: 46px;
         height: 46px;
         border-radius: 100%;
-        align-items:center;
+        align-items: center;
         justify-content: center;
         display: flex;
         margin-top: 4px;
       }
 
+      &.today {
+        border-bottom-color: var(--table-cell-border-color);
+
+        &:after {
+          display: none;
+        }
+
+        .number-date {
+          background-color: var(--main-color);
+          color: white;
+        }
+      }
+
+
       .letters-date {
-        margin-left:0px;
-        margin-right:0px;
+        margin-left: 0px;
+        margin-right: 0px;
         font-weight: 500;
         text-transform: uppercase;
         font-size: 11px;
