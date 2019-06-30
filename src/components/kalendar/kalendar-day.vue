@@ -206,7 +206,19 @@ export default {
     // to start the flow of selecting a new cell
     // while the creator is enabled
     updateCreator(payload) {
-      this.creator = this.validateSelection(payload);
+      this.creator = {
+        ...this.validateSelection(payload),
+        status: 'creating'
+      };
+      if (this.kalendar_options.overlap === false) {
+        let fixedOverlap = this.checkPossibleOverlaps(payload);
+        if (fixedOverlap) {
+          this.creator = this.validateSelection(fixedOverlap);
+          this.selectCell();
+          this.initiatePopup();
+          return;
+        }
+      }
       this.selectCell();
     },
 
@@ -263,6 +275,7 @@ export default {
       };
     },
     initiatePopup() {
+      if (this.creating && this.creator.status !== 'creating') return;
       this.creator = {
         ...this.creator,
         status: 'popup-initiated',
@@ -302,7 +315,48 @@ export default {
       this.$set(this.day_events, starting_cell.value, updated_events);
       this.temporary_event = null;
     },
-
+    checkPossibleOverlaps(payload) {
+      if (!payload.current_cell) return;
+      let overlapped = Object.keys(this.day_events)
+        .map(evKey => {
+          return this.day_events[evKey]
+        })
+        .flat()
+        .filter(event => {
+          let cellStart = new Date(payload.starting_cell.value);
+          let cellEnd = new Date(payload.ending_cell.value);
+          let eventStarts = new Date(event.start.value);
+          let eventEnds = new Date(event.end.value);
+          return (cellEnd > eventStarts && cellEnd < eventEnds) ||
+            (cellStart < eventStarts && cellEnd > eventStarts);
+        });
+      if (!overlapped || overlapped.length === 0) {
+        return;
+      }
+      let newPayload = payload;
+      if (payload.direction === 'reverse') {
+        let needed_cell = overlapped[0].end;
+        let event_cell = this.day_cells.find(c => c.value === needed_cell.masked_value);
+        let cell = this.day_cells[event_cell.index];
+        newPayload.starting_cell = {
+          value: cell.value,
+          index: cell.index
+        };
+        newPayload.current_cell = {
+          value: cell.value,
+          index: cell.index
+        };
+      } else {
+        let needed_cell = overlapped[0].start;
+        let event_cell = this.day_cells.find(c => c.value === needed_cell.masked_value);
+        let cell = this.day_cells[event_cell.index - 1];
+        newPayload.ending_cell = {
+          value: cell.value,
+          index: cell.index
+        };
+      }
+      return newPayload;
+    },
     scrollView() {
       let topoffset = this.$refs.nowIndicator.offsetTop;
       setTimeout(() => {

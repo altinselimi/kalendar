@@ -164,11 +164,13 @@ const constructNewEvent = (event) => {
   let multipleOf10 = (dateStr) => new Date(dateStr).getMinutes() % 10;
 
   if (multipleOf10(fromData.value) !== 0) {
+    console.log('Gon make masked value', fromData.value);
     fromData.rounded = true;
     fromData.round_offset = multipleOf10(fromData.value);
     let minutes = new Date(fromData.value).getMinutes();
     let maskedMinutes = (Math.floor(minutes / 10) * 10);
     masked_from.setMinutes(maskedMinutes);
+    fromData.masked_value = masked_from.toISOString();
   }
 
   let eventKey = masked_from.toISOString();

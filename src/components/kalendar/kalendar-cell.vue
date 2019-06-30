@@ -127,12 +127,12 @@ export default {
       if (read_only) return;
       if (this.creator && !this.creator.creating) return;
       let { starting_cell, original_starting_cell, creating } = this.creator;
-      if (!overlap 
+      /*if (!overlap 
         && this.cell_events.length > 0 
         && original_starting_cell.value !== this.cellData.value) {
         this.mouseUp();
         return;
-      }
+      }*/
 
       // direction of scroll
       let going_down = this.cellData.index >= starting_cell.index &&

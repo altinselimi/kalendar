@@ -132,7 +132,7 @@ export default {
     return {
       events: existing_events,
       calendar_settings: {
-        view_type: 'day',
+        view_type: 'week',
         cell_height: 10,
         scrollToNow: false,
         current_day: currentDay,
