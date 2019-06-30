@@ -1,8 +1,12 @@
 module.exports = {
-	chainWebpack: config => {
-	},
-	configureWebpack: config => {
-		//config.optimization.splitChunks.maxSize = 1;
-		//config.optimization.splitChunks.minChunks = 0;
-	},
+  parallel: true,
+  chainWebpack: (config) => {
+    config.output
+      .globalObject('this')
+    config.module.rule('worker')
+      .test(/\.worker\.js$/i)
+      .use('worker-loader')
+      .loader('worker-loader')
+      .end()
+  },
 };

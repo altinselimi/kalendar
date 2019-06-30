@@ -1,35 +1,59 @@
 <template>
-  <div class="calendar-wrap" :style="`--space-between-cols: ${colsSpace}`">
+  <div class="calendar-wrap"
+       :style="`--space-between-cols: ${colsSpace}`">
     <div class="sticky-top">
-      <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
-        <li class="day-indicator" :key="index" v-for="({date}, index) in (days || [])" :class="{'today': _isToday(date), 'is-before': isBefore(date)}">
-          <portal-target name="number-date" :slot-props="{ date }" slim></portal-target>
-          <portal-target name="letters-date" :slot-props="{ date }" slim></portal-target>
+        <li class="day-indicator"
+            :key="index"
+            v-for="({value}, index) in (days || [])"
+            :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
+          <div>
+            <span class="letters-date">{{kalendar_options.formatDayTitle(value)[0]}}</span>
+            <span class="number-date">{{kalendar_options.formatDayTitle(value)[1]}}</span>
+          </div>
         </li>
       </ul>
       <ul class="all-day">
         <span>All Day</span>
-        <li :key="index" v-for="(date, index) in (days || [])" :class="{'all-today': _isToday(date), 'is-all-day': false}" :style="`height:${calendarOptions.cell_height + 5}px`"></li>
+        <li :key="index"
+            v-for="(date, index) in (days || [])"
+            :class="{'all-today': _isToday(date.value), 'is-all-day': false}"
+            :style="`height:${kalendar_options.cell_height + 5}px`"></li>
       </ul>
     </div>
-    <div class="dummy-row" v-if="false">
+    <div class="dummy-row"
+         v-if="false">
       <ul class="dummy-days">
-        <li :key="index" v-for="(day, index) in (days || [])" :style="`height:${calendarOptions.cell_height}px`"></li>
+        <li :key="index"
+            v-for="(day, index) in (days || [])"
+            :style="`height:${kalendar_options.cell_height}px`"></li>
       </ul>
     </div>
-    <div class="blocks">
+    <div class="blocks"
+         v-if="hours">
       <div class="calendar-blocks">
         <ul class="hours">
-          <li class="hour-row-identifier" :key="index" v-for="(hour, index) in (hours || [])" :style="`height:${hourHeight}px`">
-            <span>{{formatDate(hour, hour_format)}}</span>
+          <li class="hour-row-identifier"
+              :key="index"
+              v-for="(hour, index) in (hours || [])"
+              v-if="hour.visible"
+              :style="`height:${hourHeight}px`">
+            <span>{{kalendar_options.formatLeftHours(hour.value)}}</span>
           </li>
         </ul>
-        <div v-show="calendarOptions.style !== 'material_design'" class="hour-indicator-line" :style="`top:calc(${passedtime.percentage}% - 5px)`">
+        <div v-show="kalendar_options.style !== 'material_design'"
+             class="hour-indicator-line"
+             :style="`top:calc(${passedtime.percentage}% - 5px)`">
           <span class="time-value">{{passedtime.value}}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days :day="day" class="building-blocks" :key="index" v-for="(day, index) in days" :appointments="appointments" :passed-time="passedtime.percentage" @updateAppointments="updateAppointments" @deleteAppointment="deleteAppointment">
+        <kalendar-days :day="day"
+                       class="building-blocks"
+                       :class="`day-${index+1}`"
+                       :key="day.value.slice(0,10)"
+                       v-for="(day, index) in days"
+                       :passed-time="passedtime.percentage"
+                       :ref="day.value.slice(0,10)">
         </kalendar-days>
       </div>
     </div>
@@ -37,28 +61,36 @@
 </template>
 <script>
 import format from 'date-fns/format';
-import isToday from 'date-fns/is_today';
 import KalendarDays from './kalendar-day.vue';
-import isBefore from 'date-fns/is_before';
+import myWorker from '@/components/kalendar/workers';
+import Utils from './utils';
+const { isBefore, isToday, getHourlessDate, getLocaleTime } = Utils;
 
 export default {
   components: {
     KalendarDays,
   },
-  props: ['days', 'hours'],
-  inject: ['calendarOptions'],
   created() {
-    setInterval(() => this.calendarOptions.now = new Date, 1000 * 60);
+    this.addHelperMethods();
+    setInterval(() => this.kalendar_options.now = new Date, 1000 * 60);
+    this.constructWeek();
   },
+  inject: ['kalendar_options', 'kalendar_events'],
+  data: () => ({
+    hours: null,
+    days: []
+  }),
   computed: {
     colsSpace() {
-      return this.calendarOptions.style === 'flat_design' ? '5px' : '0px';
+      return this.kalendar_options.style === 'flat_design' ? '5px' : '0px';
     },
     hourHeight() {
-      return this.calendarOptions.cell_height * (60 / this.calendarOptions.split_value); // * this.calendarOptions.hour_parts;
+      return 6 * this.kalendar_options.cell_height;
+      //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value); 
+      // * this.kalendar_options.hour_parts;
     },
     passedtime() {
-      let time = format(this.calendarOptions.now, 'HH:mm');
+      let time = format(this.kalendar_options.now, 'HH:mm');
       let hours_minutes = time.split(':');
       let minutes = hours_minutes[1],
         oret = hours_minutes[0];
@@ -68,17 +100,11 @@ export default {
       let x = seconds / 864;
       return { percentage: x, value: time };
     },
-    appointments() {
-      return this.calendarOptions.existing_appointments;
-    },
     hour_format() {
-      return this.calendarOptions.military_time ? 'HH:mm' : 'h A';
-    }
+      return this.kalendar_options.military_time ? 'HH:mm' : 'h A';
+    },
   },
   methods: {
-    formatDate(_format, how) {
-      return format(_format, how);
-    },
     _isToday(day) {
       return isToday(day);
     },
@@ -92,7 +118,76 @@ export default {
       this.$emit('clear');
     },
     isBefore(day) {
-      return isBefore(day, this.calendarOptions.now);
+      let now = new Date(this.kalendar_options.now);
+      let formattedNow = getLocaleTime(now.toISOString());
+      return isBefore(day, getHourlessDate(formattedNow));
+    },
+    constructWeek() {
+      const date = this.kalendar_options.current_day.slice(0, 10);
+      const { hide_dates, hide_days, view_type } = this.kalendar_options;
+      return Promise.all([
+        myWorker.send('getDays', {
+          day: date,
+          options: {
+            hide_dates,
+            hide_days,
+            view_type
+          }
+        }).then(reply => {
+          this.days = reply; //.slice(0,1);
+        }),
+
+        myWorker.send('getHours', {
+          hourOptions: {
+            start_hour: this.kalendar_options.day_starts_at,
+            end_hour: this.kalendar_options.day_ends_at
+          }
+        }).then(reply => {
+          // Handle the reply
+          this.hours = reply;
+        })
+      ]);
+    },
+    addHelperMethods() {
+      this.$kalendar.buildWeek = () => {
+        this.constructWeek();
+      };
+      this.$kalendar.addNewEvent = (payload) => {
+        if (!payload) return Promise.reject('No payload');
+        let targetRef = payload.from.slice(0, 10);
+        const refObject = this.$refs[targetRef];
+        if (refObject && refObject[0]) {
+          refObject[0].addEvent(payload);
+        } else {
+          // appointment is not in this view
+          let events = this.$kalendar.getEvents();
+          events.push(payload);
+          this.$kalendar.updateEvents(events);
+        }
+      };
+
+      this.$kalendar.removeEvent = (options) => {
+        let { day, key, id } = options;
+        if (day.length > 10) {
+          day = day.slice(0, 10);
+        }
+        console.log('Options:', options);
+        if (!day)
+          return Promise.reject('Day wasn\'t provided');
+        if (!id)
+          return Promise.reject('No ID was provided');
+        if (!key)
+          return Promise.reject('No key was provided in the object');
+        let targetRef = day;
+        this.$refs[targetRef][0].removeEvent({ id, key });
+      };
+
+      this.$kalendar.closePopups = () => {
+        let refs = this.days.map(day => day.value.slice(0, 10));
+        refs.forEach(ref => {
+          this.$refs[ref][0].clearCreatingLeftovers();
+        });
+      }
     },
   },
 };
@@ -110,9 +205,11 @@ $theme-color: #e5e5e5;
 .calendar-wrap {
   display: flex;
   flex-direction: column;
+
   ul {
     list-style: none;
     padding: 0px;
+
     >li {
       display: flex;
     }
@@ -122,12 +219,14 @@ $theme-color: #e5e5e5;
 .sticky-top {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   background-color: white;
+
   .days {
     margin: 0px;
     display: flex;
-    margin-left: 50px;
+    margin-left: 55px;
+
     li {
       display: inline-flex;
       align-items: flex-end;
@@ -141,18 +240,22 @@ $theme-color: #e5e5e5;
       padding-bottom: 5px;
       position: relative;
       font-size: 18px;
+
       span {
         margin-right: 3px;
       }
+
       span:first-child {
         font-size: 20px;
         font-weight: 500;
       }
     }
+
     .today {
       border-bottom-color: var(--main-color);
-      color: var(--main-color)!important;
+      color: var(--main-color) !important;
     }
+
     .today::after {
       content: '';
       position: absolute;
@@ -163,24 +266,28 @@ $theme-color: #e5e5e5;
       background-color: var(--main-color);
     }
   }
+
   .all-day {
     display: flex;
     margin-bottom: 0px; //border-top: solid 1px #e5e5e5;
     margin-top: 0px;
     border-bottom: solid 2px #e5e5e5;
+
     span {
       display: flex;
       align-items: center;
       padding: 0px 5px;
-      width: 50px;
+      width: 55px;
       font-weight: 500;
       font-size: .8rem;
       color: darken($grey, 5);
       text-transform: lowercase;
     }
+
     li {
       flex: 1; //border-right: solid 5px $border-color;
       margin-right: var(--space-between-cols);
+
       &.all-today {
         background-color: #FEF4F4;
       }
@@ -190,12 +297,14 @@ $theme-color: #e5e5e5;
 
 .dummy-row {
   display: flex;
-  padding-left: 50px;
+  padding-left: 55px;
+
   ul {
     display: flex;
     flex: 1;
     margin: 0px;
   }
+
   li {
     flex: 1;
     height: 15px; //border-right: solid 5px $border-color;
@@ -208,9 +317,11 @@ $theme-color: #e5e5e5;
   display: flex;
   position: relative;
   height: 100%;
+
   ul {
     margin-top: 0px;
   }
+
   .building-blocks {
     flex: 1;
     margin-right: var(--space-between-cols);
@@ -218,6 +329,7 @@ $theme-color: #e5e5e5;
     display: flex;
     flex-direction: column;
   }
+
   .calendar-blocks {
     width: 100%;
     display: flex;
@@ -231,16 +343,19 @@ $theme-color: #e5e5e5;
   color: darken($grey, 5);
   font-weight: 500;
   font-size: .85rem;
-  width: 50px;
+  width: 55px;
   height: 100%;
   margin-bottom: 0px;
+
   li {
     color: var(--hour-row-color);
     border-bottom: solid 1px $border-color;
     padding-left: 8px;
+
     span {
-      margin-top: -10px;
+      margin-top: -8px;
     }
+
     &:first-child span {
       visibility: hidden;
     }
