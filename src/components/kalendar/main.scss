@@ -335,3 +335,7 @@
   pointer-events: none;
   user-select: none;
 }
+
+ul.kalendar-day li.kalendar-cell:last-child {
+  display: none;
+}

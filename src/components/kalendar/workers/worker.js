@@ -93,7 +93,9 @@ const getDayCells = (dayString, day_options) => {
   let all_hours = hourUtils.getAllHours();
   if (day_options) {
     let { start_hour, end_hour } = day_options;
-    all_hours = all_hours.slice(start_hour * 6, end_hour * 6);
+    let start_index = start_hour * 6;
+    let end_index = (end_hour * 6) + 1;
+    all_hours = all_hours.slice(start_index, end_index);
   }
   for (let hourIdx = 0; hourIdx < all_hours.length; hourIdx++) {
     let hour = all_hours[hourIdx];
@@ -164,7 +166,6 @@ const constructNewEvent = (event) => {
   let multipleOf10 = (dateStr) => new Date(dateStr).getMinutes() % 10;
 
   if (multipleOf10(fromData.value) !== 0) {
-    console.log('Gon make masked value', fromData.value);
     fromData.rounded = true;
     fromData.round_offset = multipleOf10(fromData.value);
     let minutes = new Date(fromData.value).getMinutes();

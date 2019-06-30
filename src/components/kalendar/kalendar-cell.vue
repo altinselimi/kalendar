@@ -174,10 +174,6 @@ li {
   height: 100%;
 }
 
-.kalendar-cell:last-child {
-  display: none;
-}
-
 ul.building-blocks {
   li {
     z-index: 0;

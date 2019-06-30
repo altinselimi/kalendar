@@ -140,9 +140,9 @@ export default {
         read_only: false,
         day_starts_at: 0,
         day_ends_at: 24,
-        overlap: false,
+        overlap: true,
         hide_dates: ['2019-08-09'],
-        hide_days: [6],
+        hide_days: [5,6],
         past_event_creation: true
       },
       outline_slots: false,
@@ -226,6 +226,7 @@ $red: #F61067;
     border: none;
     color: #4c4b4b;
     position: absolute;
+    padding-right:0px;
     top: 5px;
     right: 5px;
     cursor: pointer;

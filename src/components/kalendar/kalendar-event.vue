@@ -1,5 +1,6 @@
 <template>
   <div class="event-card"
+       :ref="`kalendarEventRef-${event.id}`"
        :style="`
       height: ${distance}; 
       width: calc(${width_value}); 
@@ -40,6 +41,7 @@ const { isBefore, getLocaleTime } = Utils;
 
 export default {
   props: ['event', 'total', 'index', 'overlaps'],
+  created() {},
   inject: ['kalendar_options'],
   data: () => ({
     inspecting: false,
@@ -120,12 +122,19 @@ $creator-content: white;
   }
 
   &__mini {
+    .created-event > .details-card > * {
+      display: none;
+    }
 
     .appointment-title,
     .time {
+      display: block!important;
       position: absolute;
       top: 0;
       font-size: 9px;
+      z-index: 1;
+      overflow: visible;
+      height: 100%;
     }
   }
 
@@ -207,6 +216,30 @@ $creator-content: white;
 
 .created-event {
   pointer-events: all;
+  position: relative;
+
+  >.details-card {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+
+    >h1,
+    h2,
+    h3,
+    h4,
+    p,
+    small,
+    strong,
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: block;
+    }
+  }
 }
 
 ul:last-child .popup-wrapper {

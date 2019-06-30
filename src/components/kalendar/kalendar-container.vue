@@ -139,7 +139,7 @@ export default {
         cell_height: 10,
         scrollToNow: false,
         current_day: today,
-        view_type: 'Week',
+        view_type: 'week',
         style: 'material_design',
         now: new Date,
         military_time: true,
