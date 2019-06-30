@@ -339,3 +339,12 @@
 ul.kalendar-day li.kalendar-cell:last-child {
   display: none;
 }
+
+.week-navigator-button {
+  outline: 0;
+  &:hover, &:active {
+    svg {
+      stroke: var(--main-color);
+    }
+  }
+}
