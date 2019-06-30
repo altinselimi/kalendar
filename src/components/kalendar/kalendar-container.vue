@@ -2,18 +2,27 @@
   <div class="kalendar-wrapper"
        :class="{
             'no-scroll': !scrollable, 
-            'is-day-view': kalendar_options.view_type === 'Day', 
             'gstyle': kalendar_options.style === 'material_design', 
+            'day-view': kalendar_options.view_type === 'day',
     }"
        @touchstart="scrollable = false"
        @touchend="scrollable = true">
     <div class="week-navigator">
-      <div class="nav-wrapper">
+      <div class="nav-wrapper"
+           v-if="kalendar_options.view_type === 'week'">
         <button @click="previousWeek()">PREV</button>
         <div>
           <span>{{ kalendar_options.formatWeekNavigator(kalendar_options.current_day) }}</span>
         </div>
         <button @click="nextWeek()">NEXT</button>
+      </div>
+      <div class="nav-wrapper"
+           v-if="kalendar_options.view_type === 'day'">
+        <button @click="previousDay()">PREV</button>
+        <div>
+          <span>{{ kalendar_options.formatDayNavigator(kalendar_options.current_day) }}</span>
+        </div>
+        <button @click="nextDay()">NEXT</button>
       </div>
     </div>
     <kalendar-week-view />
@@ -94,6 +103,8 @@ const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+// we are going to use web workers to do the heavy lifting
+// needed for our kalendar component to work and render correctly
 import myWorker from '@/components/kalendar/workers';
 
 export default {
@@ -102,6 +113,7 @@ export default {
       import('./kalendar-weekview.vue'),
   },
   props: {
+    // this provided array will be kept in sync
     events: {
       required: true,
       type: Array,
@@ -109,6 +121,8 @@ export default {
         return Array.isArray(val);
       }
     },
+    // use this to enable/disable stuff which
+    // are supported by Kalendar itself
     configuration: {
       type: Object,
       required: false,
@@ -125,7 +139,7 @@ export default {
         cell_height: 10,
         scrollToNow: false,
         current_day: today,
-        view_type: 'Month',
+        view_type: 'Week',
         style: 'material_design',
         now: new Date,
         military_time: true,
@@ -151,6 +165,10 @@ export default {
           let startString = startDate.toUTCString().slice(5, 11);
           let endString = endDate.toUTCString().slice(5, 11);
           return `${startString} - ${endString}`;
+        },
+        formatDayNavigator: (isoDate) => {
+          let day = new Date(isoDate);
+          return day.toUTCString().slice(5, 11);
         }
       },
       kalendar_events: null,
@@ -168,7 +186,7 @@ export default {
         scrollToNow: (val) => typeof val === 'boolean',
         current_week: (val) => val === null,
         current_day: (val) => !isNaN(Date.parse(val)),
-        view_type: (val) => ['Month', 'Day'].includes(val),
+        view_type: (val) => ['week', 'day'].includes(val),
         cell_height: (val) => !isNaN(val),
         style: (val) => ['material_design', 'flat_design'].includes(val),
         military_time: (val) => typeof val === 'boolean',
@@ -234,6 +252,32 @@ export default {
     return provider;
   },
   methods: {
+    previousDay() {
+      let { current_day } = this.kalendar_options;
+      let target_day = kalendarHelpers.addDays(current_day, -1);
+      let config = kalendarHelpers.cloneObject(this.configuration);
+      config = {
+        ...config,
+        current_day: target_day.toISOString()
+      };
+      this.$emit('update:configuration', config);
+      setTimeout(() => {
+        this.$kalendar.buildWeek();
+      });
+    },
+    nextDay() {
+      let { current_day } = this.kalendar_options;
+      let target_day = kalendarHelpers.addDays(current_day, 1);
+      let config = kalendarHelpers.cloneObject(this.configuration);
+      config = {
+        ...config,
+        current_day: target_day.toISOString()
+      };
+      this.$emit('update:configuration', config);
+      setTimeout(() => {
+        this.$kalendar.buildWeek();
+      });
+    },
     previousWeek() {
       let { current_day } = this.kalendar_options;
       let nextWeek = new Date(current_day);

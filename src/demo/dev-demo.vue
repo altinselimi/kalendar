@@ -132,7 +132,7 @@ export default {
     return {
       events: existing_events,
       calendar_settings: {
-        view_type: 'Month',
+        view_type: 'day',
         cell_height: 10,
         scrollToNow: false,
         current_day: currentDay,
@@ -140,7 +140,7 @@ export default {
         read_only: false,
         day_starts_at: 0,
         day_ends_at: 24,
-        overlap: true,
+        overlap: false,
         hide_dates: ['2019-08-09'],
         hide_days: [6],
         past_event_creation: true

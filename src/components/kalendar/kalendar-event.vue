@@ -99,6 +99,7 @@ $creator-content: white;
 
   >* {
     flex: 1;
+    position: relative;
   }
 
   &.creating {
@@ -214,9 +215,10 @@ ul:last-child .popup-wrapper {
   margin-right: 10px;
 }
 
-.is-day-view ul .popup-wrapper {
+.day-view ul .popup-wrapper {
   left: auto;
   right: auto;
-  width: 100%;
+  width: calc(100% - 10px);
+  top: 10px;
 }
 </style>

@@ -36,6 +36,9 @@ import myWorker from '@/components/kalendar/workers';
 export default {
   props: ['day', 'passedTime'],
   created() {
+    // get and render day cells
+    // and then render any event
+    // on top of them
     this.renderDay();
   },
   components: {
@@ -43,11 +46,14 @@ export default {
       import('./kalendar-cell.vue'),
   },
   provide() {
+    // provide these methods to children components
+    // for easier access
     return {
       kalendarAddEvent: this.addEvent,
       kalendarClearPopups: this.clearCreatingLeftovers
     };
   },
+  // inject kalendar options from parent component
   inject: ['kalendar_options'],
   mounted() {
     if (this.scrollToNow && this.isToday) this.scrollView();
@@ -61,6 +67,9 @@ export default {
     },
   },
   data: () => ({
+    // this is the main object
+    // we use to make selections
+    // and control their flows
     creator: {
       creating: false,
       starting_cell: null,
@@ -69,7 +78,12 @@ export default {
       ending_cell: null,
       status: null,
     },
+    // temporary event is an object
+    // that holds values of creator
+    // when the popup is initiated
     temporary_event: null,
+
+    // day cells and events are used for rendering purposes
     day_cells: [],
     day_events: null,
   }),
@@ -88,12 +102,14 @@ export default {
     },
 
     addEvent(payload) {
-      //validation
+      // validation
       let validation_message = this.checkEventValidity(payload);
       if (validation_message !== null) {
         return Promise.reject(validation_message);
       }
 
+      // use web worker to generate event
+      // and then render it in the day_events objects
       let { from, to } = payload;
       from = kalendarHelpers.getLocaleTime(from);
       to = kalendarHelpers.getLocaleTime(to);
@@ -121,6 +137,10 @@ export default {
         this.$kalendar.updateEvents(events);
       });
     },
+
+    // this is not called inside this component
+    // but rather from the kalendar-weekview component
+    // which targets it using $refs object.
     removeEvent(payload) {
       let events = this.$kalendar.getEvents();
       let eventIndex = events.findIndex(event => event.id === payload.id);
@@ -181,10 +201,17 @@ export default {
       };
       this.temporary_event = null;
     },
+
+    // this method is what we use
+    // to start the flow of selecting a new cell
+    // while the creator is enabled
     updateCreator(payload) {
       this.creator = this.validateSelection(payload);
       this.selectCell();
     },
+
+    // when the direction is reversed,
+    // the ending cell is actually the originally selected cell
     validateSelection(event) {
       let { original_starting_cell, starting_cell, current_cell } = event;
       if (event.direction === 'reverse' &&
@@ -217,6 +244,7 @@ export default {
       let endDate = new Date(ending_cell.value);
 
       let distance = diffMins + (diffInHrs * 60);
+
       this.temporary_event = {
         start: {
           masked_value: startDate.toISOString(),
@@ -288,7 +316,6 @@ export default {
 ul.kalendar-day {
   position: relative;
   background-color: white;
-  max-width: 400px;
 
   &.is-weekend {
     background-color: var(--weekend-color);

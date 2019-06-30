@@ -8,7 +8,7 @@
       'selected': selected, 
       'is-an-hour': (index+1)%(60/10) === 0,
       'has-events': cell_events && cell_events.length > 0,
-      'being-created': !!beingCreated || hasPopups
+      'being-created': !!being_created || hasPopups
     }"
       :style="`
       height: ${kalendar_options.cell_height}px;
@@ -36,20 +36,20 @@ export default {
   computed: {
     cell_events() {
       let all_events = [];
-      if (this.completedEvents) {
-        all_events = all_events.concat(this.completedEvents);
+      if (this.completed_events) {
+        all_events = all_events.concat(this.completed_events);
       }
-      if (this.beingCreated) {
-        all_events = all_events.concat(this.beingCreated);
+      if (this.being_created) {
+        all_events = all_events.concat(this.being_created);
       }
       return all_events;
     },
-    completedEvents() {
+    completed_events() {
       return this.constructedEvents &&
         this.constructedEvents.hasOwnProperty(this.cellData.value) &&
         this.constructedEvents[this.cellData.value];
     },
-    beingCreated() {
+    being_created() {
       return (this.temporaryEvent &&
         this.temporaryEvent.start.value === this.cellData.value &&
         this.temporaryEvent);
@@ -88,6 +88,9 @@ export default {
         return;
       }
       let { read_only, overlap, past_event_creation } = this.kalendar_options;
+
+      // if past_event_creation is set to false, check if cell value is
+      // before current time
       if (past_event_creation === false) {
         let now = kalendarHelpers.getLocaleTime(new Date());
         if (new Date(now) > new Date(this.cellData.value)) {
@@ -95,9 +98,20 @@ export default {
           return;
         }
       }
+
+      // if overlap is set to false, prevent selection on top of
+      // other events
       if (!overlap && this.cell_events.length > 0) return;
+
+      // close any open popups in the whole kalendar instance
+      // before starting a new one
       this.$kalendar.closePopups();
 
+      // create a payload consisting of
+      // starting, current, ending and originalStarting cell
+      // starting, current and ending are self explanatory
+      // but originalStarting cell is required
+      // to determine the direction of the scroll/drag
       let payload = {
         creating: true,
         original_starting_cell: cloneObject(this.cellData),
@@ -108,17 +122,21 @@ export default {
       this.$emit('select', payload);
     },
     mouseMove() {
+      // same guards like in the mouseDown function
       let { read_only, overlap } = this.kalendar_options;
       if (read_only) return;
       if (this.creator && !this.creator.creating) return;
       let { starting_cell, original_starting_cell, creating } = this.creator;
-      let going_down = this.cellData.index >= starting_cell.index &&
-        starting_cell.index === original_starting_cell.index;
-
-      if (!overlap && this.cell_events.length > 0) {
+      if (!overlap 
+        && this.cell_events.length > 0 
+        && original_starting_cell.value !== this.cellData.value) {
         this.mouseUp();
         return;
       }
+
+      // direction of scroll
+      let going_down = this.cellData.index >= starting_cell.index &&
+        starting_cell.index === original_starting_cell.index;
 
       if (creating) {
         let payload = {
@@ -138,15 +156,6 @@ export default {
     },
     resetCreator() {
       this.$emit('reset');
-    },
-    clearPopups(status) {
-      this.kalendar_options.currently_working_on_date = null;
-      let { existing_appointments } = this.kalendar_options;
-      for (let key in existing_appointments) {
-        if (existing_appointments[key]['status'] === 'popup-initiated') {
-          this.$delete(existing_appointments, key);
-        }
-      }
     },
   },
 }

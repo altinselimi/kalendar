@@ -30,16 +30,23 @@ registerPromiseWorker((message) => {
   }
 })
 
-function getDays(dayString, { hide_dates, hide_days }) {
+function getDays(dayString, { hide_dates, hide_days, view_type }) {
   let date = new Date(dayString);
   date.setUTCHours(0, 0, 0, 0);
   let day_of_week = date.getDay();
   let days = [];
-  for (let idx = 0; idx < 7; idx++) {
-    days.push({
-      value: addDays(date, idx - day_of_week).toISOString(),
-      index: idx,
-    });
+  if (view_type === 'day') {
+    days = [{
+      value: date.toISOString(),
+      index: 0
+    }];
+  } else {
+    for (let idx = 0; idx < 7; idx++) {
+      days.push({
+        value: addDays(date, idx - day_of_week).toISOString(),
+        index: idx,
+      });
+    }
   }
   if (hide_dates && hide_dates.length > 0) {
     days = days.filter(({ value }) => {

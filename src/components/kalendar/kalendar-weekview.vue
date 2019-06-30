@@ -2,14 +2,15 @@
   <div class="calendar-wrap"
        :style="`--space-between-cols: ${colsSpace}`">
     <div class="sticky-top">
-      <portal-target name="week-navigator-place"></portal-target>
       <ul class="days">
         <li class="day-indicator"
             :key="index"
             v-for="({value}, index) in (days || [])"
             :class="{'today': _isToday(value), 'is-before': isBefore(value)}">
-          <span class="letters-date">{{kalendar_options.formatDayTitle(value)[0]}}</span>
-          <span class="number-date">{{kalendar_options.formatDayTitle(value)[1]}}</span>
+          <div>
+            <span class="letters-date">{{kalendar_options.formatDayTitle(value)[0]}}</span>
+            <span class="number-date">{{kalendar_options.formatDayTitle(value)[1]}}</span>
+          </div>
         </li>
       </ul>
       <ul class="all-day">
@@ -122,16 +123,19 @@ export default {
     },
     constructWeek() {
       const date = this.kalendar_options.current_day.slice(0, 10);
-      const { hide_dates, hide_days } = this.kalendar_options;
-      return Promise.all([myWorker.send('getDays', {
+      const { hide_dates, hide_days, view_type } = this.kalendar_options;
+      return Promise.all([
+        myWorker.send('getDays', {
           day: date,
           options: {
             hide_dates,
-            hide_days
+            hide_days,
+            view_type
           }
         }).then(reply => {
           this.days = reply; //.slice(0,1);
         }),
+
         myWorker.send('getHours', {
           hourOptions: {
             start_hour: this.kalendar_options.day_starts_at,

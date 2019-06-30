@@ -102,8 +102,6 @@ const addTimezoneInfo = (ISOdate) => {
 const isToday = (date) => {
   if (!date) return
   let today = getLocaleTime(new Date()).slice(0, 10);
-  console.log('TodaySS:', today);
-  console.log('DateSS:', date.slice(0, 10));
   return date.slice(0, 10) === today;
 }
 
