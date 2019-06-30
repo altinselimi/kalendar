@@ -224,6 +224,47 @@
   </div>
 </template>
 <script>
+const existing_events = [{
+    "from": "2019-06-27T04:00:00.300Z",
+    "to": "2019-06-27T04:10:00.300Z",
+    "data": {
+      "title": "Right now",
+      "description": "Lorem ipsum"
+    }
+  },
+  {
+    "from": "2019-06-26T10:22:00-07:00",
+    "to": "2019-06-26T11:55:00-07:00",
+    "data": {
+      "title": "Truth",
+      "description": "Look."
+    }
+  },
+  {
+    "from": "2019-06-26T10:22:00-07:00",
+    "to": "2019-06-26T11:20:00-07:00",
+    "data": {
+      "title": "Side",
+      "description": "Look.2"
+    }
+  },
+  {
+    "from": "2019-06-26T10:22:00+02:00",
+    "to": "2019-06-26T11:20:00+02:00",
+    "data": {
+      "title": "Europe",
+      "description": "Final Countdown"
+    }
+  }
+];
+
+let today = new Date();
+let year = today.getFullYear() + '',
+  month = ((today.getMonth() + 1) + '').padStart(2, 0),
+  day = (today.getDate() + '').padStart(2, 0);
+
+const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
+
 import Vue from 'vue';
 
 import VueHighlightJS from 'vue-highlightjs'
@@ -239,8 +280,16 @@ import locale from 'element-ui/lib/locale';
 locale.use(lang);
 
 import HowTo from './how-to.vue';
+import { DateTime } from 'luxon';
+
 
 export default {
+  created() {
+    Vue.filter('formatToHours', (value, how) => {
+      let dt = DateTime.fromISO(value);
+      return dt.toLocaleString(DateTime.TIME_24_SIMPLE);
+    });
+  },
   components: {
     Kalendar,
     options: () =>
@@ -257,20 +306,20 @@ export default {
     HowTo,
   },
   data: () => ({
-    events: existing_events,
+    events: [],
     calendar_settings: {
-      view_type: 'Month',
+      view_type: 'week',
       cell_height: 10,
       scrollToNow: false,
-      current_day: new Date(),
+      current_day: currentDay,
       military_time: false,
       read_only: false,
       day_starts_at: 0,
       day_ends_at: 24,
       overlap: true,
       hide_dates: ['2019-08-09'],
-      hide_days: [6],
-      past_event_creation: false
+      hide_days: [5, 6],
+      past_event_creation: true
     },
     outline_slots: false,
     new_appointment: {},
@@ -354,48 +403,46 @@ body {
   }
 }
 
-.calendar-component {
-  //padding: 50px 0px;
-  position: relative;
-  z-index: 1;
+.details-card {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  height: 100%;
 
-  .details-card {
-    display: flex;
-    flex-direction: column;
-    width: 100px;
-    height: 100%;
+  button {
+    margin: 0;
+    border: none;
+    color: #4c4b4b;
+    position: absolute;
+    padding-right:0px;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    background: transparent;
 
-    button {
-      margin: 0;
-      border: none;
-      background-color: transparent;
-      //color: $red;
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      cursor: pointer;
-
-      svg {
-        width: 18px;
-        height: 18px;
-      }
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
     }
+  }
+
+  .remove {
+    opacity: 0;
+    transition: opacity .15s;
+  }
+
+  &:hover .remove {
+    opacity: 1;
   }
 }
 
-.event-popup {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.event-popup .buttons {
-  margin-top: 5px;
+.popup-event .buttons {
   display: flex;
   justify-content: space-between;
 }
 
-.event-popup .buttons button {
+.popup-event .buttons button {
   border: none;
   color: #29771c;
   background-color: rgba($green, .04);
