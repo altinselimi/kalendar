@@ -49,6 +49,7 @@
         </div>
         <kalendar-days :day="day"
                        class="building-blocks"
+                       :class="`day-${index+1}`"
                        :key="day.value.slice(0,10)"
                        v-for="(day, index) in days"
                        :passed-time="passedtime.percentage"

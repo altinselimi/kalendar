@@ -81,7 +81,7 @@
       display: none;
     }
 
-    ul.building-blocks li.is-an-hour::before {
+    ul.building-blocks.day-1 li.is-an-hour::before {
       content: '';
       position: absolute;
       bottom: -1px;

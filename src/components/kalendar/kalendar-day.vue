@@ -211,7 +211,7 @@ export default {
         status: 'creating'
       };
       if (this.kalendar_options.overlap === false) {
-        let fixedOverlap = this.checkPossibleOverlaps(payload);
+        let fixedOverlap = this.overlapPolice(payload);
         if (fixedOverlap) {
           this.creator = this.validateSelection(fixedOverlap);
           this.selectCell();
@@ -315,7 +315,7 @@ export default {
       this.$set(this.day_events, starting_cell.value, updated_events);
       this.temporary_event = null;
     },
-    checkPossibleOverlaps(payload) {
+    overlapPolice(payload) {
       if (!payload.current_cell) return;
       let overlapped = Object.keys(this.day_events)
         .map(evKey => {
