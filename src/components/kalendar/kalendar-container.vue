@@ -10,19 +10,27 @@
     <div class="week-navigator">
       <div class="nav-wrapper"
            v-if="kalendar_options.view_type === 'week'">
-        <button @click="previousWeek()">PREV</button>
+        <button class="week-navigator-button" @click="previousWeek()">
+          <svg style="transform: rotate(180deg)" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
         <div>
           <span>{{ kalendar_options.formatWeekNavigator(kalendar_options.current_day) }}</span>
         </div>
-        <button @click="nextWeek()">NEXT</button>
+        <button class="week-navigator-button" @click="nextWeek()">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       </div>
       <div class="nav-wrapper"
            v-if="kalendar_options.view_type === 'day'">
-        <button @click="previousDay()">PREV</button>
+        <button class="week-navigator-button" @click="previousDay()">
+          <svg style="transform: rotate(180deg)" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
         <div>
           <span>{{ kalendar_options.formatDayNavigator(kalendar_options.current_day) }}</span>
         </div>
-        <button @click="nextDay()">NEXT</button>
+        <button class="week-navigator-button" @click="nextDay()">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       </div>
     </div>
     <kalendar-week-view />

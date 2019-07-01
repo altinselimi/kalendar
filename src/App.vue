@@ -12,7 +12,7 @@ export default {
   name: 'app',
   computed: {
     isDev() {
-      return process.env.NODE_ENV === 'development';
+      return false;//process.env.NODE_ENV === 'development';
     }
   },
   components: {
