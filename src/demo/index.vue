@@ -1,164 +1,22 @@
 <template>
   <div class="calendarium">
     <quick-intro></quick-intro>
+    <add-manual-event v-if="adding_manually"
+                      @close="adding_manually = false"
+                      @done="addManually" />
+    <options :data.sync="calendar_settings" />
     <button class="add-manual"
             @click="adding_manually = true">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           width="24"
-           height="24"
-           viewBox="0 0 24 24"
-           fill="none"
-           stroke="currentColor"
-           stroke-width="2"
-           stroke-linecap="round"
-           stroke-linejoin="round"
-           class="feather feather-plus">
-        <line x1="12"
-              y1="5"
-              x2="12"
-              y2="19"></line>
-        <line x1="5"
-              y1="12"
-              x2="19"
-              y2="12"></line>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
     </button>
-    <div class="manual-add"
-         v-show="adding_manually">
-      <form name="manual-form">
-        <label>Title
-          <el-input v-model="manual_form['title']"
-                    name="title"
-                    placeholder="Title" />
-        </label>
-        <label>Description
-          <el-input v-model="manual_form['description']"
-                    type="textarea"
-                    name="description"
-                    placeholder="Description"
-                    rows="2"></el-input>
-        </label>
-        <label>Date
-          <el-date-picker v-model="manual_form['date']"
-                          type="date"
-                          placeholder="Pick a day"
-                          value-format="yyyy-MM-dd">
-          </el-date-picker>
-        </label>
-        <label>
-          From
-          <el-time-select :picker-options="{ start: '00:00',step: '00:15',end: '24:00'}"
-                          v-model="manual_form['from']"
-                          placeholder="Start time">
-          </el-time-select>
-        </label>
-        <label>
-          To
-          <el-time-select :picker-options="{ start: '00:00',step: '00:15',end: '24:00'}"
-                          v-model="manual_form['to']"
-                          placeholder="End time">
-          </el-time-select>
-        </label>
-        <span class="info">Date format must be a valid one. For example:
-          <strong>2018-08-09T01:50:00</strong>.</span>
-        <button type="button"
-                @click="addManually()"
-                class="save">Add Event</button>
-        <button type="button"
-                class="close"
-                @click="adding_manually = false">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="2"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="feather feather-plus">
-            <line x1="12"
-                  y1="5"
-                  x2="12"
-                  y2="19"></line>
-            <line x1="5"
-                  y1="12"
-                  x2="19"
-                  y2="12"></line>
-          </svg>
-        </button>
-      </form>
-    </div>
-    <options>
-      <label>Style
-        <el-select v-model="calendar_settings['style']"
-                   placeholder="Style"
-                   size="small">
-          <el-option value="material_design"
-                     label="Material Design"></el-option>
-          <el-option value="flat_design"
-                     label="Flat Design"></el-option>
-        </el-select>
-      </label>
-      <label>View Type
-        <el-select v-model="calendar_settings['view_type']"
-                   placeholder="View Type"
-                   size="small">
-          <el-option value="Day"></el-option>
-          <el-option value="Month"></el-option>
-        </el-select>
-      </label>
-      <label>Hour Base
-        <el-select v-model.number="calendar_settings['split_value']"
-                   placeholder="Hour Base"
-                   size="small">
-          <el-option value="5"
-                     label="5 minutes"></el-option>
-          <el-option value="10"
-                     label="10 minutes"></el-option>
-          <el-option value="15"
-                     label="15 minutes"></el-option>
-          <el-option value="20"
-                     label="20 minutes"></el-option>
-          <el-option value="30"
-                     label="30 minutes"></el-option>
-        </el-select>
-      </label>
-      <label>Military Time
-        <el-checkbox size="small"
-                     v-model="calendar_settings['military_time']"></el-checkbox>
-      </label>
-      <label>Cell Height
-        <el-input size="small"
-                  type="number"
-                  name="cell-height"
-                  v-model.number="calendar_settings['cell_height']" />
-      </label>
-      <label>Day
-        <el-date-picker size="small"
-                        v-model="calendar_settings['current_day']"
-                        type="date"
-                        placeholder="Pick a day"
-                        format="yyyy-MM-dd">
-        </el-date-picker>
-      </label>
-      <label>Scroll to now
-        <el-checkbox size="small"
-                     v-model="calendar_settings['scrollToNow']"></el-checkbox>
-      </label>
-      <label>Outline slots
-        <el-checkbox size="small"
-                     v-model="outline_slots"></el-checkbox>
-      </label>
-      <label>Read only
-        <el-checkbox size="small"
-                     v-model="calendar_settings['read_only']"></el-checkbox>
-      </label>
-    </options>
     <div class="calendar-component"
          :class="{'show-slots': outline_slots}">
       <kalendar :configuration.sync="calendar_settings"
                 :events.sync="events"
+                :key="kalendarRenderId"
                 class="generate-shadow">
         <!-- CREATED CARD SLOT -->
         <div slot="details-card"
@@ -274,7 +132,16 @@ import Kalendar from '../components/kalendar/kalendar-container.vue';
 //import { Kalendar } from 'kalendar-vue';
 //import 'kalendar-vue/dist/kalendar-vue.css';
 
-import { DatePicker, TimePicker, Select, Input, TimeSelect, Option, Checkbox } from 'element-ui';
+import { DatePicker, TimePicker, Select, Input, TimeSelect, Option, Checkbox, Form } from 'element-ui';
+Vue.use(DatePicker, { locale });
+Vue.use(TimePicker, { locale });
+Vue.use(Select, { locale });
+Vue.use(Input, { locale });
+Vue.use(TimeSelect, { locale });
+Vue.use(Option, { locale });
+Vue.use(Checkbox, { locale });
+Vue.use(Form, { locale });
+
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
 locale.use(lang);
@@ -282,6 +149,7 @@ locale.use(lang);
 import HowTo from './how-to.vue';
 import { DateTime } from 'luxon';
 
+import addManualEvent from './manual-event.vue';
 
 export default {
   created() {
@@ -296,14 +164,16 @@ export default {
       import('./options.vue'),
     quickIntro: () =>
       import('./quick-intro.vue'),
-    elInput: Input,
-    elSelect: Select,
-    elTimePicker: TimePicker,
-    elDatePicker: DatePicker,
-    elTimeSelect: TimeSelect,
-    elOption: Option,
-    elCheckbox: Checkbox,
     HowTo,
+    addManualEvent
+  },
+  computed: {
+    kalendarRenderId() {
+      let { view_type, scrollToNow, current_day, read_only, day_starts_at, day_ends_at, overlap, hide_dates, hide_days, past_event_creation } = this.calendar_settings;
+      let arr = [view_type, scrollToNow, current_day, read_only, day_starts_at, day_ends_at, overlap, hide_dates, hide_days, past_event_creation];
+      console.log({arr});
+      return arr.join('-');
+    },
   },
   data: () => ({
     events: [],
@@ -317,13 +187,12 @@ export default {
       day_starts_at: 0,
       day_ends_at: 24,
       overlap: true,
-      hide_dates: ['2019-08-09'],
+      hide_dates: ['2019-10-31'],
       hide_days: [5, 6],
       past_event_creation: true
     },
     outline_slots: false,
     new_appointment: {},
-    manual_form: {},
     adding_manually: false,
     input_value: '',
   }),
@@ -355,22 +224,9 @@ export default {
         description: null,
         title: null,
       };
-      this.manual_appointment = { ...this.new_appointment,
-        from: null,
-        to: null,
-        date: null,
-      };
     },
-    addManually() {
-      const { title, description } = this.manual_form;
-      let { date, from, to } = this.manual_form;
-      let formattedFrom = `${date}T${from}:00.000Z`;
-      let formattedTo = `${date}T${to}:00.000Z`;
-      let payload = {
-        data: { title, description },
-        from: formattedFrom,
-        to: formattedTo
-      };
+    addManually(payload) {
+      console.log('AddManually payload', payload);
       this.$kalendar.addNewEvent(
         payload,
       );
@@ -383,7 +239,6 @@ export default {
         key: kalendarEvent.key,
         id: kalendarEvent.kalendar_id,
       })
-      console.log('Event:', kalendarEvent);
     },
   },
 };
@@ -414,7 +269,7 @@ body {
     border: none;
     color: #4c4b4b;
     position: absolute;
-    padding-right:0px;
+    padding-right: 0px;
     top: 5px;
     right: 5px;
     cursor: pointer;
@@ -486,7 +341,7 @@ body {
   align-items: center;
   width: 100%;
   height: 100%;
-  z-index: 11;
+  z-index: 30;
   background-color: rgba(black, .7);
 
   >form {

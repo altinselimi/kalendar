@@ -88,6 +88,7 @@ export default {
         return;
       }
       let { read_only, overlap, past_event_creation } = this.kalendar_options;
+      if(read_only) return;
 
       // if past_event_creation is set to false, check if cell value is
       // before current time

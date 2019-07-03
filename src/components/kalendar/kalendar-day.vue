@@ -56,7 +56,8 @@ export default {
   // inject kalendar options from parent component
   inject: ['kalendar_options'],
   mounted() {
-    if (this.scrollToNow && this.isToday) this.scrollView();
+    console.log('ScrollToNOW:', this.kalendar_options.scrollToNow);
+    if (this.kalendar_options.scrollToNow && this.isToday) this.scrollView();
   },
   computed: {
     isWeekend() {
@@ -359,6 +360,7 @@ export default {
     },
     scrollView() {
       let topoffset = this.$refs.nowIndicator.offsetTop;
+      console.log('Scrolling to :', topoffset);
       setTimeout(() => {
         window.scroll({ top: topoffset, left: 0, behavior: 'smooth' });
       }, 500);

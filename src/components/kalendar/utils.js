@@ -118,7 +118,7 @@ const isWeekend = (date) => {
 
 const formatAMPM = (date) => {
   let hours = date.getUTCHours();
-  let result = `${hours % 12} ${hours >= 12 ? 'PM' : 'AM'}`;
+  let result = `${hours % 12 === 0 ? 12 : hours % 12} ${hours >= 12 ? 'PM' : 'AM'}`;
   return result;
 }
 
