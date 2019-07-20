@@ -188,7 +188,7 @@ export default {
       day_ends_at: 24,
       overlap: true,
       hide_dates: ['2019-10-31'],
-      hide_days: [5, 6],
+      hide_days: [0, 6],
       past_event_creation: true
     },
     outline_slots: false,

@@ -31,9 +31,8 @@ registerPromiseWorker((message) => {
 })
 
 function getDays(dayString, { hide_dates, hide_days, view_type }) {
-  let date = new Date(dayString);
-  date.setUTCHours(0, 0, 0, 0);
-  let day_of_week = date.getDay();
+  let date = new Date(`${dayString}T00:00:00.000Z`);
+  let day_of_week = date.getUTCDay() - 1;
   let days = [];
   if (view_type === 'day') {
     days = [{
