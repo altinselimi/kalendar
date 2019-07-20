@@ -1,5 +1,3 @@
-// remove this dependency once you have internet
-
 let creators_offset = new Date().getTimezoneOffset() / 60;
 if (creators_offset * -1 >= 0) {
   creators_offset *= -1;
@@ -18,6 +16,12 @@ const getHourlessDate = (date_string) => {
 
   return `${year}-${month}-${day}T00:00:00.000Z`;
 };
+
+const getDatelessHour = (date_string, military) => {
+  let time = addTimezoneInfo(date_string);
+  if(military) return getLocaleTime(time).slice(11,16);
+  return formatAMPM(new Date(getLocaleTime(time)));
+}
 
 const getYearMonthDay = (date_string) => {
   return getHourlessDate(date_string).slice(0, 10);
@@ -133,6 +137,7 @@ export default {
   cloneObject,
   addTimezoneInfo,
   getHourlessDate,
+  getDatelessHour,
   getYearMonthDay,
   getLocaleTime,
   isToday,

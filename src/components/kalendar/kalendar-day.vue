@@ -10,7 +10,7 @@
     <div ref="nowIndicator"
          :class="kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip'"
          v-if="isToday"
-         :style="`top:calc(${passedTime}% - 5px)`">
+         :style="`top:${passedTime}px`">
       <span class="line"
             v-show="kalendar_options.style === 'material_design'"></span>
     </div>
@@ -56,7 +56,6 @@ export default {
   // inject kalendar options from parent component
   inject: ['kalendar_options'],
   mounted() {
-    console.log('ScrollToNOW:', this.kalendar_options.scrollToNow);
     if (this.kalendar_options.scrollToNow && this.isToday) this.scrollView();
   },
   computed: {

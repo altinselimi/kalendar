@@ -96,6 +96,10 @@
           <el-checkbox size="small"
                        v-model="calendar_settings.read_only"></el-checkbox>
         </label>
+        <label>Military time
+          <el-checkbox size="small"
+                       v-model="calendar_settings.military_time"></el-checkbox>
+        </label>
       </div>
     </div>
   </div>

@@ -160,7 +160,7 @@ const constructNewEvent = (event) => {
     value: to_value,
     masked_value: masked_to.toISOString(),
     rounded: false,
-    round_offset: null
+    round_offset: null,
   };
 
   let multipleOf10 = (dateStr) => new Date(dateStr).getMinutes() % 10;

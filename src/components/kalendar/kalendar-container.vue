@@ -158,8 +158,7 @@ export default {
         overlap: true,
         past_event_creation: true,
         formatLeftHours: (date) => {
-          let isoDate = new Date(date).toISOString();
-          return kalendarHelpers.formatAMPM(new Date(date));
+          return Utils.getDatelessHour(date, this.configuration.military_time);
         },
         formatDayTitle: (date) => {
           let isoDate = new Date(date);
@@ -223,9 +222,6 @@ export default {
     }
   },
   created() {
-    /*let events_going_two_days = this.events.filter(event => {
-
-    });*/
     this.kalendar_events = this.events.map(event => ({
       ...event,
       id: event.id || kalendarHelpers.generateUUID()

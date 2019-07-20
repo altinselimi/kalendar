@@ -45,6 +45,7 @@ export default {
   inject: ['kalendar_options'],
   data: () => ({
     inspecting: false,
+    editing: false,
   }),
   computed: {
     isPast() {
@@ -67,7 +68,7 @@ export default {
       return `${(this.event.distance * multiplier) - (0.2 * multiplier)}px`;
     },
     status() {
-      return this.event && this.event.status;
+      return (this.event && this.event.status) || this.editing;
     },
     information() {
       let { start, end, data, id, key } = this.event;
@@ -79,6 +80,13 @@ export default {
         data
       }
       return payload;
+    },
+    editEvent() {
+      this.$kalendar.closePopups();
+      this.editing = true;
+    },
+    closeEventPopup() {
+      this.editing = false;
     },
   }
 }
