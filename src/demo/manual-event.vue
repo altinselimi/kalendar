@@ -25,7 +25,7 @@
         From
         <el-time-picker v-model="formData.from"
                         placeholder="Start time"
-                        value-format="HH:mm:ss:00"
+                        value-format="HH:mm:00"
                         format="HH:mm"
                         :picker-options="{
                         	format: 'HH:mm'
@@ -36,7 +36,7 @@
         To
         <el-time-picker v-model="formData.to"
                         placeholder="End time"
-                        value-format="HH:mm:ss:00"
+                        value-format="HH:mm:00"
                         format="HH:mm"
                         :picker-options="{
                         	format: 'HH:mm'
@@ -72,8 +72,8 @@ export default {
   methods: {
     addManually() {
       const { title, description, date, from, to } = this.formData;
-      let formattedFrom = `${date}T${from}:00.000Z`;
-      let formattedTo = `${date}T${to}:00.000Z`;
+      let formattedFrom = `${date}T${from}.000Z`;
+      let formattedTo = `${date}T${to}.000Z`;
       let payload = {
         data: { title, description },
         from: formattedFrom,

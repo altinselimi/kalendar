@@ -191,6 +191,8 @@ const constructNewEvent = (event) => {
     key: eventKey
   };
 
+  console.log('Constructed event:', constructedEvent);
+
   return constructedEvent;
 }
 

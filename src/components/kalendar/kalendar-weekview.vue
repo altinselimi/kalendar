@@ -63,7 +63,7 @@
 import KalendarDays from './kalendar-day.vue';
 import myWorker from '@/components/kalendar/workers';
 import Utils from './utils';
-const { isBefore, isToday, getHourlessDate, getDatelessHour, getLocaleTime, formatAMPM } = Utils;
+const { isBefore, isToday, getHourlessDate, addTimezoneInfo, getDatelessHour, getLocaleTime, formatAMPM } = Utils;
 
 export default {
   components: {
@@ -94,22 +94,22 @@ export default {
       let day_starts = `${time.split('T')[0]}T${(day_starts_at + '').padStart(2,0)}:00:00.000Z`;
       let day_ends = `${time.split('T')[0]}T${(day_ends_at + '').padStart(2,0)}:00:00.000Z`;
 
-      console.log({day_starts, day_ends, time});
+      console.log({ day_starts, day_ends, time });
 
-      if(new Date(day_ends) - new Date(time) < 0) {
+      if (new Date(day_ends) - new Date(time) < 0) {
         return null;
       }
-      if(new Date(time) - new Date(day_starts) < 0) {
+      if (new Date(time) - new Date(day_starts) < 0) {
         return null;
       }
 
-      let label = time.split('T')[1].slice(0,5);
-      if(this.kalendar_options.military_time){
+      let label = time.split('T')[1].slice(0, 5);
+      if (this.kalendar_options.military_time) {
         let ampm = formatAMPM(label.split(':')[0]);
         let ampmlabel = ampm.slice(-2);
-        console.log({ampm});
+        console.log({ ampm });
       }
-      let distance = ((new Date(time) - new Date(day_starts)) / 1000)/60;
+      let distance = ((new Date(time) - new Date(day_starts)) / 1000) / 60;
       return { distance, time };
     },
   },
@@ -163,6 +163,10 @@ export default {
       };
       this.$kalendar.addNewEvent = (payload) => {
         if (!payload) return Promise.reject('No payload');
+
+        let { from, to } = payload;
+        if (from.slice(-4) === '000Z') payload.from = addTimezoneInfo(from);
+        if (to.slice(-4) === '000Z') payload.to = addTimezoneInfo(to);
         let targetRef = payload.from.slice(0, 10);
         const refObject = this.$refs[targetRef];
         if (refObject && refObject[0]) {

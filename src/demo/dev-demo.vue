@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button @click="addManually()">addManually</button>
     <kalendar :configuration.sync="calendar_settings"
               :events.sync="events"
               class="generate-shadow">
@@ -68,8 +69,8 @@
 import Utils from '../components/kalendar/utils.js';
 
 const existing_events = [{
-  "from": "2019-06-27T04:00:00.300Z",
-  "to": "2019-06-27T04:10:00.300Z",
+  "from": "2019-07-30T04:00:00.300Z",
+  "to": "2019-07-30T04:10:00.300Z",
   "data":
   {
     "title": "Right now",
@@ -77,8 +78,8 @@ const existing_events = [{
   }
 },
 {
-  "from": "2019-06-26T10:22:00-07:00",
-  "to": "2019-06-26T11:55:00-07:00",
+  "from": "2019-07-31T10:22:00-07:00",
+  "to": "2019-07-31T11:55:00-07:00",
   "data":
   {
     "title": "Truth",
@@ -86,8 +87,8 @@ const existing_events = [{
   }
 },
 {
-  "from": "2019-06-26T10:22:00-07:00",
-  "to": "2019-06-26T11:20:00-07:00",
+  "from": "2019-07-31T10:22:00-07:00",
+  "to": "2019-07-31T11:20:00-07:00",
   "data":
   {
     "title": "Side",
@@ -95,8 +96,8 @@ const existing_events = [{
   }
 },
 {
-  "from": "2019-06-26T10:22:00+02:00",
-  "to": "2019-06-26T11:20:00+02:00",
+  "from": "2019-07-31T10:22:00+02:00",
+  "to": "2019-07-31T11:20:00+02:00",
   "data":
   {
     "title": "Europe",
@@ -186,14 +187,13 @@ export default {
     addManually() {
       let title = 'New one';
       let description = 'Lorem dsr';
-      let from = tomorrow_from.toISOString();
-      let to = tomorrow_to.toISOString();
+      let from = "2019-08-01T10:22:00+02:00";
+      let to = "2019-08-02T11:20:00+02:00";
       let payload = {
         data: { title, description },
         from,
         to
       };
-      console.log('Payload:', payload);
       this.$kalendar.addNewEvent(
         payload,
       );

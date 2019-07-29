@@ -210,7 +210,7 @@ export default {
         ...this.validateSelection(payload),
         status: 'creating'
       };
-      if (this.kalendar_options.overlap === false) {
+      if (this.kalendar_options.overlap === false && this.day_events.length > 0) {
         let fixedOverlap = this.overlapPolice(payload);
         if (fixedOverlap) {
           this.creator = this.validateSelection(fixedOverlap);
