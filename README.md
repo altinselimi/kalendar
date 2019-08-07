@@ -49,116 +49,55 @@ components: {
 </script>
 ```
 
+### Kalendar Options
+| Option              | Default Value                                                  | Type          | Description                                                                                                  |
+|---------------------|----------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------|
+| view_type           | 'week'                                                         | string        | Determines the mode of kalendar. You can pick either 'week' or 'day'. Day is recommended for mobile devices. |
+| cell_height         | 10                                                             | string        | Determines the height in pixels of a cell                                                                    |
+| current_day         | new Date().toISOString()                                       | string        | Determines the week or day which is shown in the kalendar                                                    |
+| style               | 'material_design'                                              | string        | You can pick either 'material_design' or 'flat_design' (iOS)                                                 |
+| read_only           | false                                                          | boolean       | Enabled, viewers won't be able to interact with kalendar                                                     |
+| day_starts_at       | 0                                                              | integer       | Determines what hour the kalendar starts from (0 to 24)                                                      |
+| day_ends_at         | 24                                                             | integer       | Determines what hour the kalendar ends at (0 to 24)                                                          |
+| overlap             | true                                                           | boolean       | Enables ability to create multiple events (overlapping) at the same timeframe                                |
+| hide_dates          | []                                                             | Array<String> | Hides the provided dates from kalendar. Array of strings each being a valid date in YYYY-MM-DD format.       |
+| hide_days           | [6]                                                            | Array<Int>    | Hides the provided days from kalendar. Monday = 0 ... Sunday = 6                                             |
+| past_event_creation | true                                                           | boolean       | Determines the ability of creating events that have happened in the past                                     |
+| scrollToNow         | true                                                           | boolean       | Scroll kalendar to current time on render                                                                    |
+| formatLeftHours     | (date) => { return format(date, 'HH') }                        | function      | A function which accepts an ISO date and determines how the hours on the left side are shown                 |
+| formatDayTitle      | (date) => { return format(date, 'DDD dd') }                    | function      | A function which accepts an ISO date and determines what the day column title shows                          |
+| formatWeekNavigator | (date) => { return `${startDate(date)} - ${endDate(date)}`}    | function      | A function which accepts an ISO date and determines what the week view navigator (at the top) shows          |
+| formatDayNavigator  | (date) => { return new Date(date).toUTCString().slice(5, 11) } | function      | A function which accepts an ISO date and determines what the day view navigator (at the top) shows           |
+
 ## Using Slots
 
 > The plugin can turn incredibly useful using scoped slots. You can customize all the essential parts of it.
 
-
-```vue
-<kalendar :configuration="calendar_settings" :appointments="appointments" class="generate-shadow">
-	<div slot="creating-card" slot-scope="{appointment_props}">
-		<!-- This is the card that is displayed while the user is dragging mouse on cells -->
-		<!-- You can access various attributes of that selection using the slot scope appointment_props. It contains fields like: start_value, end_value and status. -->
-		<h4 class="appointment-title" style="text-align: left;">New Appointment</h4>
-		<span class="time">{{appointment_props.start_value.value}} - {{appointment_props.end_value.value}}
-		</span>
-	</div>
-	<div slot="popup-form" slot-scope="{popup_scope}" style="display: flex; flex-direction: column;">
-		<!-- This is the popup that is displayed when user has finished dragging(selecting) appointment start and end values. -->
-		<!-- You can use the popup_scope variable to access various fields, such as: appointment_data (similar to appointment_props) and close. -->
-		<!-- There is a listener attached to the close field. Whenever it gets a false value, the popup closes. -->
-		<!-- You can add as many fields as you want. When saving them, make sure to insert them in the data field of the payload for appointments array. In that way you can access them even in the *details-card* slot.-->
-		<h4 style="margin-bottom: 10px">New Appointment</h4>
-		<input v-model="new_appointment['title']" type="text" name="title" placeholder="Title">
-		<textarea v-model="new_appointment['description']" type="text" name="description" placeholder="Description" rows="2"></textarea>
-		<div class="buttons">
-			<button class="cancel" @click="popup_scope.close_popup = true">Cancel</button>
-			<button @click="completeAppointment(popup_scope, new_appointment)">Save</button>
-		</div>
-	</div>
-	<div slot="details-card" slot-scope="{appointment_props}">
-		<!-- Similar to creating-card, except that this one is displayed for existing appointments. -->
-		<!-- Here you can access the data object, aswell as other fields. Data field is where you save the values from the popup form, which are then accessible here. -->
-		<h4 class="appointment-title">{{appointment_props.data.title}}</h4>
-		<small v-show="(appointment_props.end - appointment_props.start) > 2">{{appointment_props.data.description}}</small>
-		<span class="time">{{appointment_props.start_value.value | normalizeDate('hh:mm A')}} - {{appointment_props.end_value.value | normalizeDate('hh:mm A')}}</span>
-	</div>
-	<!-- Date formatting -->
-	<template slot="first-date" slot-scope="{ date }">
-		<!-- Displays first date in week navigation header -->
-		{{ date | normalizeDate('MMM DD') }}
-	</template>
-	<template slot="last-date" slot-scope="{ date }">
-		<!-- Displays last date in week navigation header -->
-		{{ date | normalizeDate('DD MMM, YYYY') }}
-	</template>
-	<template slot="current-date" slot-scope="{ date }">
-		<!-- Displays current date in single day navigation -->
-		{{ date | normalizeDate('DD MMM, YYYY') }}
-	</template>
-	<template slot="number-date" slot-scope="{ date }">
-		<!-- Day number in day indicators -->
-		{{ date | normalizeDate('D') }}
-	</template>
-	<template slot="letters-date" slot-scope="{ date }">
-		<!-- Weekday name in day indicators -->
-		{{ date | normalizeDate('ddd') }}
-	</template>
-</kalendar>
-
-<script>
-	...
-	completeAppointment(popup_data, form_data) {
-		let payload = {
-			data: {
-				title: form_data.title,
-				description: form_data.description,
-			},
-			from: popup_data.appointment_props.start_value.value,
-			to: popup_data.appointment_props.end_value.value,
-			date: format(popup_data.appointment_props.start_value.value, 'YYYY-MM-DD'),
-		};
-		this.appointments.push(payload);
-		this.new_appointment = {
-			title: null,
-			description: null,
-		};
-		popup_data.close_popup = true;
-	},
-</script>
-```
 ### Slots summary
 
-#### Appointment cards
+| Slot name     | Slot scope        | Slot description                                                                     |
+|---------------|-------------------|--------------------------------------------------------------------------------------|
+| created-card  | event_information | Display information about an existing event                                          |
+| creating-card | event_information | Display information about an event which is being created (mouse is being dragged)   |
+| popup-form    | popup_information | Display information about a temporary event (after user finishes dragging the mouse) |
 
-| Slot name           | Slot scope                      |  Description                                        |
-|---------------------|---------------------------------|-----------------------------------------------------|
-| creating&#8209;card | {&#160;appointment_props&#160;} | Displayed while the user is dragging mouse on cells |
-| details&#8209;card  | {&#160;appointment_props&#160;} | Similar to creating-card, except that this one is displayed for existing appointments |
-| popup&#8209;form    | {&#160;popup_scope&#160;}       | Displayed when user has finished dragging (selecting appointment start and end values) |
-
-#### Date representations
-Useful for localizing dates
-
-| Slot name          | Slot scope         | Description                                       |
-|--------------------|--------------------|---------------------------------------------------|
-| first&#8209;date   | {&#160;date&#160;} | Displays first date in week navigation            |
-| last&#8209;date    | {&#160;date&#160;} | Displays last date in week navigation             |
-| current&#8209;date | {&#160;date&#160;} | Displays current date in single day navigation    |
-| number&#8209;date  | {&#160;date&#160;} | Displays day number in day indicators             |
-| letters&#8209;date | {&#160;date&#160;} | Displays weekday name in day indicators           |
-
+#### event_information definition
+| Field       | Type   | Description                                                                       |   |   |
+|-------------|--------|-----------------------------------------------------------------------------------|---|---|
+| start_time  | String | Start time as ISO Date String of the event                                        |   |   |
+| end_time    | String | End time as ISO Date String of the event                                          |   |   |
+| kalendar_id | String | Unique ID used for operations internally by kalendar                              |   |   |
+| key         | String | Key of the event used internally by kalendar                                      |   |   |
+| data        | Object | Data object which can hold any type of information which may prove useful for you |   |   |
 
 ## Roadmap
-- ⚠️ Refactor so code is readable/understandable and others can help
-- Add Read-Only mode
-- Remove date-fns dependency
-- Improve performance
+- ~⚠️ Refactor so code is readable/understandable and others can help--~
+- ~Add Read-Only mode~
+- ~Remove date-fns dependency~
+- ~Improve performance~
 	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
 	* Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
 	* Use event delegation and remove listeners from every cell. Use event target instead, to manipulate the cell DOM object.
 - Add month view
 - Write docs
 - Write unit-tests
-- Write the React version of this plugin
-- Write the Angular version of this plugin
