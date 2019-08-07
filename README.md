@@ -1,4 +1,4 @@
-# Kalendar
+## 🗓 Kalendar
 [![npm version](https://badge.fury.io/js/kalendar-vue.svg)](https://badge.fury.io/js/kalendar-vue)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
@@ -7,11 +7,11 @@
 > Your best friend when it comes to events managment in Vue, React or Angular.
 > This is the Vue version of this plugin.
 
-## Live Demo
+## 🕹 Live Demo
 [Kalendar Showcase](http://kalendar.altinselimi.com/)
 [Codepen](https://codepen.io/altinselimi/pen/PdPLBZ)
 
-## Getting Started
+## 🏁Getting Started
 - Install plugin from npm
 ```
 npm install kalendar-vue -S
@@ -29,27 +29,32 @@ components: {
 - Provide Appointments array. This array will be the source of the appointments which are rendered in the calendar.
 ```vue
 <template>
-	<kalendar :configuration="calendar_settings" :appointments="appointments"/>
+	<kalendar :configuration="calendar_settings" :events="events"/>
 </template>
 <script>
 	...
 	data: () => ({
-		appointments: [],
+		events: [],
 		calendar_settings: {
-			style: 'material_design', // ['flat_design', 'material_design']
-			view_type: 'Month', // ['Month', 'Day']
-			split_value: 20, // Value % 60 === 0
-			cell_height: 20, // !isNaN(Value)
-			scrollToNow: true, // Boolean
-			current_day: new Date(), // Valid date
-			military_time: true, // Boolean
+			style: 'material_design',
+			view_type: 'week',
+			cell_height: 20,
+			scrollToNow: true,
+			current_day: new Date(),
+			read_only: false,
+			day_starts_at: 0,
+      			day_ends_at: 24,
+      			overlap: true,
+      			hide_dates: ['2019-10-31'], // Spooky
+      			hide_days: [6],
+      			past_event_creation: true
 		},
 		...
 	})
 </script>
 ```
 
-### Kalendar Options
+### 🎛Kalendar Options
 | Option              | Default Value                                                  | Type          | Description                                                                                                  |
 |---------------------|----------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------|
 | view_type           | 'week'                                                         | string        | Determines the mode of kalendar. You can pick either 'week' or 'day'. Day is recommended for mobile devices. |
@@ -90,7 +95,7 @@ components: {
 | key         | String | Key of the event used internally by kalendar                                      |   |   |
 | data        | Object | Data object which can hold any type of information which may prove useful for you |   |   |
 
-## Roadmap
+## 🛣Roadmap
 - ~⚠️ Refactor so code is readable/understandable and others can help--~
 - ~Add Read-Only mode~
 - ~Remove date-fns dependency~
