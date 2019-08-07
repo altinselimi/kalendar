@@ -1,5 +1,5 @@
 <template>
-  <div class="calendarium">
+  <div>
     <quick-intro></quick-intro>
     <add-manual-event v-if="adding_manually"
                       @close="adding_manually = false"
@@ -71,7 +71,7 @@
                     @click="closePopups()">
               Cancel
             </button>
-            <button @click="addAppointment(popup_information)">
+            <button @click="addEvent(popup_information)">
               Save
             </button>
           </div>
@@ -201,7 +201,7 @@ export default {
     getHours(start, end) {
       return `${format(start, 'hh:mm A')} - ${format(end, 'hh:mm A')}`;
     },
-    addAppointment(popup_info) {
+    addEvent(popup_info) {
       let payload = {
         data: {
           title: this.new_appointment.title,
@@ -227,7 +227,6 @@ export default {
       };
     },
     addManually(payload) {
-      console.log('AddManually payload', payload);
       this.$kalendar.addNewEvent(
         payload,
       );
