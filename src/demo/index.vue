@@ -234,7 +234,8 @@ export default {
       this.adding_manually = false;
     },
     removeEvent(kalendarEvent) {
-      let day = kalendarEvent.start_time.toISOString().slice(0, 10);
+      console.log({kalendarEvent});
+      let day = kalendarEvent.start_time.slice(0, 10);
       this.$kalendar.removeEvent({
         day,
         key: kalendarEvent.key,
