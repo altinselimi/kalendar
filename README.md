@@ -54,7 +54,7 @@ components: {
 </script>
 ```
 
-### 🎛Kalendar Options
+### 🎛 Kalendar Options
 | Option              | Default Value                                                  | Type          | Description                                                                                                  |
 |---------------------|----------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------|
 | view_type           | 'week'                                                         | string        | Determines the mode of kalendar. You can pick either 'week' or 'day'. Day is recommended for mobile devices. |
@@ -95,7 +95,7 @@ components: {
 | key         | String | Key of the event used internally by kalendar                                      |   |   |
 | data        | Object | Data object which can hold any type of information which may prove useful for you |   |   |
 
-## 🛣Roadmap
+## 🛣 Roadmap
 - ~⚠️ Refactor so code is readable/understandable and others can help--~
 - ~Add Read-Only mode~
 - ~Remove date-fns dependency~
