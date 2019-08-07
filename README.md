@@ -9,7 +9,6 @@
 
 ## 🕹 Live Demo
 [Kalendar Showcase](http://kalendar.altinselimi.com/)
-[Codepen](https://codepen.io/altinselimi/pen/PdPLBZ)
 
 ## 🏁Getting Started
 - Install plugin from npm
