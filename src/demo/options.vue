@@ -96,9 +96,13 @@
           <el-checkbox size="small"
                        v-model="calendar_settings.read_only"></el-checkbox>
         </label>
-        <label>Military time
+        <label>Overlap events
           <el-checkbox size="small"
-                       v-model="calendar_settings.military_time"></el-checkbox>
+                       v-model="calendar_settings.overlap"></el-checkbox>
+        </label>
+        <label>Past event creation
+          <el-checkbox size="small"
+                       v-model="calendar_settings.past_event_creation"></el-checkbox>
         </label>
       </div>
     </div>
