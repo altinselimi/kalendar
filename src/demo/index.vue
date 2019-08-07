@@ -19,7 +19,7 @@
                 :key="kalendarRenderId"
                 class="generate-shadow">
         <!-- CREATED CARD SLOT -->
-        <div slot="details-card"
+        <div slot="created-card"
              slot-scope="{ event_information }"
              class="details-card">
           <h4 class="appointment-title">{{event_information.data.title}}</h4>

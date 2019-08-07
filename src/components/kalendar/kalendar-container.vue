@@ -86,7 +86,7 @@
             class="slotable">
       <div slot-scope="information"
            class="created-event">
-        <slot name="details-card"
+        <slot name="created-card"
               :event_information="information">
           <h4 style="margin-bottom: 5px">{{information.title}}</h4>
           <p>{{information.description}}</p>
