@@ -4,12 +4,11 @@
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-> Your best friend when it comes to events managment in Vue, React or Angular.
+> Your best friend when it comes to events management in Vue.
 > This is the Vue version of this plugin.
 
 ## 🕹 Live Demo
 [Kalendar Showcase](http://kalendar.altinselimi.com/)
-[Codepen](https://codepen.io/altinselimi/pen/PdPLBZ)
 
 ## 🏁Getting Started
 - Install plugin from npm
