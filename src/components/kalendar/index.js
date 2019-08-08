@@ -5,7 +5,7 @@ import KalendarCell from './kalendar-cell';
 import KalendarEvent from './kalendar-event';
 import KalendarDay from './kalendar-day';
 import KalendarWeekView from './kalendar-weekview';
-window.crypto = window.crypto || window.msCrypto; // IE11 Polyfill
+// window.crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 
 // Install the components
 export function install(Vue) {
