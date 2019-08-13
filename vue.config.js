@@ -3,13 +3,16 @@ module.exports = {
   chainWebpack: (config) => {
     config.output
       .globalObject('this')
-    config.module.rule('worker')
+    config.module
+      .rule('worker')
       .test(/\.worker\.js$/i)
       .use('worker-loader')
       .loader('worker-loader')
       .tap(options => {
         return {
-          inline: true
+          fallback: false,
+          inline: true,
+          name: 'WorkerName.[hash].js'
         };
       })
       .end()
