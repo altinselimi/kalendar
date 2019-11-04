@@ -12,7 +12,7 @@ module.exports = {
         return {
           fallback: false,
           inline: true,
-          name: 'WorkerName.[hash].js'
+          name: 'KalendarWorker.[hash].js'
         };
       })
       .end()
