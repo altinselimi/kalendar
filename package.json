@@ -16,21 +16,23 @@
     "*.js"
   ],
   "dependencies": {
+    "@babel/core": "^7.6.4",
+    "core-js": "^3.3.6",
     "element-ui": "^2.4.6",
     "luxon": "^1.12.1",
     "portal-vue": "^1.3.0",
     "promise-worker": "^2.0.1",
     "smoothscroll-polyfill": "^0.4.3",
-    "vue": "^2.5.16",
+    "vue": "^2.6.10",
     "vue-highlightjs": "^1.3.3"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.10.0",
-    "@vue/cli-service": "^3.10.0",
+    "@vue/cli-plugin-babel": "^4.0.5",
+    "@vue/cli-service": "^4.0.5",
     "babel-plugin-component": "^1.1.1",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^7.0.1",
-    "vue-template-compiler": "^2.5.16",
-    "worker-plugin": "^3.1.0"
+    "worker-plugin": "^3.1.0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^7.3.1",
+    "vue-template-compiler": "^2.6.10"
   }
 }

@@ -5,7 +5,6 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 > Your best friend when it comes to events management in Vue.
-> This is the Vue version of this plugin.
 
 ## 🕹 Live Demo
 [Kalendar Showcase](http://kalendar.altinselimi.com/)

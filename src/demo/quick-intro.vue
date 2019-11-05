@@ -10,7 +10,7 @@
 			<h1>Kalendar</h1>
 			<p class="small-description">Your best friend when it comes to event managment in
 				<a href="https://github.com/altinselimi/kalendar">Vue</a>,
-				<a class="soon">React</a> or
+				<a href="https://github.com/akxcv/vuera">React</a> or
 				<a class="soon">Angular.</a>
 			</p>
 		</div>
