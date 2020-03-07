@@ -10,6 +10,7 @@ import { terser } from "rollup-plugin-terser";
 import minimist from "minimist";
 import webWorkerLoader from "rollup-plugin-web-worker-loader";
 import strip from "@rollup/plugin-strip";
+import cleaner from "rollup-plugin-cleaner";
 
 // Get browserslist config and remove ie from es build targets
 const esbrowserslist = fs
@@ -91,6 +92,9 @@ if (!argv.format || argv.format === "es") {
         ]
       }),
       commonjs(),
+      cleaner({
+        targets: ["./dist/"]
+      }),
       strip(),
       webWorkerLoader({
         forceInline: true,
@@ -124,6 +128,9 @@ if (!argv.format || argv.format === "cjs") {
       }),
       babel(baseConfig.plugins.babel),
       commonjs(),
+      cleaner({
+        targets: ["./dist/"]
+      }),
       strip(),
       webWorkerLoader({
         forceInline: true,
@@ -151,6 +158,9 @@ if (!argv.format || argv.format === "iife") {
       vue(baseConfig.plugins.vue),
       babel(baseConfig.plugins.babel),
       commonjs(),
+      cleaner({
+        targets: ["./dist/"]
+      }),
       strip(),
       terser({
         output: {
