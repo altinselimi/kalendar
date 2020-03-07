@@ -1,51 +1,51 @@
 <template>
-  <div class="event-card"
-       :ref="`kalendarEventRef-${event.id}`"
-       :style="`
+  <div
+    class="event-card"
+    :ref="`kalendarEventRef-${event.id}`"
+    :style="
+      `
       height: ${distance}; 
       width: calc(${width_value}); 
       left: calc(${left_offset});
       top: ${top_offset};
-    `"
-       @click="inspecting = true"
-       @mouseleave="inspecting = false"
-       :class="{
-        'is-past': isPast,
-      'overlaps': overlaps > 0,
-      'two-in-one': total > 1, 
-      'inspecting': !!inspecting,
+    `
+    "
+    @click="inspecting = true"
+    @mouseleave="inspecting = false"
+    :class="{
+      'is-past': isPast,
+      overlaps: overlaps > 0,
+      'two-in-one': total > 1,
+      inspecting: !!inspecting,
       'event-card__mini': event.distance <= 10,
-      'event-card__small': (event.distance > 10 && event.distance < 40) || (overlaps > 1) 
-    }">
-    <portal-target v-if="status === 'creating' || status === 'popup-initiated'"
-                   :slot-props="information"
-                   name="event-creation"
-                   slim></portal-target>
-    <portal-target v-else
-                   name="event-details"
-                   :slot-props="information"
-                   slim>
+      'event-card__small':
+        (event.distance > 10 && event.distance < 40) || overlaps > 1
+    }"
+  >
+    <portal-target
+      v-if="status === 'creating' || status === 'popup-initiated'"
+      :slot-props="information"
+      name="event-creation"
+      slim
+    ></portal-target>
+    <portal-target v-else name="event-details" :slot-props="information" slim>
     </portal-target>
-    <div v-if="status === 'popup-initiated'"
-         class="popup-wrapper">
-      <portal-target name="event-popup-form"
-                     slim
-                     :slot-props="information">
+    <div v-if="status === 'popup-initiated'" class="popup-wrapper">
+      <portal-target name="event-popup-form" slim :slot-props="information">
       </portal-target>
     </div>
   </div>
 </template>
 <script>
-import Utils from './utils.js';
-const { isBefore, getLocaleTime } = Utils;
+import { isBefore, getLocaleTime, addTimezoneInfo } from "./utils.js";
 
 export default {
-  props: ['event', 'total', 'index', 'overlaps'],
+  props: ["event", "total", "index", "overlaps"],
   created() {},
-  inject: ['kalendar_options'],
+  inject: ["kalendar_options"],
   data: () => ({
     inspecting: false,
-    editing: false,
+    editing: false
   }),
   computed: {
     isPast() {
@@ -53,19 +53,22 @@ export default {
       return isBefore(this.event.start.value, now);
     },
     width_value() {
-      return `${100/this.total}% - ${this.overlaps * 50 / this.total}px`;
+      return `${100 / this.total}% - ${(this.overlaps * 50) / this.total}px`;
     },
     left_offset() {
-      return `(${this.index} * (${this.width_value})) + ${this.overlaps * 50}px`;
+      return `(${this.index} * (${this.width_value})) + ${this.overlaps *
+        50}px`;
     },
     top_offset() {
-      return this.event.start.round_offset ? `${this.event.start.round_offset}px` : `0px`;
+      return this.event.start.round_offset
+        ? `${this.event.start.round_offset}px`
+        : `0px`;
     },
     distance() {
       if (!this.event) return;
       let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
-      return `${(this.event.distance * multiplier) - (0.2 * multiplier)}px`;
+      return `${this.event.distance * multiplier - 0.2 * multiplier}px`;
     },
     status() {
       return (this.event && this.event.status) || this.editing;
@@ -73,12 +76,12 @@ export default {
     information() {
       let { start, end, data, id, key } = this.event;
       let payload = {
-        start_time: kalendarHelpers.addTimezoneInfo(start.value),
-        end_time: kalendarHelpers.addTimezoneInfo(end.value),
+        start_time: addTimezoneInfo(start.value),
+        end_time: addTimezoneInfo(end.value),
         kalendar_id: id,
         key,
         data
-      }
+      };
       return payload;
     },
     editEvent() {
@@ -87,9 +90,9 @@ export default {
     },
     closeEventPopup() {
       this.editing = false;
-    },
+    }
   }
-}
+};
 </script>
 <style lang="scss">
 $creator-bg: #34aadc;
@@ -107,7 +110,7 @@ $creator-content: white;
     margin: 0px;
   }
 
-  >* {
+  > * {
     flex: 1;
     position: relative;
   }
@@ -116,7 +119,7 @@ $creator-content: white;
     z-index: -1;
   }
 
-  &.overlaps>* {
+  &.overlaps > * {
     border: solid 1px white !important;
   }
 
@@ -124,7 +127,8 @@ $creator-content: white;
     z-index: 11 !important;
 
     .created-event {
-      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
+        0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
       transition: opacity 100ms linear;
     }
   }
@@ -136,7 +140,7 @@ $creator-content: white;
 
     .appointment-title,
     .time {
-      display: block!important;
+      display: block !important;
       position: absolute;
       top: 0;
       font-size: 9px;
@@ -156,7 +160,7 @@ $creator-content: white;
     }
   }
 
-  &.two-in-one .details-card>* {
+  &.two-in-one .details-card > * {
     font-size: 60%;
   }
 
@@ -201,9 +205,9 @@ $creator-content: white;
   pointer-events: all;
   user-select: none;
   background-color: white;
-  border: solid 1px rgba(black, .08);
+  border: solid 1px rgba(black, 0.08);
   border-radius: 4px;
-  box-shadow: 0px 2px 12px -3px rgba(black, .3);
+  box-shadow: 0px 2px 12px -3px rgba(black, 0.3);
   padding: 10px;
 
   h4 {
@@ -226,7 +230,7 @@ $creator-content: white;
   pointer-events: all;
   position: relative;
 
-  >.details-card {
+  > .details-card {
     max-width: 100%;
     overflow: hidden;
     white-space: nowrap;
@@ -235,7 +239,7 @@ $creator-content: white;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 
-    >h1,
+    > h1,
     h2,
     h3,
     h4,

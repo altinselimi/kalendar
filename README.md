@@ -1,4 +1,5 @@
 ## 🗓 Kalendar
+
 [![npm version](https://badge.fury.io/js/kalendar-vue.svg)](https://badge.fury.io/js/kalendar-vue)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
@@ -7,14 +8,19 @@
 > Your best friend when it comes to events management in Vue.
 
 ## 🕹 Live Demo
+
 [Kalendar Showcase](http://kalendar.altinselimi.com/)
 
 ## 🏁Getting Started
-- Install plugin from npm
+
+-   Install plugin from npm
+
 ```
 npm install kalendar-vue -S
 ```
-- Import plugin in your component
+
+-   Import plugin in your component
+
 ```js
 import { Kalendar } from 'kalendar-vue';
 import 'kalendar-vue/dist/KalendarVue.css';
@@ -24,37 +30,40 @@ components: {
 	...
 },
 ```
-- Provide Appointments array. This array will be the source of the appointments which are rendered in the calendar.
+
+-   Provide Appointments array. This array will be the source of the appointments which are rendered in the calendar.
+
 ```vue
 <template>
-	<kalendar :configuration="calendar_settings" :events="events"/>
+	<kalendar :configuration="calendar_settings" :events="events" />
 </template>
 <script>
+...
+data: () => ({
+	events: [],
+	calendar_settings: {
+		style: 'material_design',
+		view_type: 'week',
+		cell_height: 20,
+		scrollToNow: true,
+		current_day: new Date(),
+		read_only: false,
+		day_starts_at: 0,
+     			day_ends_at: 24,
+     			overlap: true,
+     			hide_dates: ['2019-10-31'], // Spooky
+     			hide_days: [6],
+     			past_event_creation: true
+	},
 	...
-	data: () => ({
-		events: [],
-		calendar_settings: {
-			style: 'material_design',
-			view_type: 'week',
-			cell_height: 20,
-			scrollToNow: true,
-			current_day: new Date(),
-			read_only: false,
-			day_starts_at: 0,
-      			day_ends_at: 24,
-      			overlap: true,
-      			hide_dates: ['2019-10-31'], // Spooky
-      			hide_days: [6],
-      			past_event_creation: true
-		},
-		...
-	})
+})
 </script>
 ```
 
 ### 🎛 Kalendar Options
+
 | Option              | Default Value                                                  | Type          | Description                                                                                                  |
-|---------------------|----------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------|
+| ------------------- | -------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
 | view_type           | 'week'                                                         | string        | Determines the mode of kalendar. You can pick either 'week' or 'day'. Day is recommended for mobile devices. |
 | cell_height         | 10                                                             | string        | Determines the height in pixels of a cell                                                                    |
 | current_day         | new Date().toISOString()                                       | string        | Determines the week or day which is shown in the kalendar                                                    |
@@ -79,28 +88,29 @@ components: {
 ### Slots summary
 
 | Slot name     | Slot scope        | Slot description                                                                     |
-|---------------|-------------------|--------------------------------------------------------------------------------------|
+| ------------- | ----------------- | ------------------------------------------------------------------------------------ |
 | created-card  | event_information | Display information about an existing event                                          |
 | creating-card | event_information | Display information about an event which is being created (mouse is being dragged)   |
 | popup-form    | popup_information | Display information about a temporary event (after user finishes dragging the mouse) |
 
 #### event_information definition
-| Field       | Type   | Description                                                                       |   |   |
-|-------------|--------|-----------------------------------------------------------------------------------|---|---|
-| start_time  | String | Start time as ISO Date String of the event                                        |   |   |
-| end_time    | String | End time as ISO Date String of the event                                          |   |   |
-| kalendar_id | String | Unique ID used for operations internally by kalendar                              |   |   |
-| key         | String | Key of the event used internally by kalendar                                      |   |   |
-| data        | Object | Data object which can hold any type of information which may prove useful for you |   |   |
+
+| Field       | Type   | Description                                                                       |     |     |
+| ----------- | ------ | --------------------------------------------------------------------------------- | --- | --- |
+| start_time  | String | Start time as ISO Date String of the event                                        |     |     |
+| end_time    | String | End time as ISO Date String of the event                                          |     |     |
+| kalendar_id | String | Unique ID used for operations internally by kalendar                              |     |     |
+| key         | String | Key of the event used internally by kalendar                                      |     |     |
+| data        | Object | Data object which can hold any type of information which may prove useful for you |     |     |
 
 ## 🛣 Roadmap
-- ~⚠️ Refactor so code is readable/understandable and others can help--~
-- ~Add Read-Only mode~
-- ~Remove date-fns dependency~
-- ~Improve performance~
-	* Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
-	* Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop
-	* Use event delegation and remove listeners from every cell. Use event target instead, to manipulate the cell DOM object.
-- Add month view
-- Write docs
-- Write unit-tests
+
+-   ~⚠️ Refactor so code is readable/understandable and others can help--~
+-   ~Add Read-Only mode~
+-   ~Remove date-fns dependency~
+-   ~Improve performance~
+    _ Hard-code split value to 5mins, and use split-value-prop to only mark current_min%split-value-prop === 0
+    _ Using upmentioned technique, day hours can be hardcoded into JSON, while the date part would come in from `for in` loop \* Use event delegation and remove listeners from every cell. Use event target instead, to manipulate the cell DOM object.
+-   Add month view
+-   Write docs
+-   Write unit-tests
