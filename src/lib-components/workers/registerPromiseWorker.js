@@ -11,7 +11,7 @@ function isPromise(obj) {
 	);
 }
 
-function registerPromiseWorker(callback) {
+export default function(callback) {
 	function postOutgoingMessage(e, messageId, error, result) {
 		function postMessage(msg) {
 			/* istanbul ignore if */
@@ -91,5 +91,3 @@ function registerPromiseWorker(callback) {
 
 	self.addEventListener("message", onIncomingMessage);
 }
-
-module.exports = registerPromiseWorker;

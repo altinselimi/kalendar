@@ -120,6 +120,8 @@ export default {
         0
       )}:00:00.000Z`;
 
+      console.log({ day_starts, day_ends, time });
+
       if (new Date(day_ends) - new Date(time) < 0) {
         return null;
       }
