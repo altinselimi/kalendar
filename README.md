@@ -23,7 +23,6 @@ npm install kalendar-vue -S
 
 ```js
 import { Kalendar } from 'kalendar-vue';
-import 'kalendar-vue/dist/KalendarVue.css';
 ...
 components: {
 	Kalendar,
