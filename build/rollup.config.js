@@ -93,7 +93,7 @@ if (!argv.format || argv.format === "es") {
       }),
       commonjs(),
       cleaner({
-        targets: ["./build/"]
+        targets: ["./dist/"]
       }),
       strip(),
       webWorkerLoader({
@@ -129,7 +129,7 @@ if (!argv.format || argv.format === "cjs") {
       babel(baseConfig.plugins.babel),
       commonjs(),
       cleaner({
-        targets: ["./build/"]
+        targets: ["./dist/"]
       }),
       strip(),
       webWorkerLoader({
@@ -159,7 +159,7 @@ if (!argv.format || argv.format === "iife") {
       babel(baseConfig.plugins.babel),
       commonjs(),
       cleaner({
-        targets: ["./build/"]
+        targets: ["./dist/"]
       }),
       strip(),
       terser({
