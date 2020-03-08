@@ -141,40 +141,5 @@ if (!argv.format || argv.format === "cjs") {
   buildFormats.push(umdConfig);
 }
 
-if (!argv.format || argv.format === "iife") {
-  const unpkgConfig = {
-    ...baseConfig,
-    external,
-    output: {
-      compact: true,
-      file: "dist/kalendar-vue.min.js",
-      format: "iife",
-      name: "KalendarVue",
-      exports: "named",
-      globals
-    },
-    plugins: [
-      ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
-      babel(baseConfig.plugins.babel),
-      commonjs(),
-      cleaner({
-        targets: ["./dist/"]
-      }),
-      strip(),
-      terser({
-        output: {
-          ecma: 5
-        }
-      }),
-      webWorkerLoader({
-        forceInline: true,
-        pattern: /worker-loader!(.+)/
-      })
-    ]
-  };
-  buildFormats.push(unpkgConfig);
-}
-
 // Export config
 export default buildFormats;
