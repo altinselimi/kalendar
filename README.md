@@ -13,15 +13,19 @@
 
 ## 🏁Getting Started
 
--   Install plugin from npm
+-   Install plugin and its dependencies from npm
 
 ```
-npm install kalendar-vue -S
+npm install kalendar-vue portal-vue -S
 ```
 
--   Import plugin in your component
+-   Import plugin and its dependencies in your component
 
 ```js
+import Vue from "vue";
+import PortalVue from "portal-vue";
+Vue.use(PortalVue);
+
 import { Kalendar } from 'kalendar-vue';
 ...
 components: {
