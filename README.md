@@ -49,7 +49,7 @@ data: () => ({
 		view_type: 'week',
 		cell_height: 20,
 		scrollToNow: true,
-		current_day: new Date(),
+		current_day: new Date().toISOString(),
 		read_only: false,
 		day_starts_at: 0,
      			day_ends_at: 24,
