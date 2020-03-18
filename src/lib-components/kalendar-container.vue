@@ -135,8 +135,10 @@
     <portal to="event-details" class="slotable">
       <div slot-scope="information" class="created-event">
         <slot name="created-card" :event_information="information">
-          <h4 style="margin-bottom: 5px">{{ information.title }}</h4>
-          <p>{{ information.description }}</p>
+          <h4 style="margin-bottom: 5px">{{ information.data }}</h4>
+          <p>
+            {{ information.start_time.substr(11,5) }} - {{ information.end_time.substr(11,5) }}
+          </p>
         </slot>
       </div>
     </portal>
