@@ -125,8 +125,8 @@ const _existing_events = [
 
 let today = new Date();
 let year = today.getFullYear() + "",
-	month = (today.getMonth() + 1 + "").padStart(2, 0),
-	day = (today.getDate() + "").padStart(2, 0);
+	month = (today.getMonth() + 1 + "").padStart(2, '0'),
+	day = (today.getDate() + "").padStart(2, '0');
 
 // change the dates on _existing events to this week
 const startDate = new Date(_existing_events[0].from).getUTCDate();
