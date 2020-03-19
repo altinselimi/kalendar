@@ -11,6 +11,17 @@
 
 [Kalendar Showcase](http://kalendar.altinselimi.com/)
 
+### Running the Demo Locally
+
+You can run the demo locally :
+  - git clone https://github.com/altinselimi/kalendar.git
+  - cd kalendar
+  - npm install
+  - npm run serve
+  
+ The code for the demo app is in `src/serve-dev.vue` - a small but complete calendar app. 
+ This is a good place to learn how thing work and a good starting point for your own implementation. 
+ 
 ## 🏁Getting Started
 
 -   Install plugin and its dependencies from npm

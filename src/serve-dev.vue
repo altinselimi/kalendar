@@ -88,7 +88,7 @@
 	</div>
 </template>
 <script>
-const existing_events = [
+const _existing_events = [
 	{
 		from: "2019-07-30T04:00:00.300Z",
 		to: "2019-07-30T04:10:00.300Z",
@@ -127,6 +127,18 @@ let today = new Date();
 let year = today.getFullYear() + "",
 	month = (today.getMonth() + 1 + "").padStart(2, 0),
 	day = (today.getDate() + "").padStart(2, 0);
+
+// change the dates on _existing events to this week
+const startDate = new Date(_existing_events[0].from).getUTCDate();
+
+function makeNow(dateString) {
+	const d = new Date(dateString);
+	d.setYear(today.getUTCFullYear());
+	d.setMonth(today.getUTCMonth());
+	d.setDate(today.getUTCDate() + (d.getUTCDate() - startDate));
+	return d.toISOString();
+}
+const existing_events = _existing_events.map(ev => ({...ev, from: makeNow(ev.from), to: makeNow(ev.to)}))
 
 const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
 
