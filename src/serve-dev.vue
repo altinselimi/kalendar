@@ -174,11 +174,7 @@ export default {
 				hide_days: [],
 				past_event_creation: true
 			},
-			outline_slots: false,
 			new_appointment: {},
-			manual_form: {},
-			adding_manually: false,
-			input_value: ""
 		};
 	},
 	methods: {
@@ -203,12 +199,6 @@ export default {
 			this.new_appointment = {
 				description: null,
 				title: null
-			};
-			this.manual_appointment = {
-				...this.new_appointment,
-				from: null,
-				to: null,
-				date: null
 			};
 		},
 		addManually() {
