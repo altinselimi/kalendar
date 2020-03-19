@@ -129,12 +129,6 @@ export default {
         return null;
       }
 
-      let label = time.split("T")[1].slice(0, 5);
-      if (this.kalendar_options.military_time) {
-        let ampm = formatAMPM(label.split(":")[0]);
-        let ampmlabel = ampm.slice(-2);
-        console.log({ ampm });
-      }
       let distance = (new Date(time) - new Date(day_starts)) / 1000 / 60;
       return { distance, time };
     }
