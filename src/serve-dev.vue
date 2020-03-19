@@ -88,9 +88,9 @@
 	</div>
 </template>
 <script>
-const existing_events = [
+const _existing_events = [
 	{
-		from: "2019-07-30T04:00:00.300Z",
+		from: "2019-07-10T04:00:00.300Z",
 		to: "2019-07-30T04:10:00.300Z",
 		data: {
 			title: "Right now",
@@ -98,7 +98,7 @@ const existing_events = [
 		}
 	},
 	{
-		from: "2019-07-31T10:22:00-07:00",
+		from: "2019-07-11T10:22:00-07:00",
 		to: "2019-07-31T11:55:00-07:00",
 		data: {
 			title: "Truth",
@@ -106,7 +106,7 @@ const existing_events = [
 		}
 	},
 	{
-		from: "2019-07-31T10:22:00-07:00",
+		from: "2019-07-11T10:22:00-07:00",
 		to: "2019-07-31T11:20:00-07:00",
 		data: {
 			title: "Side",
@@ -114,7 +114,7 @@ const existing_events = [
 		}
 	},
 	{
-		from: "2019-07-31T10:22:00+02:00",
+		from: "2019-07-11T10:22:00+02:00",
 		to: "2019-07-31T11:20:00+02:00",
 		data: {
 			title: "Europe",
@@ -125,8 +125,20 @@ const existing_events = [
 
 let today = new Date();
 let year = today.getFullYear() + "",
-	month = (today.getMonth() + 1 + "").padStart(2, 0),
-	day = (today.getDate() + "").padStart(2, 0);
+	month = (today.getMonth() + 1 + "").padStart(2, '0'),
+	day = (today.getDate() + "").padStart(2, '0');
+
+// change the dates on _existing events to this week
+const startDate = new Date(_existing_events[0].from).getUTCDate();
+
+function makeNow(dateString) {
+	const d = new Date(dateString);
+	d.setYear(today.getUTCFullYear());
+	d.setMonth(today.getUTCMonth());
+	d.setDate(today.getUTCDate() + (d.getUTCDate() - startDate));
+	return d.toISOString();
+}
+const existing_events = _existing_events.map(ev => ({...ev, from: makeNow(ev.from), to: makeNow(ev.to)}))
 
 const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
 
@@ -162,11 +174,7 @@ export default {
 				hide_days: [],
 				past_event_creation: true
 			},
-			outline_slots: false,
 			new_appointment: {},
-			manual_form: {},
-			adding_manually: false,
-			input_value: ""
 		};
 	},
 	methods: {
@@ -192,18 +200,12 @@ export default {
 				description: null,
 				title: null
 			};
-			this.manual_appointment = {
-				...this.new_appointment,
-				from: null,
-				to: null,
-				date: null
-			};
 		},
 		addManually() {
 			let title = "New one";
 			let description = "Lorem dsr";
-			let from = "2019-08-01T10:22:00+02:00";
-			let to = "2019-08-02T11:20:00+02:00";
+			let from = makeNow("2019-07-12T10:22:00+02:00");
+			let to = makeNow("2019-07-13T11:20:00+02:00");
 			let payload = {
 				data: { title, description },
 				from,
