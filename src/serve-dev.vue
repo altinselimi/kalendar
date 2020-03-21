@@ -4,7 +4,6 @@
 		<kalendar
 			:configuration.sync="calendar_settings"
 			:events.sync="events"
-			class="generate-shadow"
 		>
 			<!-- CREATED CARD SLOT -->
 			<div
@@ -124,9 +123,14 @@ const _existing_events = [
 ];
 
 let today = new Date();
-let year = today.getFullYear() + "",
-	month = (today.getMonth() + 1 + "").padStart(2, '0'),
-	day = (today.getDate() + "").padStart(2, '0');
+
+function getCurrentDay() {
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	today.setMilliseconds(0);
+	return today.toISOString();
+}
 
 // change the dates on _existing events to this week
 const startDate = new Date(_existing_events[0].from).getUTCDate();
@@ -139,8 +143,6 @@ function makeNow(dateString) {
 	return d.toISOString();
 }
 const existing_events = _existing_events.map(ev => ({...ev, from: makeNow(ev.from), to: makeNow(ev.to)}))
-
-const currentDay = `${year}-${month}-${day}T00:00:00.000Z`;
 
 import Vue from "vue";
 
@@ -164,7 +166,7 @@ export default {
 				view_type: "week",
 				cell_height: 10,
 				scrollToNow: false,
-				current_day: currentDay,
+				current_day: getCurrentDay(),
 				military_time: false,
 				read_only: false,
 				day_starts_at: 0,

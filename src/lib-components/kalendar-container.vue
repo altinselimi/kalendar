@@ -11,7 +11,7 @@
   >
     <div class="week-navigator">
       <div class="nav-wrapper" v-if="kalendar_options.view_type === 'week'">
-        <button class="week-navigator-button" @click="previousWeek()">
+        <button class="week-navigator-button" @click="changeDay(-7)">
           <svg
             style="transform: rotate(180deg)"
             viewBox="0 0 24 24"
@@ -32,7 +32,7 @@
             kalendar_options.formatWeekNavigator(kalendar_options.current_day)
           }}</span>
         </div>
-        <button class="week-navigator-button" @click="nextWeek()">
+        <button class="week-navigator-button" @click="changeDay(7)">
           <svg
             viewBox="0 0 24 24"
             width="24"
@@ -49,7 +49,7 @@
         </button>
       </div>
       <div class="nav-wrapper" v-if="kalendar_options.view_type === 'day'">
-        <button class="week-navigator-button" @click="previousDay()">
+        <button class="week-navigator-button" @click="changeDay(-1)">
           <svg
             style="transform: rotate(180deg)"
             viewBox="0 0 24 24"
@@ -70,7 +70,7 @@
             kalendar_options.formatDayNavigator(kalendar_options.current_day)
           }}</span>
         </div>
-        <button class="week-navigator-button" @click="nextDay()">
+        <button class="week-navigator-button" @click="changeDay(1)">
           <svg
             viewBox="0 0 24 24"
             width="24"
@@ -145,36 +145,20 @@
   </div>
 </template>
 <script>
-import Vue from "vue";
-import PortalVue from "portal-vue";
+  import Vue from "vue";
 
-import {
-  getHourlessDate,
-  generateUUID,
-  addDays,
-  cloneObject,
-  getDatelessHour,
-  startOfWeek,
-  endOfWeek
-} from "./utils.js";
+  import {
+    addDays,
+    cloneObject,
+    endOfWeek,
+    generateUUID,
+    getDatelessHour,
+    getHourlessDate,
+    startOfWeek
+  } from "./utils.js";
 
-const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
 
-const days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-
-// we are going to use web workers to do the heavy lifting
-// needed for our kalendar component to work and render correctly
-import myWorker from "@/lib-components/workers";
-
-export default {
+  export default {
   components: {
     KalendarWeekView: () => import("./kalendar-weekview.vue")
   },
@@ -321,59 +305,14 @@ export default {
     return provider;
   },
   methods: {
-    previousDay() {
-      let { current_day } = this.kalendar_options;
-      let target_day = addDays(current_day, -1);
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: target_day.toISOString()
-      };
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    nextDay() {
-      let { current_day } = this.kalendar_options;
-      let target_day = addDays(current_day, 1);
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: target_day.toISOString()
-      };
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    previousWeek() {
-      let { current_day } = this.kalendar_options;
-      let nextWeek = new Date(current_day);
-      nextWeek.setDate(nextWeek.getDate() - 7);
-      nextWeek.setUTCHours(0, 0, 0, 0);
+    changeDay(numDays) {
+      let newDay = addDays(this.kalendar_options.current_day, numDays);
+      console.log(`setting current day to ${newDay.toISOString()}`)
 
       let config = cloneObject(this.configuration);
       config = {
         ...config,
-        current_day: nextWeek.toISOString()
-      };
-
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    nextWeek() {
-      let { current_day } = this.kalendar_options;
-      let nextWeek = new Date(current_day);
-      nextWeek.setDate(nextWeek.getDate() + 7);
-      nextWeek.setUTCHours(0, 0, 0, 0);
-
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: nextWeek.toISOString()
+        current_day: newDay.toISOString()
       };
 
       this.$emit("update:configuration", config);
@@ -386,11 +325,11 @@ export default {
       let minutes = dateObj
         .getUTCHours()
         .toString()
-        .padStart(2, 0);
+        .padStart(2, "0");
       let seconds = dateObj
         .getUTCMinutes()
         .toString()
-        .padStart(2, 0);
+        .padStart(2, "0");
       return `${minutes}:${seconds}`;
     },
     addAppointment(popup_info) {
