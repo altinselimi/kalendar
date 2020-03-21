@@ -145,20 +145,20 @@
   </div>
 </template>
 <script>
-  import Vue from "vue";
+import Vue from "vue";
 
-  import {
-    addDays,
-    cloneObject,
-    endOfWeek,
-    generateUUID,
-    getDatelessHour,
-    getHourlessDate,
-    startOfWeek
-  } from "./utils.js";
+import {
+  addDays,
+  cloneObject,
+  endOfWeek,
+  generateUUID,
+  getDatelessHour,
+  getHourlessDate,
+  startOfWeek
+} from "./utils.js";
 
 
-  export default {
+export default {
   components: {
     KalendarWeekView: () => import("./kalendar-weekview.vue")
   },
@@ -307,7 +307,6 @@
   methods: {
     changeDay(numDays) {
       let newDay = addDays(this.kalendar_options.current_day, numDays);
-      console.log(`setting current day to ${newDay.toISOString()}`)
 
       let config = cloneObject(this.configuration);
       config = {
