@@ -43,8 +43,7 @@
           <li
             class="hour-row-identifier"
             :key="index"
-            v-for="(hour, index) in hours || []"
-            v-if="hour.visible"
+            v-for="(hour, index) in hoursVisible"
             :style="`height:${hourHeight}px`"
           >
             <span>{{ kalendar_options.formatLeftHours(hour.value) }}</span>
@@ -53,9 +52,9 @@
         <div
           v-show="kalendar_options.style !== 'material_design'"
           class="hour-indicator-line"
-          :style="`top:${passedtime.distance}px`"
+          :style="`top:${passedTime.distance}px`"
         >
-          <span class="time-value">{{ passedtime.value }}</span>
+          <span class="time-value">{{ passedTime.value }}</span>
           <span class="line"></span>
         </div>
         <kalendar-days
@@ -64,7 +63,7 @@
           :class="`day-${index + 1}`"
           :key="day.value.slice(0, 10)"
           v-for="(day, index) in days"
-          :passed-time="passedtime.distance"
+          :passed-time="passedTime.distance"
           :ref="day.value.slice(0, 10)"
         >
         </kalendar-days>
@@ -80,9 +79,7 @@ import {
   isToday,
   getHourlessDate,
   addTimezoneInfo,
-  getDatelessHour,
   getLocaleTime,
-  formatAMPM
 } from "./utils";
 
 export default {
@@ -100,6 +97,10 @@ export default {
     days: []
   }),
   computed: {
+    hoursVisible() {
+      if (!this.hours) return [];
+      return this.hours.filter(x => !!x.visible);
+    },
     colsSpace() {
       return this.kalendar_options.style === "flat_design" ? "5px" : "0px";
     },
@@ -108,7 +109,7 @@ export default {
       //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value);
       // * this.kalendar_options.hour_parts;
     },
-    passedtime() {
+    passedTime() {
       let { day_starts_at, day_ends_at, now } = this.kalendar_options;
       let time = getLocaleTime(now);
       let day_starts = `${time.split("T")[0]}T${(day_starts_at + "").padStart(

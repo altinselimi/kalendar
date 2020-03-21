@@ -11,8 +11,8 @@ if (creators_offset * -1 >= 0) {
 const getHourlessDate = date_string => {
   let today = date_string ? new Date(date_string) : new Date();
   let year = today.getFullYear() + "",
-    month = (today.getMonth() + 1 + "").padStart(2, 0),
-    day = (today.getDate() + "").padStart(2, 0);
+    month = (today.getMonth() + 1 + "").padStart(2, "0"),
+    day = (today.getDate() + "").padStart(2, "0");
 
   return `${year}-${month}-${day}T00:00:00.000Z`;
 };
@@ -99,8 +99,8 @@ const cloneObject = object => {
 
 const getDayDateID = date => {
   let year = `${date.getUTCFullYear()}`;
-  let month = `${date.getUTCMonth()}`.padStart(2, 0);
-  let day = `${date.getUTCDate()}`.padStart(2, 0);
+  let month = `${date.getUTCMonth()}`.padStart(2, "0");
+  let day = `${date.getUTCDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 

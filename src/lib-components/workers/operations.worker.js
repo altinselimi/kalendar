@@ -61,14 +61,14 @@ function getDays(dayString, { hide_dates, hide_days, view_type }) {
   return days;
 }
 
-function getHours(day_options) {
+function getHours(hour_options) {
   let date = new Date();
   date.setUTCHours(0, 0, 0, 0);
   let iso_date = getYearMonthDay(date);
 
   let day_hours = hourUtils.getFullHours();
-  if (day_options) {
-    let { start_hour, end_hour } = day_options;
+  if (hour_options) {
+    let { start_hour, end_hour } = hour_options;
     day_hours = day_hours.slice(start_hour, end_hour);
   }
   let hours = [];

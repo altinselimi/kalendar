@@ -27,12 +27,10 @@
       :slot-props="information"
       name="event-creation"
       slim
-    ></portal-target>
-    <portal-target v-else name="event-details" :slot-props="information" slim>
-    </portal-target>
+    />
+    <portal-target v-else name="event-details" :slot-props="information" slim />
     <div v-if="status === 'popup-initiated'" class="popup-wrapper">
-      <portal-target name="event-popup-form" slim :slot-props="information">
-      </portal-target>
+      <portal-target name="event-popup-form" slim :slot-props="information" />
     </div>
   </div>
 </template>

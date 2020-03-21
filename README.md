@@ -30,6 +30,10 @@ You can run the demo locally :
 npm install kalendar-vue portal-vue -S
 ```
 
+-   The easiest option is to copy the demo app from `src/serve-dev.vue` into your project and start from that.
+
+Step by Step:
+
 -   Import plugin and its dependencies in your component
 
 ```js
@@ -47,10 +51,11 @@ components: {
 
 -   Provide Appointments array. This array will be the source of the appointments which are rendered in the calendar.
 Specify the start and end times of each appointment as ISO format strings.
+You must use the `sync` modifier when passing the `configuration` prop to the component or else switching weeks will break.
 
 ```vue
 <template>
-	<kalendar :configuration="calendar_settings" :events="events" />
+	<kalendar :configuration.sync="calendar_settings" :events.sync="events" />
 </template>
 <script>
 ...
