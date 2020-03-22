@@ -18,10 +18,10 @@ You can run the demo locally :
   - cd kalendar
   - npm install
   - npm run serve
-  
+
  The code for the demo app is in `src/serve-dev.vue` - a small but complete calendar app. 
  This is a good place to learn how thing work and a good starting point for your own implementation. 
- 
+
 ## 🏁Getting Started
 
 -   Install plugin and its dependencies from npm
@@ -55,7 +55,7 @@ You must use the `sync` modifier when passing the `configuration` prop to the co
 
 ```vue
 <template>
-	<kalendar :configuration.sync="calendar_settings" :events.sync="events" />
+	<kalendar :configuration="calendar_settings" :events.sync="events" />
 </template>
 <script>
 ...
@@ -65,7 +65,7 @@ data: () => ({
       view_type: 'week',
       cell_height: 20,
       scrollToNow: true,
-      current_day: new Date().toISOString(),
+      start_day: new Date().toISOString(),
       read_only: false,
       day_starts_at: 0,
       day_ends_at: 24,
@@ -98,7 +98,7 @@ data: () => ({
 | ------------------- | -------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
 | view_type           | 'week'                                                         | string        | Determines the mode of kalendar. You can pick either 'week' or 'day'. Day is recommended for mobile devices. |
 | cell_height         | 10                                                             | string        | Determines the height in pixels of a cell                                                                    |
-| current_day         | new Date().toISOString()                                       | string        | Determines the week or day which is shown in the kalendar                                                    |
+| start_day           | new Date().toISOString()                                       | string        | Determines the week or day which is shown in the kalendar on first load                                                    |
 | style               | 'material_design'                                              | string        | You can pick either 'material_design' or 'flat_design' (iOS)                                                 |
 | read_only           | false                                                          | boolean       | Enabled, viewers won't be able to interact with kalendar                                                     |
 | day_starts_at       | 0                                                              | integer       | Determines what hour the kalendar starts from (0 to 24)                                                      |
