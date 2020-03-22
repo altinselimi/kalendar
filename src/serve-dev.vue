@@ -2,8 +2,8 @@
 	<div>
 		<button @click="addManually()">addManually</button>
 		<kalendar
-			:configuration.sync="calendar_settings"
-			:events.sync="events"
+			:configuration="calendar_settings"
+			:events="events"
 		>
 			<!-- CREATED CARD SLOT -->
 			<div
@@ -166,7 +166,7 @@ export default {
 				view_type: "week",
 				cell_height: 10,
 				scrollToNow: false,
-				current_day: getCurrentDay(),
+				//start_day: getCurrentDay(),
 				military_time: false,
 				read_only: false,
 				day_starts_at: 0,
