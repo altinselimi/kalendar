@@ -3,7 +3,7 @@
 		<button @click="addManually()">addManually</button>
 		<kalendar
 			:configuration="calendar_settings"
-			:events="events"
+			:events.sync="events"
 		>
 			<!-- CREATED CARD SLOT -->
 			<div
