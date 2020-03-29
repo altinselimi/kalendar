@@ -83,6 +83,13 @@ import {
 } from "./utils";
 
 export default {
+  props: {
+    current_day: {
+      required: true,
+      type: String,
+      validator: d => !isNaN(Date.parse(d)),
+    }
+  },
   components: {
     KalendarDays
   },
@@ -112,26 +119,14 @@ export default {
     passedTime() {
       let { day_starts_at, day_ends_at, now } = this.kalendar_options;
       let time = getLocaleTime(now);
-      let day_starts = `${time.split("T")[0]}T${(day_starts_at + "").padStart(
-        2,
-        0
-      )}:00:00.000Z`;
-      let day_ends = `${time.split("T")[0]}T${(day_ends_at + "").padStart(
-        2,
-        0
-      )}:00:00.000Z`;
+      let day_starts = `${time.split("T")[0]}T${(day_starts_at + "").padStart(2, '0')}:00:00.000Z`;
+      let day_ends = `${time.split("T")[0]}T${(day_ends_at + "").padStart(2, '0')}:00:00.000Z`;
+      let time_obj = new Date(time);
 
-      console.log({ day_starts, day_ends, time });
+      if(new Date(day_ends) < time_obj || time_obj < new Date(day_starts)) return null;
 
-      if (new Date(day_ends) - new Date(time) < 0) {
-        return null;
-      }
-      if (new Date(time) - new Date(day_starts) < 0) {
-        return null;
-      }
-
-      let distance = (new Date(time) - new Date(day_starts)) / 1000 / 60;
-      return { distance, time };
+      let distance = (time_obj - new Date(day_starts)) / 1000 / 60;
+      return {distance, time};
     }
   },
   methods: {
@@ -153,7 +148,7 @@ export default {
       return isBefore(day, getHourlessDate(formattedNow));
     },
     constructWeek() {
-      const date = this.kalendar_options.current_day.slice(0, 10);
+      const date = this.current_day.slice(0, 10);
       const { hide_dates, hide_days, view_type } = this.kalendar_options;
       return Promise.all([
         myWorker
@@ -168,7 +163,6 @@ export default {
           .then(reply => {
             this.days = reply; //.slice(0,1);
           }),
-
         myWorker
           .send("getHours", {
             hourOptions: {

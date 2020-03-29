@@ -29,7 +29,7 @@
         </button>
         <div>
           <span>{{
-            kalendar_options.formatWeekNavigator(kalendar_options.current_day)
+            kalendar_options.formatWeekNavigator(current_day)
           }}</span>
         </div>
         <button class="week-navigator-button" @click="changeDay(7)">
@@ -67,7 +67,7 @@
         </button>
         <div>
           <span>{{
-            kalendar_options.formatDayNavigator(kalendar_options.current_day)
+            kalendar_options.formatDayNavigator(current_day)
           }}</span>
         </div>
         <button class="week-navigator-button" @click="changeDay(1)">
@@ -87,7 +87,7 @@
         </button>
       </div>
     </div>
-    <kalendar-week-view />
+    <kalendar-week-view :current_day="current_day"/>
     <portal to="event-creation" class="slotable">
       <div slot-scope="information" class="creating-event">
         <slot name="creating-card" :event_information="information">
@@ -149,7 +149,7 @@ import Vue from "vue";
 
 import {
   addDays,
-  cloneObject,
+  getTime,
   endOfWeek,
   generateUUID,
   getDatelessHour,
@@ -182,13 +182,12 @@ export default {
     }
   },
   data() {
-    let today = getHourlessDate();
     return {
+      current_day: getHourlessDate(),
       default_options: {
-        dark: false,
         cell_height: 10,
         scrollToNow: false,
-        current_day: today,
+        start_day: getHourlessDate(),
         view_type: "week",
         style: "material_design",
         now: new Date(),
@@ -231,24 +230,17 @@ export default {
       let provided_props = this.configuration;
 
       let conditions = {
-        //dark: (val) => typeof val === 'boolean',
         scrollToNow: val => typeof val === "boolean",
-        current_week: val => val === null,
-        current_day: val => !isNaN(Date.parse(val)),
+        start_day: val => !isNaN(Date.parse(val)),
         view_type: val => ["week", "day"].includes(val),
         cell_height: val => !isNaN(val),
         style: val => ["material_design", "flat_design"].includes(val),
         military_time: val => typeof val === "boolean",
         read_only: val => typeof val === "boolean",
-        day_starts_at: val => {
-          return typeof val === "number" && val >= 0 && val <= 24;
-        },
-        day_ends_at: val => {
-          return typeof val === "number" && val >= 0 && val <= 24;
-        },
+        day_starts_at: val => typeof val === "number" && val >= 0 && val <= 24,
+        day_ends_at: val => typeof val === "number" && val >= 0 && val <= 24,
         hide_dates: val => Array.isArray(val),
-        hide_days: val =>
-          Array.isArray(val) && !val.find(n => typeof n !== "number"),
+        hide_days: val => Array.isArray(val) && !val.find(n => typeof n !== "number"),
         overlap: val => typeof val === "boolean",
         past_event_creation: val => typeof val === "boolean"
       };
@@ -264,6 +256,7 @@ export default {
     }
   },
   created() {
+    this.current_day = this.kalendar_options.start_day;
     this.kalendar_events = this.events.map(event => ({
       ...event,
       id: event.id || generateUUID()
@@ -273,9 +266,7 @@ export default {
       Vue.prototype.$kalendar = {};
     }
 
-    this.$kalendar.getEvents = () => {
-      return this.kalendar_events.slice(0);
-    };
+    this.$kalendar.getEvents = () => this.kalendar_events.slice(0);
 
     this.$kalendar.updateEvents = payload => {
       this.kalendar_events = payload.map(event => ({
@@ -305,31 +296,10 @@ export default {
     return provider;
   },
   methods: {
+    getTime,
     changeDay(numDays) {
-      let newDay = addDays(this.kalendar_options.current_day, numDays);
-
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: newDay.toISOString()
-      };
-
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    getTime(date) {
-      let dateObj = new Date(date);
-      let minutes = dateObj
-        .getUTCHours()
-        .toString()
-        .padStart(2, "0");
-      let seconds = dateObj
-        .getUTCMinutes()
-        .toString()
-        .padStart(2, "0");
-      return `${minutes}:${seconds}`;
+      this.current_day = addDays(this.current_day, numDays).toISOString()
+      setTimeout(() => this.$kalendar.buildWeek());
     },
     addAppointment(popup_info) {
       let payload = {

@@ -39,6 +39,19 @@ const getUTCDate = (date_string = Date.now()) => {
   );
 };
 
+const getTime = (date) => {
+  let dateObj = new Date(date);
+  let minutes = dateObj
+    .getUTCHours()
+    .toString()
+    .padStart(2, "0");
+  let seconds = dateObj
+    .getUTCMinutes()
+    .toString()
+    .padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+
 const addDays = (date, days) => {
   let dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
@@ -160,5 +173,6 @@ export {
   isToday,
   isBefore,
   isWeekend,
-  formatAMPM
+  formatAMPM,
+  getTime,
 };
