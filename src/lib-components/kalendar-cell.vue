@@ -1,9 +1,6 @@
 <template>
   <li
     v-if="cellData.visible"
-    @mouseover.self="mouseMove()"
-    @mousedown.self="mouseDown()"
-    @mouseup="mouseUp()"
     class="kalendar-cell"
     :class="{
       selected: selected,
@@ -13,19 +10,21 @@
     }"
     :style="
       `
-      height: ${kalendar_options.cell_height}px;
+      height: ${options.cell_height}px;
     `
     "
+    @mouseup="mouseUp()"
+    @mouseover.self="mouseMove()"
+    @mousedown.self="mouseDown()"
   >
     <KalendarEvent
-      :style="`z-index: 10`"
-      v-if="cell_events && cell_events.length"
       v-for="(event, eventIndex) in cell_events"
-      :event="event"
       :key="eventIndex"
+      :event="event"
       :total="cell_events.length"
       :index="eventIndex"
       :overlaps="overlapValue"
+      :style="`z-index: 10`"
     />
   </li>
 </template>
@@ -40,7 +39,7 @@ export default {
     "constructedEvents",
     "temporaryEvent"
   ],
-  inject: ["kalendar_options"],
+  inject: ["options"],
   components: {
     KalendarEvent: () => import("./kalendar-event.vue")
   },
@@ -65,16 +64,13 @@ export default {
     being_created() {
       return (
         this.temporaryEvent &&
-        this.temporaryEvent.start.value === this.cellData.value &&
-        this.temporaryEvent
+        this.temporaryEvent.start.value === this.cellData.value
       );
     },
     overlappingEvents() {
       if (!this.constructedEvents || this.cell_events.length < 1) return [];
       return Object.keys(this.constructedEvents)
-        .map(evKey => {
-          return this.constructedEvents[evKey];
-        })
+        .map(evKey => this.constructedEvents[evKey])
         .flat()
         .filter(event => {
           let cellDate = new Date(this.cellData.value);
@@ -105,7 +101,7 @@ export default {
         this.mouseUp();
         return;
       }
-      let { read_only, overlap, past_event_creation } = this.kalendar_options;
+      let { read_only, overlap, past_event_creation } = this.options;
       if (read_only) return;
 
       // if past_event_creation is set to false, check if cell value is
@@ -120,7 +116,6 @@ export default {
 
       // if overlap is set to false, prevent selection on top of
       // other events
-      console.log("Cell events:", this.cell_events.length);
       if (!overlap && this.cell_events.length > 0) return;
 
       // close any open popups in the whole kalendar instance
@@ -143,8 +138,7 @@ export default {
     },
     mouseMove() {
       // same guards like in the mouseDown function
-      let { read_only, overlap } = this.kalendar_options;
-      if (read_only) return;
+      if (this.options.read_only) return;
       if (this.creator && !this.creator.creating) return;
       let { starting_cell, original_starting_cell, creating } = this.creator;
 
@@ -164,14 +158,11 @@ export default {
       }
     },
     mouseUp() {
-      if (this.kalendar_options.read_only) return;
-      if (this.creator.creating) {
+      if (this.options.read_only) return;
+      if (this.creator && this.creator.creating) {
         this.$emit("initiatePopup");
       }
     },
-    resetCreator() {
-      this.$emit("reset");
-    }
   }
 };
 </script>
