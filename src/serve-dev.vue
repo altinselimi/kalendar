@@ -216,14 +216,12 @@ export default {
 			this.$kalendar.addNewEvent(payload);
 		},
 		removeEvent(kalendarEvent) {
-			console.log("KalendarEvent", kalendarEvent);
 			let day = kalendarEvent.start_time.slice(0, 10);
 			this.$kalendar.removeEvent({
 				day,
 				key: kalendarEvent.key,
 				id: kalendarEvent.kalendar_id
 			});
-			console.log("Event:", kalendarEvent);
 		}
 	}
 };
