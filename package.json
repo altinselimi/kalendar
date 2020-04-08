@@ -1,6 +1,6 @@
 {
   "name": "kalendar-vue",
-  "version": "2.0.9",
+  "version": "2.0.12",
   "description": "",
   "private": false,
   "main": "dist/index.js",
@@ -13,8 +13,7 @@
     "serve": "vue-cli-service serve src/serve-dev.js",
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
+    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es"
   },
   "dependencies": {},
   "devDependencies": {

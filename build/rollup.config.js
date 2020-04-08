@@ -107,11 +107,12 @@ if (!argv.format || argv.format === "es") {
 
 if (!argv.format || argv.format === "cjs") {
   const umdConfig = {
+    inlineDynamicImports: true,
     ...baseConfig,
     external,
     output: {
       compact: true,
-      dir: "dist/",
+      file: "dist/kalendar-vue.umd.js",
       format: "cjs",
       name: "KalendarVue",
       exports: "named",
@@ -122,15 +123,11 @@ if (!argv.format || argv.format === "cjs") {
       vue({
         ...baseConfig.plugins.vue,
         template: {
-          ...baseConfig.plugins.vue.template,
-          optimizeSSR: true
+          ...baseConfig.plugins.vue.template
         }
       }),
       babel(baseConfig.plugins.babel),
       commonjs(),
-      cleaner({
-        targets: ["./dist/"]
-      }),
       strip(),
       webWorkerLoader({
         forceInline: true,
