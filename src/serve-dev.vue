@@ -1,10 +1,7 @@
 <template>
 	<div>
 		<button @click="addManually()">addManually</button>
-		<kalendar
-			:configuration="calendar_settings"
-			:events.sync="events"
-		>
+		<kalendar :configuration="calendar_settings" :events.sync="events">
 			<!-- CREATED CARD SLOT -->
 			<div
 				slot="created-card"
@@ -89,37 +86,37 @@
 <script>
 const _existing_events = [
 	{
-		from: "2019-07-10T04:00:00.300Z",
-		to: "2019-07-30T04:10:00.300Z",
+		from: '2019-07-10T04:00:00.300Z',
+		to: '2019-07-30T04:10:00.300Z',
 		data: {
-			title: "Right now",
-			description: "Lorem ipsum"
-		}
+			title: 'Right now',
+			description: 'Lorem ipsum',
+		},
 	},
 	{
-		from: "2019-07-11T10:22:00-07:00",
-		to: "2019-07-31T11:55:00-07:00",
+		from: '2019-07-11T10:22:00-07:00',
+		to: '2019-07-31T11:55:00-07:00',
 		data: {
-			title: "Truth",
-			description: "Look."
-		}
+			title: 'Truth',
+			description: 'Look.',
+		},
 	},
 	{
-		from: "2019-07-11T10:22:00-07:00",
-		to: "2019-07-31T11:20:00-07:00",
+		from: '2019-07-11T10:22:00-07:00',
+		to: '2019-07-31T11:20:00-07:00',
 		data: {
-			title: "Side",
-			description: "Look.2"
-		}
+			title: 'Side',
+			description: 'Look.2',
+		},
 	},
 	{
-		from: "2019-07-11T10:22:00+02:00",
-		to: "2019-07-31T11:20:00+02:00",
+		from: '2019-07-11T10:22:00+02:00',
+		to: '2019-07-31T11:20:00+02:00',
 		data: {
-			title: "Europe",
-			description: "Final Countdown"
-		}
-	}
+			title: 'Europe',
+			description: 'Final Countdown',
+		},
+	},
 ];
 
 let today = new Date();
@@ -142,28 +139,32 @@ function makeNow(dateString) {
 	d.setDate(today.getUTCDate() + (d.getUTCDate() - startDate));
 	return d.toISOString();
 }
-const existing_events = _existing_events.map(ev => ({...ev, from: makeNow(ev.from), to: makeNow(ev.to)}))
+const existing_events = _existing_events.map(ev => ({
+	...ev,
+	from: makeNow(ev.from),
+	to: makeNow(ev.to),
+}));
 
-import Vue from "vue";
+import Vue from 'vue';
 
-import Kalendar from "@/lib-components/kalendar-container.vue";
-import { DateTime } from "luxon";
+import Kalendar from '@/lib-components/kalendar-container.vue';
+import { DateTime } from 'luxon';
 
 export default {
 	created() {
-		Vue.filter("formatToHours", (value, how) => {
+		Vue.filter('formatToHours', (value, how) => {
 			let dt = DateTime.fromISO(value);
 			return dt.toLocaleString(DateTime.TIME_24_SIMPLE);
 		});
 	},
 	components: {
-		Kalendar
+		Kalendar,
 	},
 	data() {
 		return {
 			events: existing_events,
 			calendar_settings: {
-				view_type: "week",
+				view_type: 'week',
 				cell_height: 10,
 				scrollToNow: false,
 				//start_day: getCurrentDay(),
@@ -172,9 +173,9 @@ export default {
 				day_starts_at: 0,
 				day_ends_at: 24,
 				overlap: true,
-				hide_dates: ["2019-08-09"],
+				hide_dates: ['2019-08-09'],
 				hide_days: [],
-				past_event_creation: true
+				past_event_creation: true,
 			},
 			new_appointment: {},
 		};
@@ -184,10 +185,10 @@ export default {
 			let payload = {
 				data: {
 					title: this.new_appointment.title,
-					description: this.new_appointment.description
+					description: this.new_appointment.description,
 				},
 				from: popup_info.start_time,
-				to: popup_info.end_time
+				to: popup_info.end_time,
 			};
 
 			this.$kalendar.addNewEvent(payload);
@@ -200,18 +201,18 @@ export default {
 		clearFormData() {
 			this.new_appointment = {
 				description: null,
-				title: null
+				title: null,
 			};
 		},
 		addManually() {
-			let title = "New one";
-			let description = "Lorem dsr";
-			let from = makeNow("2019-07-12T10:22:00+02:00");
-			let to = makeNow("2019-07-13T11:20:00+02:00");
+			let title = 'New one';
+			let description = 'Lorem dsr';
+			let from = makeNow('2019-07-12T10:22:00+02:00');
+			let to = makeNow('2019-07-13T11:20:00+02:00');
 			let payload = {
 				data: { title, description },
 				from,
-				to
+				to,
 			};
 			this.$kalendar.addNewEvent(payload);
 		},
@@ -220,10 +221,10 @@ export default {
 			this.$kalendar.removeEvent({
 				day,
 				key: kalendarEvent.key,
-				id: kalendarEvent.kalendar_id
+				id: kalendarEvent.kalendar_id,
 			});
-		}
-	}
+		},
+	},
 };
 </script>
 <style lang="scss">

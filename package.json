@@ -1,50 +1,58 @@
 {
-  "name": "kalendar-vue",
-  "version": "2.1.0",
-  "description": "",
-  "private": false,
-  "main": "dist/index.js",
-  "files": [
-    "dist/*",
-    "src/**/*.vue",
-    "!src/serve-dev.*"
-  ],
-  "scripts": {
-    "serve": "vue-cli-service serve src/serve-dev.js",
-    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
-    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@rollup/plugin-alias": "^2.2.0",
-    "@rollup/plugin-commonjs": "^11.0.2",
-    "@rollup/plugin-replace": "^2.2.1",
-    "@rollup/plugin-strip": "^1.3.2",
-    "@vue/cli-plugin-babel": "^4.1.0",
-    "@vue/cli-service": "^4.1.0",
-    "cross-env": "^6.0.3",
-    "luxon": "^1.22.0",
-    "minimist": "^1.2.5",
-    "portal-vue": "^2.1.7",
-    "rollup": "^1.27.13",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-cleaner": "^1.0.0",
-    "rollup-plugin-terser": "^5.1.3",
-    "rollup-plugin-vue": "^5.1.5",
-    "rollup-plugin-web-worker-loader": "^0.9.0",
-    "sass-loader": "^8.0.2",
-    "vue": "^2.6.10",
-    "vue-template-compiler": "^2.6.10",
-    "worker-loader": "^2.0.0"
-  },
-  "peerDependencies": {
-    "vue": "^2.6.10",
-    "portal-vue": "^2.1.7"
-  },
-  "engines": {
-    "node": ">=8"
-  }
+    "name": "kalendar-vue",
+    "version": "2.1.0",
+    "description": "",
+    "private": false,
+    "main": "dist/index.js",
+    "files": [
+        "dist/*",
+        "src/**/*.vue",
+        "!src/serve-dev.*"
+    ],
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": true,
+        "jsxBracketSameLine": false,
+        "vueIndentScriptAndStyle": false
+    },
+    "scripts": {
+        "serve": "vue-cli-service serve src/serve-dev.js",
+        "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
+        "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
+        "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.7.7",
+        "@babel/preset-env": "^7.7.7",
+        "@rollup/plugin-alias": "^2.2.0",
+        "@rollup/plugin-commonjs": "^11.0.2",
+        "@rollup/plugin-replace": "^2.2.1",
+        "@rollup/plugin-strip": "^1.3.2",
+        "@vue/cli-plugin-babel": "^4.1.0",
+        "@vue/cli-service": "^4.1.0",
+        "cross-env": "^6.0.3",
+        "luxon": "^1.22.0",
+        "minimist": "^1.2.5",
+        "portal-vue": "^2.1.7",
+        "rollup": "^1.27.13",
+        "rollup-plugin-babel": "^4.3.3",
+        "rollup-plugin-cleaner": "^1.0.0",
+        "rollup-plugin-terser": "^5.1.3",
+        "rollup-plugin-vue": "^5.1.5",
+        "rollup-plugin-web-worker-loader": "^0.9.0",
+        "sass-loader": "^8.0.2",
+        "vue": "^2.6.10",
+        "vue-template-compiler": "^2.6.10",
+        "worker-loader": "^2.0.0"
+    },
+    "peerDependencies": {
+        "vue": "^2.6.10",
+        "portal-vue": "^2.1.7"
+    },
+    "engines": {
+        "node": ">=8"
+    }
 }
