@@ -27,12 +27,10 @@
       :slot-props="information"
       name="event-creation"
       slim
-    ></portal-target>
-    <portal-target v-else name="event-details" :slot-props="information" slim>
-    </portal-target>
+    />
+    <portal-target v-else name="event-details" :slot-props="information" slim />
     <div v-if="status === 'popup-initiated'" class="popup-wrapper">
-      <portal-target name="event-popup-form" slim :slot-props="information">
-      </portal-target>
+      <portal-target name="event-popup-form" slim :slot-props="information" />
     </div>
   </div>
 </template>
@@ -42,7 +40,7 @@ import { isBefore, getLocaleTime, addTimezoneInfo } from "./utils.js";
 export default {
   props: ["event", "total", "index", "overlaps"],
   created() {},
-  inject: ["kalendar_options"],
+  inject: ["options"],
   data: () => ({
     inspecting: false,
     editing: false
@@ -66,7 +64,7 @@ export default {
     },
     distance() {
       if (!this.event) return;
-      let multiplier = this.kalendar_options.cell_height / 10;
+      let multiplier = this.options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
       return `${this.event.distance * multiplier - 0.2 * multiplier}px`;
     },
@@ -74,24 +72,16 @@ export default {
       return (this.event && this.event.status) || this.editing;
     },
     information() {
-      let { start, end, data, id, key } = this.event;
-      let payload = {
+      let {start, end, data, id, key} = this.event;
+      return {
         start_time: addTimezoneInfo(start.value),
         end_time: addTimezoneInfo(end.value),
         kalendar_id: id,
         key,
         data
       };
-      return payload;
     },
-    editEvent() {
-      this.$kalendar.closePopups();
-      this.editing = true;
-    },
-    closeEventPopup() {
-      this.editing = false;
-    }
-  }
+  },
 };
 </script>
 <style lang="scss">

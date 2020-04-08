@@ -2,8 +2,6 @@ import registerPromiseWorker from "./registerPromiseWorker.js";
 import {
   generateUUID,
   addDays,
-  addMinutes,
-  addHours,
   getYearMonthDay,
   getLocaleTime
 } from "../utils.js";
@@ -61,14 +59,14 @@ function getDays(dayString, { hide_dates, hide_days, view_type }) {
   return days;
 }
 
-function getHours(day_options) {
+function getHours(hour_options) {
   let date = new Date();
   date.setUTCHours(0, 0, 0, 0);
   let iso_date = getYearMonthDay(date);
 
   let day_hours = hourUtils.getFullHours();
-  if (day_options) {
-    let { start_hour, end_hour } = day_options;
+  if (hour_options) {
+    let { start_hour, end_hour } = hour_options;
     day_hours = day_hours.slice(start_hour, end_hour);
   }
   let hours = [];
@@ -121,9 +119,7 @@ const constructDayEvents = (day, existing_events) => {
         to
       };
     })
-    .filter(({ from }) => {
-      return from.slice(0, 10) === day.slice(0, 10);
-    });
+    .filter(({ from }) => from.slice(0, 10) === day.slice(0, 10));
 
   if (events_for_this_day.length === 0) return {};
   let filtered_events = {};
@@ -183,7 +179,7 @@ const constructNewEvent = event => {
   const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
   const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
 
-  let constructedEvent = {
+  return {
     start: fromData,
     end: toData,
     data: event.data,
@@ -192,10 +188,6 @@ const constructNewEvent = event => {
     status: "completed",
     key: eventKey
   };
-
-  console.log("Constructed event:", constructedEvent);
-
-  return constructedEvent;
 };
 
 /**

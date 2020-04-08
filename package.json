@@ -27,7 +27,7 @@
     "@vue/cli-service": "^4.1.0",
     "cross-env": "^6.0.3",
     "luxon": "^1.22.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "portal-vue": "^2.1.7",
     "rollup": "^1.27.13",
     "rollup-plugin-babel": "^4.3.3",

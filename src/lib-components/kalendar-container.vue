@@ -3,15 +3,15 @@
     class="kalendar-wrapper"
     :class="{
       'no-scroll': !scrollable,
-      gstyle: kalendar_options.style === 'material_design',
-      'day-view': kalendar_options.view_type === 'day'
+      gstyle: options.style === 'material_design',
+      'day-view': options.view_type === 'day'
     }"
     @touchstart="scrollable = false"
     @touchend="scrollable = true"
   >
     <div class="week-navigator">
-      <div class="nav-wrapper" v-if="kalendar_options.view_type === 'week'">
-        <button class="week-navigator-button" @click="previousWeek()">
+      <div class="nav-wrapper" v-if="options.view_type === 'week'">
+        <button class="week-navigator-button" @click="changeDay(-7)">
           <svg
             style="transform: rotate(180deg)"
             viewBox="0 0 24 24"
@@ -29,10 +29,10 @@
         </button>
         <div>
           <span>{{
-            kalendar_options.formatWeekNavigator(kalendar_options.current_day)
+            options.formatWeekNavigator(current_day)
           }}</span>
         </div>
-        <button class="week-navigator-button" @click="nextWeek()">
+        <button class="week-navigator-button" @click="changeDay(7)">
           <svg
             viewBox="0 0 24 24"
             width="24"
@@ -48,8 +48,8 @@
           </svg>
         </button>
       </div>
-      <div class="nav-wrapper" v-if="kalendar_options.view_type === 'day'">
-        <button class="week-navigator-button" @click="previousDay()">
+      <div class="nav-wrapper" v-if="options.view_type === 'day'">
+        <button class="week-navigator-button" @click="changeDay(-1)">
           <svg
             style="transform: rotate(180deg)"
             viewBox="0 0 24 24"
@@ -67,10 +67,10 @@
         </button>
         <div>
           <span>{{
-            kalendar_options.formatDayNavigator(kalendar_options.current_day)
+            options.formatDayNavigator(current_day)
           }}</span>
         </div>
-        <button class="week-navigator-button" @click="nextDay()">
+        <button class="week-navigator-button" @click="changeDay(1)">
           <svg
             viewBox="0 0 24 24"
             width="24"
@@ -87,7 +87,7 @@
         </button>
       </div>
     </div>
-    <kalendar-week-view />
+    <kalendar-week-view :current_day="current_day"/>
     <portal to="event-creation" class="slotable">
       <div slot-scope="information" class="creating-event">
         <slot name="creating-card" :event_information="information">
@@ -135,8 +135,10 @@
     <portal to="event-details" class="slotable">
       <div slot-scope="information" class="created-event">
         <slot name="created-card" :event_information="information">
-          <h4 style="margin-bottom: 5px">{{ information.title }}</h4>
-          <p>{{ information.description }}</p>
+          <h4 style="margin-bottom: 5px">{{ information.data }}</h4>
+          <p>
+            {{ information.start_time.substr(11,5) }} - {{ information.end_time.substr(11,5) }}
+          </p>
         </slot>
       </div>
     </portal>
@@ -144,33 +146,16 @@
 </template>
 <script>
 import Vue from "vue";
-import PortalVue from "portal-vue";
 
 import {
-  getHourlessDate,
-  generateUUID,
   addDays,
-  cloneObject,
+  getTime,
+  endOfWeek,
+  generateUUID,
   getDatelessHour,
-  startOfWeek,
-  endOfWeek
+  getHourlessDate,
+  startOfWeek
 } from "./utils.js";
-
-const crypto = window.crypto || window.msCrypto; // IE11 Polyfill
-
-const days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-
-// we are going to use web workers to do the heavy lifting
-// needed for our kalendar component to work and render correctly
-import myWorker from "@/lib-components/workers";
 
 export default {
   components: {
@@ -181,28 +166,23 @@ export default {
     events: {
       required: true,
       type: Array,
-      validator: function(val) {
-        return Array.isArray(val);
-      }
+      validator: val => Array.isArray(val),
     },
     // use this to enable/disable stuff which
     // are supported by Kalendar itself
     configuration: {
       type: Object,
       required: false,
-      validator: function(val) {
-        return typeof val === "object";
-      }
+      validator: val => typeof val === "object",
     }
   },
   data() {
-    let today = getHourlessDate();
     return {
-      default_options: {
-        dark: false,
+      current_day: getHourlessDate(),
+      options: {
         cell_height: 10,
         scrollToNow: false,
-        current_day: today,
+        start_day: getHourlessDate(),
         view_type: "week",
         style: "material_design",
         now: new Date(),
@@ -239,45 +219,38 @@ export default {
       scrollable: true
     };
   },
-  computed: {
-    kalendar_options() {
-      let options = this.default_options;
-      let provided_props = this.configuration;
-
-      let conditions = {
-        //dark: (val) => typeof val === 'boolean',
-        scrollToNow: val => typeof val === "boolean",
-        current_week: val => val === null,
-        current_day: val => !isNaN(Date.parse(val)),
-        view_type: val => ["week", "day"].includes(val),
-        cell_height: val => !isNaN(val),
-        style: val => ["material_design", "flat_design"].includes(val),
-        military_time: val => typeof val === "boolean",
-        read_only: val => typeof val === "boolean",
-        day_starts_at: val => {
-          return typeof val === "number" && val >= 0 && val <= 24;
-        },
-        day_ends_at: val => {
-          return typeof val === "number" && val >= 0 && val <= 24;
-        },
-        hide_dates: val => Array.isArray(val),
-        hide_days: val =>
-          Array.isArray(val) && !val.find(n => typeof n !== "number"),
-        overlap: val => typeof val === "boolean",
-        past_event_creation: val => typeof val === "boolean"
-      };
-      for (let key in provided_props) {
-        if (
-          conditions.hasOwnProperty(key) &&
-          conditions[key](provided_props[key])
-        ) {
-          options[key] = provided_props[key];
-        }
-      }
-      return options;
-    }
-  },
   created() {
+    const validations = {
+      scrollToNow: val => typeof val === "boolean",
+      start_day: val => !isNaN(Date.parse(val)),
+      view_type: val => ["week", "day"].includes(val),
+      cell_height: val => !isNaN(val),
+      style: val => ["material_design", "flat_design"].includes(val),
+      military_time: val => typeof val === "boolean",
+      read_only: val => typeof val === "boolean",
+      day_starts_at: val => typeof val === "number" && val >= 0 && val <= 24,
+      day_ends_at: val => typeof val === "number" && val >= 0 && val <= 24,
+      hide_dates: val => Array.isArray(val),
+      hide_days: val => Array.isArray(val) && !val.find(n => typeof n !== "number"),
+      overlap: val => typeof val === "boolean",
+      past_event_creation: val => typeof val === "boolean"
+    };
+
+    for (let [key, value] of Object.entries(this.configuration)) {
+      if (!validations.hasOwnProperty(key)) {
+        console.log(`Kalendar: Unknown configuration option ${key}`)
+        continue;
+      }
+      if (!validations[key](value)) {
+        console.log(`Kalendar: Invalid value for configuration option "${key}":\n  ${value}`)
+        // TODO - should we raise an error instead of continuing?
+        continue;
+      }
+      this.options[key] = value;
+    }
+
+    this.current_day = this.options.start_day;
+
     this.kalendar_events = this.events.map(event => ({
       ...event,
       id: event.id || generateUUID()
@@ -287,15 +260,14 @@ export default {
       Vue.prototype.$kalendar = {};
     }
 
-    this.$kalendar.getEvents = () => {
-      return this.kalendar_events.slice(0);
-    };
+    this.$kalendar.getEvents = () => this.kalendar_events.slice(0);
 
     this.$kalendar.updateEvents = payload => {
       this.kalendar_events = payload.map(event => ({
         ...event,
         id: event.id || generateUUID()
       }));
+
       this.$emit(
         "update:events",
         payload.map(event => ({
@@ -308,9 +280,9 @@ export default {
   },
   provide() {
     const provider = {};
-    Object.defineProperty(provider, "kalendar_options", {
+    Object.defineProperty(provider, "options", {
       enumerable: true,
-      get: () => this.kalendar_options
+      get: () => this.options
     });
     Object.defineProperty(provider, "kalendar_events", {
       enumerable: true,
@@ -319,77 +291,10 @@ export default {
     return provider;
   },
   methods: {
-    previousDay() {
-      let { current_day } = this.kalendar_options;
-      let target_day = addDays(current_day, -1);
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: target_day.toISOString()
-      };
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    nextDay() {
-      let { current_day } = this.kalendar_options;
-      let target_day = addDays(current_day, 1);
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: target_day.toISOString()
-      };
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    previousWeek() {
-      let { current_day } = this.kalendar_options;
-      let nextWeek = new Date(current_day);
-      nextWeek.setDate(nextWeek.getDate() - 7);
-      nextWeek.setUTCHours(0, 0, 0, 0);
-
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: nextWeek.toISOString()
-      };
-
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    nextWeek() {
-      let { current_day } = this.kalendar_options;
-      let nextWeek = new Date(current_day);
-      nextWeek.setDate(nextWeek.getDate() + 7);
-      nextWeek.setUTCHours(0, 0, 0, 0);
-
-      let config = cloneObject(this.configuration);
-      config = {
-        ...config,
-        current_day: nextWeek.toISOString()
-      };
-
-      this.$emit("update:configuration", config);
-      setTimeout(() => {
-        this.$kalendar.buildWeek();
-      });
-    },
-    getTime(date) {
-      let dateObj = new Date(date);
-      let minutes = dateObj
-        .getUTCHours()
-        .toString()
-        .padStart(2, 0);
-      let seconds = dateObj
-        .getUTCMinutes()
-        .toString()
-        .padStart(2, 0);
-      return `${minutes}:${seconds}`;
+    getTime,
+    changeDay(numDays) {
+      this.current_day = addDays(this.current_day, numDays).toISOString()
+      setTimeout(() => this.$kalendar.buildWeek());
     },
     addAppointment(popup_info) {
       let payload = {

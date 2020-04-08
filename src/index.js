@@ -8,6 +8,8 @@ const install = function installKalendarVue(Vue) {
 	Object.entries(components).forEach(([componentName, component]) => {
 		Vue.component(componentName, component);
 	});
+
+	Vue.prototype.$kalendar = {};
 };
 
 // Create module definition for Vue.use()
