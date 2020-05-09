@@ -40,7 +40,7 @@ import { isBefore, getLocaleTime, addTimezoneInfo } from "./utils.js";
 export default {
   props: ["event", "total", "index", "overlaps"],
   created() {},
-  inject: ["options"],
+  inject: ["kalendar_options"],
   data: () => ({
     inspecting: false,
     editing: false
@@ -64,7 +64,7 @@ export default {
     },
     distance() {
       if (!this.event) return;
-      let multiplier = this.options.cell_height / 10;
+      let multiplier = this.kalendar_options.cell_height / 10;
       // 0.5 * multiplier for an offset so next cell is easily selected
       return `${this.event.distance * multiplier - 0.2 * multiplier}px`;
     },
@@ -72,16 +72,24 @@ export default {
       return (this.event && this.event.status) || this.editing;
     },
     information() {
-      let {start, end, data, id, key} = this.event;
-      return {
+      let { start, end, data, id, key } = this.event;
+      let payload = {
         start_time: addTimezoneInfo(start.value),
         end_time: addTimezoneInfo(end.value),
         kalendar_id: id,
         key,
         data
       };
+      return payload;
     },
-  },
+    editEvent() {
+      this.$kalendar.closePopups();
+      this.editing = true;
+    },
+    closeEventPopup() {
+      this.editing = false;
+    }
+  }
 };
 </script>
 <style lang="scss">

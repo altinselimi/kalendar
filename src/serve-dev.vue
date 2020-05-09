@@ -217,6 +217,7 @@ export default {
 			this.$kalendar.addNewEvent(payload);
 		},
 		removeEvent(kalendarEvent) {
+			console.log('KalendarEvent', kalendarEvent);
 			let day = kalendarEvent.start_time.slice(0, 10);
 			this.$kalendar.removeEvent({
 				day,
