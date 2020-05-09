@@ -1,10 +1,13 @@
-import Vue from "vue";
-import Dev from "@/serve-dev.vue";
-import PortalVue from "portal-vue";
+import Vue from 'vue';
+import Dev from '@/serve-dev.vue';
+import Demo from '@/demo';
+import PortalVue from 'portal-vue';
 Vue.use(PortalVue);
 
 Vue.config.productionTip = false;
 
+const isDev = true; //process.env.NODE_ENV === 'development';
+
 new Vue({
-	render: h => h(Dev)
-}).$mount("#app");
+	render: h => h(isDev ? Dev : Demo),
+}).$mount('#app');
