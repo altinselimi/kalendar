@@ -117,7 +117,7 @@ import addManualEvent from './manual-event.vue';
 const _existing_events = [
     {
         from: '2019-07-10T04:00:00',
-        to: '2019-07-30T04:24:00',
+        to: '2019-07-10T04:24:00',
         data: {
             title: 'Wake Up',
             description: 'Or snooze as usual.',
@@ -125,7 +125,7 @@ const _existing_events = [
     },
     {
         from: '2019-07-11T10:22:00-07:00',
-        to: '2019-07-31T11:55:00-07:00',
+        to: '2019-07-11T11:55:00-07:00',
         data: {
             title: 'Eat an IceCream',
             description: 'Not more than 2. 10:22 SF Time.',
@@ -133,7 +133,7 @@ const _existing_events = [
     },
     {
         from: '2019-07-11T10:22:00-07:00',
-        to: '2019-07-31T11:20:00-07:00',
+        to: '2019-07-11T11:20:00-07:00',
         data: {
             title: 'Brunch with Friends - SF Time',
             description: 'Discuss existential crisis. 10:22 SF Time.',
@@ -141,7 +141,7 @@ const _existing_events = [
     },
     {
         from: '2019-07-11T16:22:00+02:00',
-        to: '2019-07-31T17:20:00+02:00',
+        to: '2019-07-11T17:20:00+02:00',
         data: {
             title: 'Running',
             description: 'Final Countdown',

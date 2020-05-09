@@ -119,6 +119,7 @@
                         type="text"
                         name="title"
                         placeholder="Title"
+                        style="width: 100%;"
                     />
                     <textarea
                         v-model="new_appointment['description']"
