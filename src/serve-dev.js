@@ -6,7 +6,7 @@ Vue.use(PortalVue);
 
 Vue.config.productionTip = false;
 
-const isDev = false; //process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 
 new Vue({
 	render: h => h(isDev ? Dev : Demo),
