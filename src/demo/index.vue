@@ -73,48 +73,6 @@
                         </svg>
                     </button>
                 </div>
-                <!-- CREATING CARD SLOT -->
-                <div slot="creating-card" slot-scope="{ event_information }">
-                    <h4 class="appointment-title" style="text-align: left;">
-                        New Appointment
-                    </h4>
-                    <span class="time">
-                        {{ event_information.start_time | formatToHours }}
-                        -
-                        {{ event_information.end_time | formatToHours }}
-                    </span>
-                </div>
-                <!-- POPUP CARD SLOT -->
-                <div
-                    slot="popup-form"
-                    slot-scope="{ popup_information }"
-                    style="display: flex; flex-direction: column;"
-                >
-                    <h4 style="margin-bottom: 10px">
-                        New Appointment
-                    </h4>
-                    <input
-                        v-model="new_appointment['title']"
-                        type="text"
-                        name="title"
-                        placeholder="Title"
-                    />
-                    <textarea
-                        v-model="new_appointment['description']"
-                        type="text"
-                        name="description"
-                        placeholder="Description"
-                        rows="2"
-                    ></textarea>
-                    <div class="buttons">
-                        <button class="cancel" @click="closePopups()">
-                            Cancel
-                        </button>
-                        <button @click="addAppointment(popup_information)">
-                            Save
-                        </button>
-                    </div>
-                </div>
             </kalendar>
         </div>
         <how-to></how-to>
@@ -159,7 +117,7 @@ import addManualEvent from './manual-event.vue';
 const _existing_events = [
     {
         from: '2019-07-10T04:00:00',
-        to: '2019-07-30T04:10:00',
+        to: '2019-07-30T04:24:00',
         data: {
             title: 'Wake Up',
             description: 'Or snooze as usual.',
