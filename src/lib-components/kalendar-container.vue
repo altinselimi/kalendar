@@ -194,6 +194,7 @@ export default {
             default_options: {
                 cell_height: 10,
                 scrollToNow: false,
+                hourlySelection: false,
                 start_day: getHourlessDate(),
                 view_type: 'week',
                 style: 'material_design',
@@ -241,6 +242,7 @@ export default {
 
             let conditions = {
                 scrollToNow: val => typeof val === 'boolean',
+                hourlySelection: val => typeof val === 'boolean',
                 start_day: val => !isNaN(Date.parse(val)),
                 view_type: val => ['week', 'day'].includes(val),
                 cell_height: val => !isNaN(val),
