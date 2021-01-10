@@ -103,8 +103,9 @@ export default {
           day: this.day.value,
           hourOptions: {
             start_hour: this.kalendar_options.day_starts_at,
-            end_hour: this.kalendar_options.day_ends_at
-          }
+            end_hour: this.kalendar_options.day_ends_at,
+          },
+            hourlySelection: this.kalendar_options.hourlySelection
         })
         .then(reply => {
           this.day_cells = reply;
@@ -280,7 +281,7 @@ export default {
       let startDate = new Date(starting_cell.value);
       let endDate = new Date(ending_cell.value);
 
-      let distance = diffMins + diffInHrs * 60;
+      let distance = diffMins + diffInHrs * (this.kalendar_options.hourlySelection ? 10 : 60);
 
       this.temporary_event = {
         start: {
@@ -335,7 +336,7 @@ export default {
           rounded: false,
           round_offset: null
         },
-        distance: diffMins + diffInHrs * 60,
+        distance: diffMins + diffInHrs * (this.kalendar_options.hourlySelection ? 10 : 60),
         status: "popup-initiated"
       };
 

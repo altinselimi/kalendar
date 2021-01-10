@@ -14,14 +14,13 @@ registerPromiseWorker(message => {
   if (type === "message") {
     return `Worker replies: ${new Date().toISOString()}`;
   }
-
   switch (type) {
     case "getDays":
       return getDays(data.day, data.options);
     case "getHours":
       return getHours(data.hourOptions);
     case "getDayCells":
-      return getDayCells(data.day, data.hourOptions);
+      return getDayCells(data.day, data.hourOptions, data.hourlySelection);
     case "constructDayEvents":
       return constructDayEvents(data.day, data.events);
     case "constructNewEvent":
@@ -83,18 +82,18 @@ function getHours(hour_options) {
   return hours;
 }
 
-const getDayCells = (dayString, day_options) => {
+const getDayCells = (dayString, day_options, hourlySelection) => {
   if (new Date(dayString).toISOString() !== dayString) {
     throw new Error("Unsupported dayString parameter provided");
   }
 
   let cells = [];
   let date_part = dayString.slice(0, 10);
-  let all_hours = hourUtils.getAllHours();
+  let all_hours = hourlySelection ? hourUtils.getFullHours() : hourUtils.getAllHours();
   if (day_options) {
     let { start_hour, end_hour } = day_options;
-    let start_index = start_hour * 6;
-    let end_index = end_hour * 6 + 1;
+    let start_index = start_hour * (hourlySelection ? 1 : 6);
+    let end_index = end_hour * (hourlySelection ? 1 : 6) + 1;
     all_hours = all_hours.slice(start_index, end_index);
   }
   for (let hourIdx = 0; hourIdx < all_hours.length; hourIdx++) {

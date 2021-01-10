@@ -167,6 +167,7 @@ export default {
 				view_type: 'week',
 				cell_height: 10,
 				scrollToNow: false,
+				hourlySelection: false,
 				//start_day: getCurrentDay(),
 				military_time: false,
 				read_only: false,
