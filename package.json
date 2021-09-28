@@ -1,6 +1,6 @@
 {
-    "name": "kalendar-vue",
-    "version": "2.1.1",
+    "name": "4smart-kalendar",
+    "version": "2.1.2",
     "description": "",
     "private": false,
     "main": "dist/index.js",
