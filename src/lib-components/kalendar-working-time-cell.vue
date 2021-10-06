@@ -3,7 +3,7 @@
         @mouseover.self="mouseMove()"
         @mousedown.self="mouseDown()"
         @mouseup="mouseUp()"
-        class="kalendar-cell"
+        class="kalendar-cell --work-time"
         :class="{
             'selected-work-time': isConstructed || isSelectedTemp,
             'is-an-hour': (index + 1) % 6 === 0, // у каждого шестого рисуем нижнию рамку для окончания часа
@@ -65,7 +65,10 @@ li {
 ul.building-blocks {
     li {
         z-index: 0;
-        border-bottom: dotted 1px var(--odd-cell-border-color);
+        
+        &.--work-time {
+            border-bottom: dotted 1px var(--green);
+        }
 
         &.first_of_appointment {
             z-index: 1;
@@ -85,7 +88,7 @@ ul.building-blocks {
         }
         
         &.selected-work-time {
-            background-color: darkseagreen;
+            background-color: var(--green);
         }
     }
 }
