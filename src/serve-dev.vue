@@ -1,7 +1,12 @@
 <template>
 	<div>
 		<button @click="addManually()">addManually</button>
-		<kalendar :configuration="calendar_settings" :events.sync="events">
+		<button @click="addWorkTime()">addWorkTime</button>
+		<kalendar 
+			:configuration="calendar_settings" 
+			:events.sync="events"
+			:work_time.sync="work_time"
+		>
 			<!-- CREATED CARD SLOT -->
 			<div
 				slot="created-card"
@@ -86,8 +91,8 @@
 <script>
 const _existing_events = [
 	{
-		from: '2019-07-10T04:00:00.300Z',
-		to: '2019-07-30T04:10:00.300Z',
+		from: '2021-10-07T04:00:00.300Z',
+		to: '2021-10-08T04:10:00.300Z',
 		data: {
 			title: 'Right now',
 			description: 'Lorem ipsum',
@@ -110,14 +115,19 @@ const _existing_events = [
 		},
 	},
 	{
-		from: '2019-07-11T10:22:00+02:00',
-		to: '2019-07-31T11:20:00+02:00',
+		from: '2019-07-11T10:22:00',
+		to: '2019-07-31T16:20:00',
 		data: {
 			title: 'Europe',
 			description: 'Final Countdown',
 		},
 	},
 ];
+
+const _existing_working_hours = {
+	'2021-10-05T07:20:00.000Z': '',
+	'2021-10-05T07:30:00.000Z': ''
+}
 
 let today = new Date();
 
@@ -163,16 +173,18 @@ export default {
 	data() {
 		return {
 			events: existing_events,
+			work_time: _existing_working_hours,
 			calendar_settings: {
 				view_type: 'week',
 				cell_height: 10,
 				scrollToNow: false,
 				//start_day: getCurrentDay(),
 				military_time: false,
+				working_hours: false,
 				read_only: false,
-				day_starts_at: 0,
+				day_starts_at: 7,
 				day_ends_at: 24,
-				overlap: true,
+				overlap: true, // перекрытие событий
 				hide_dates: ['2019-08-09'],
 				hide_days: [],
 				past_event_creation: true,
@@ -225,6 +237,10 @@ export default {
 				id: kalendarEvent.kalendar_id,
 			});
 		},
+		addWorkTime() {
+			this.calendar_settings.working_hours = !this.calendar_settings.working_hours
+			this.calendar_settings.read_only = !this.calendar_settings.read_only
+		}
 	},
 };
 </script>

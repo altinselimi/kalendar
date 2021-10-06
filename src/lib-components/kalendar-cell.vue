@@ -10,12 +10,9 @@
             'is-an-hour': (index + 1) % (60 / 10) === 0,
             'has-events': cell_events && cell_events.length > 0,
             'being-created': !!being_created || hasPopups,
+            'work-time': isConstructed,
         }"
-        :style="
-            `
-      height: ${kalendar_options.cell_height}px;
-    `
-        "
+        :style="`height: ${kalendar_options.cell_height}px;`"
     >
         <KalendarEvent
             :style="`z-index: 10`"
@@ -38,6 +35,7 @@ export default {
         'index',
         'cellData',
         'constructedEvents',
+        'constructedWorkHours',
         'temporaryEvent',
     ],
     inject: ['kalendar_options'],
@@ -65,8 +63,7 @@ export default {
         being_created() {
             return (
                 this.temporaryEvent &&
-                this.temporaryEvent.start.value === this.cellData.value &&
-                this.temporaryEvent
+                this.temporaryEvent.start.value === this.cellData.value
             );
         },
         overlappingEvents() {
@@ -94,6 +91,9 @@ export default {
                 !!this.cell_events.find(ev => ev.status === 'popup-initiated')
             );
         },
+        isConstructed() {
+            return this.cellData.value in this.constructedWorkHours
+        },
     },
     methods: {
         mouseDown() {
@@ -108,6 +108,7 @@ export default {
                 overlap,
                 past_event_creation,
             } = this.kalendar_options;
+            
             if (read_only) return;
 
             // if past_event_creation is set to false, check if cell value is
@@ -146,8 +147,11 @@ export default {
         mouseMove() {
             // same guards like in the mouseDown function
             let { read_only, overlap } = this.kalendar_options;
+            
             if (read_only) return;
+            
             if (this.creator && !this.creator.creating) return;
+            
             let {
                 starting_cell,
                 original_starting_cell,
@@ -215,6 +219,10 @@ ul.building-blocks {
 
         &.being-created {
             z-index: 11;
+        }
+
+        &.work-time {
+            background-color: var(--current-day-color);
         }
     }
 }
