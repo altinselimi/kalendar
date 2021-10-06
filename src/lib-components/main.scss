@@ -32,6 +32,8 @@
             'Segoe UI', Arial, sans-serif;
 
         .week-navigator {
+            display: flex;
+            justify-content: space-between;
             background: white;
             border-bottom: none;
             padding: 20px;
@@ -268,9 +270,6 @@
         align-items: center;
         justify-content: space-between;
         font-size: 22px;
-        width: 25ch;
-        max-width: 30ch;
-        margin: 0 auto;
 
         span {
             white-space: nowrap;
@@ -280,13 +279,12 @@
     button {
         background: transparent;
         border: none;
-        padding: 0px;
+        padding: 5px 0 0;
         display: inline-flex;
-        margin: 0px 10px;
+        margin: 0 10px;
         color: #ec4d3d;
         align-items: center;
         font-size: 14px;
-        padding-bottom: 5px;
     }
 }
 
@@ -350,4 +348,10 @@ ul.kalendar-day li.kalendar-cell:last-child {
             stroke: var(--main-color);
         }
     }
+}
+.kalendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }

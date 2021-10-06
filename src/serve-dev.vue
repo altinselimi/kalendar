@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<button @click="addManually()">addManually</button>
-		<button @click="addWorkTime()">addWorkTime</button>
 		<kalendar 
 			:configuration="calendar_settings" 
 			:events.sync="events"
@@ -84,6 +83,9 @@
 						Save
 					</button>
 				</div>
+			</div>
+			<div slot="workTimeEdit">
+				<button @click="addWorkTime()">addWorkTime</button>
 			</div>
 		</kalendar>
 	</div>
