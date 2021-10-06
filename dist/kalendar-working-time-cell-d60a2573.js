@@ -1,4 +1,4 @@
-import { d as __vue_normalize__, e as __vue_create_injector__ } from './index-a415e6b0.js';
+import { d as __vue_normalize__, e as __vue_create_injector__ } from './index-a4cbd4fe.js';
 import 'vue';
 
 //
@@ -55,7 +55,7 @@ var __vue_render__ = function __vue_render__() {
   var _c = _vm._self._c || _h;
 
   return _c('li', {
-    staticClass: "kalendar-cell",
+    staticClass: "kalendar-cell --work-time",
     class: {
       'selected-work-time': _vm.isConstructed || _vm.isSelectedTemp,
       'is-an-hour': (_vm.index + 1) % 6 === 0 // у каждого шестого рисуем нижнию рамку для окончания часа
@@ -89,8 +89,8 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-6fc2aa86_0", {
-    source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0;border-bottom:dotted 1px var(--odd-cell-border-color)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.selected-work-time{background-color:#8fbc8f}",
+  inject("data-v-02b22f5a_0", {
+    source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0}ul.building-blocks li.--work-time{border-bottom:dotted 1px var(--green)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.selected-work-time{background-color:var(--green)}",
     map: undefined,
     media: undefined
   });
