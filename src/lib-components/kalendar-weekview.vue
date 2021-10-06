@@ -57,7 +57,7 @@
           <span class="time-value">{{ passedTime.value }}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days
+        <kalendar-day
           :day="day"
           class="building-blocks"
           :class="`day-${index + 1}`"
@@ -66,13 +66,13 @@
           :passed-time="passedTime.distance"
           :ref="day.value.slice(0, 10)"
         >
-        </kalendar-days>
+        </kalendar-day>
       </div>
     </div>
   </div>
 </template>
 <script>
-import KalendarDays from "./kalendar-day.vue";
+import KalendarDay from "./kalendar-day.vue";
 import myWorker from "@/lib-components/workers";
 import {
   isBefore,
@@ -91,14 +91,14 @@ export default {
     }
   },
   components: {
-    KalendarDays
+    KalendarDay
   },
   created() {
     this.addHelperMethods();
     setInterval(() => (this.kalendar_options.now = new Date()), 1000 * 60);
     this.constructWeek();
   },
-  inject: ["kalendar_options", "kalendar_events"],
+  inject: ["kalendar_options", "kalendar_events", "kalendar_work_hours"],
   data: () => ({
     hours: null,
     days: []

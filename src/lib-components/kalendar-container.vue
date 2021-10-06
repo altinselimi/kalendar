@@ -178,6 +178,13 @@ export default {
                 return Array.isArray(val);
             },
         },
+        work_time: {
+            required: true,
+            type: Object,
+            validator: function(val) {
+                return typeof val === "object"
+            },
+        },
         // use this to enable/disable stuff which
         // are supported by Kalendar itself
         configuration: {
@@ -199,11 +206,12 @@ export default {
                 style: 'material_design',
                 now: new Date(),
                 military_time: true,
+                working_hours: true,
                 read_only: false,
                 day_starts_at: 0,
                 day_ends_at: 24,
                 time_mode: 'relative',
-                overlap: true,
+                overlap: true, // перекрытие событий
                 past_event_creation: true,
                 formatLeftHours: date => {
                     return getDatelessHour(
@@ -230,6 +238,7 @@ export default {
                 },
             },
             kalendar_events: null,
+            kalendar_work_hours: null,
             new_appointment: {},
             scrollable: true,
         };
@@ -246,6 +255,7 @@ export default {
                 cell_height: val => !isNaN(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
+                working_hours: val => typeof val === 'boolean',
                 read_only: val => typeof val === 'boolean',
                 day_starts_at: val =>
                     typeof val === 'number' && val >= 0 && val <= 24,
@@ -274,13 +284,14 @@ export default {
             ...event,
             id: event.id || generateUUID(),
         }));
+        
+        this.kalendar_work_hours = {...this.work_time};
 
         if (!this.$kalendar) {
             Vue.prototype.$kalendar = {};
         }
 
         this.$kalendar.getEvents = () => this.kalendar_events.slice(0);
-
         this.$kalendar.updateEvents = payload => {
             this.kalendar_events = payload.map(event => ({
                 ...event,
@@ -295,6 +306,28 @@ export default {
                 }))
             );
         };
+
+        this.$kalendar.getWorkHours = () => {
+            return {...this.kalendar_work_hours}
+        };
+        this.$kalendar.updateWorkHours = payload => {
+            this.kalendar_work_hours = {
+                ...this.kalendar_work_hours,
+                ...payload
+            };
+            this.$emit(
+              'update:work_time',
+              this.kalendar_work_hours
+            );
+        };
+        this.$kalendar.removeWorkHours = payload => {
+            delete this.kalendar_work_hours[payload]
+            
+            this.$emit(
+              'update:work_time',
+              this.kalendar_work_hours
+            );
+        };
     },
     provide() {
         const provider = {};
@@ -305,6 +338,10 @@ export default {
         Object.defineProperty(provider, 'kalendar_events', {
             enumerable: true,
             get: () => this.kalendar_events,
+        });
+        Object.defineProperty(provider, 'kalendar_work_hours', {
+            enumerable: true,
+            get: () => this.kalendar_work_hours,
         });
         return provider;
     },
