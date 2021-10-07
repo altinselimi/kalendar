@@ -1,19 +1,6 @@
-import { d as __vue_normalize__, e as __vue_create_injector__ } from './index-a4cbd4fe.js';
+import { k as getTime, d as __vue_normalize__, e as __vue_create_injector__ } from './index-577c8574.js';
 import 'vue';
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 var script = {
   props: ['creatingWorkTime', 'index', 'cellData', 'constructedWorkHours', 'temporaryWorkHours'],
@@ -27,6 +14,7 @@ var script = {
     }
   },
   methods: {
+    getTime: getTime,
     mouseDown: function mouseDown() {
       this.$emit('selectWorkHours', this.cellData.value);
     },
@@ -81,7 +69,7 @@ var __vue_render__ = function __vue_render__() {
         return _vm.mouseUp();
       }
     }
-  });
+  }, [_vm._v("\n    " + _vm._s(_vm.getTime(_vm.cellData.value)) + "\n")]);
 };
 
 var __vue_staticRenderFns__ = [];
@@ -89,8 +77,8 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-02b22f5a_0", {
-    source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0}ul.building-blocks li.--work-time{border-bottom:dotted 1px var(--green)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.selected-work-time{background-color:var(--green)}",
+  inject("data-v-7bdb2578_0", {
+    source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0}ul.building-blocks li.--work-time{justify-content:flex-end;font-size:8px;color:#dddada;user-select:none}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.selected-work-time{background:#7afFD766;color:#fff}",
     map: undefined,
     media: undefined
   });
