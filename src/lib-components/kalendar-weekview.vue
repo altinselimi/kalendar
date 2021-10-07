@@ -46,7 +46,9 @@
             v-for="(hour, index) in hoursVisible"
             :style="`height:${hourHeight}px`"
           >
-            <span>{{ kalendar_options.formatLeftHours(hour.value) }}</span>
+            <span>
+              {{ kalendar_options.formatLeftHours(hour.value) }}
+            </span>
           </li>
         </ul>
         <div
@@ -249,7 +251,6 @@ $theme-color: #e5e5e5;
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color: white;
 
   .days {
     margin: 0px;
@@ -386,7 +387,7 @@ $theme-color: #e5e5e5;
     }
 
     &:first-child span {
-      visibility: hidden;
+      // visibility: hidden;
     }
   }
 }

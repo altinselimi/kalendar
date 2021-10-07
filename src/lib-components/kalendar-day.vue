@@ -465,7 +465,6 @@ ul.kalendar-day {
   
   &:hover {
     background: rgba(#2089FF, .1);
-    cursor: pointer;
   }
 
   &.is-weekend {

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<button @click="addManually()">addManually</button>
+		<button @click="addManually()" v-if="false">addManually</button>
 		<kalendar 
 			:configuration="calendar_settings" 
 			:events.sync="events"

@@ -10,10 +10,11 @@
         }"
         :style="`height: ${kalendar_options.cell_height}px;`"
     >
+        {{ getTime(cellData.value) }}
     </li>
 </template>
 <script>
-
+import { getTime } from './utils.js';
 export default {
     props: [
         'creatingWorkTime',
@@ -32,6 +33,7 @@ export default {
       }
     },
     methods: {
+        getTime,
         mouseDown() {
             this.$emit('selectWorkHours', this.cellData.value);
         },
@@ -67,7 +69,11 @@ ul.building-blocks {
         z-index: 0;
         
         &.--work-time {
-            border-bottom: dotted 1px var(--green);
+            justify-content: flex-end;
+            font-size: 8px;
+            color: #dddada;
+            // border-bottom: dotted 1px var(--green);
+            user-select: none;
         }
 
         &.first_of_appointment {
@@ -88,7 +94,8 @@ ul.building-blocks {
         }
         
         &.selected-work-time {
-            background-color: var(--green);
+            background: #7AFFD766;
+            color: #fff;
         }
     }
 }

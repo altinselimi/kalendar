@@ -63,7 +63,8 @@ export default {
         being_created() {
             return (
                 this.temporaryEvent &&
-                this.temporaryEvent.start.value === this.cellData.value
+                this.temporaryEvent.start.value === this.cellData.value &&
+                this.temporaryEvent
             );
         },
         overlappingEvents() {
@@ -222,7 +223,7 @@ ul.building-blocks {
         }
 
         &.work-time {
-            background-color: var(--current-day-color);
+            background-color: #7AFFD766;
         }
     }
 }

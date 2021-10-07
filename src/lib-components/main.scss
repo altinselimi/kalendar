@@ -9,7 +9,7 @@
 
     --main-color: #ec4d3d;
     --weekend-color: #f7f7f7;
-    --current-day-color: #eeffef;
+    --current-day-color: #7AFFD7;
     --table-cell-border-color: #e5e5e5;
     --odd-cell-border-color: #e5e5e5;
     --hour-row-color: inherit;
@@ -123,7 +123,6 @@
         }
 
         .days {
-            border-top: solid 1px var(--table-cell-border-color);
             position: relative;
 
             &:before {
@@ -133,7 +132,7 @@
                 width: 55px;
                 left: 0;
                 bottom: 0;
-                background-color: var(--table-cell-border-color);
+                // background-color: var(--table-cell-border-color);
             }
         }
 
@@ -143,8 +142,8 @@
             align-items: center;
             color: var(--dark);
             font-size: 13px;
-            padding-left: 0px;
-            border-right: solid 1px var(--table-cell-border-color);
+            padding-left: 0;
+            background: #fff;
 
             > div {
                 display: flex;
@@ -157,13 +156,13 @@
             }
 
             .number-date {
-                margin-left: 0px;
-                margin-right: 0px;
+                margin-left: 0;
+                margin-right: 0;
                 order: 2;
-                font-size: 25px;
-                font-weight: 500;
-                width: 46px;
-                height: 46px;
+                font-size: 18px;
+                font-weight: 600;
+                width: 32px;
+                height: 32px;
                 border-radius: 100%;
                 align-items: center;
                 justify-content: center;
@@ -202,7 +201,7 @@
                     top: 0;
                     width: 1px;
                     height: 100%;
-                    background-color: var(--table-cell-border-color);
+                    // background-color: var(--table-cell-border-color);
                 }
             }
         }
