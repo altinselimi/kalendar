@@ -96,7 +96,13 @@
             </div>
             <slot name="workTimeEdit"></slot>
         </div>
-        <kalendar-week-view :current_day="current_day" />
+        <div class="b-scroll-container" :style="{ height: kalendar_options.height }">
+            <scroll-container>
+                <kalendar-week-view a
+                  :current_day="current_day" 
+                />
+            </scroll-container>
+        </div>
         <portal to="event-creation" class="slotable">
             <div slot-scope="information" class="creating-event">
                 <slot name="creating-card" :event_information="information">
@@ -171,6 +177,7 @@ import {
 export default {
     components: {
         KalendarWeekView: () => import('./kalendar-weekview.vue'),
+        ScrollContainer: () => import('./scroll-container.vue'),
     },
     props: {
         // this provided array will be kept in sync
@@ -204,6 +211,7 @@ export default {
             default_options: {
                 cell_height: 10,
                 scrollToNow: false,
+                height: '80vh',
                 start_day: getHourlessDate(),
                 view_type: 'week',
                 style: 'material_design',
@@ -256,6 +264,7 @@ export default {
                 start_day: val => !isNaN(Date.parse(val)),
                 view_type: val => ['week', 'day'].includes(val),
                 cell_height: val => !isNaN(val),
+                height: val => !isNaN(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
                 working_hours: val => typeof val === 'boolean',
@@ -380,4 +389,6 @@ export default {
     },
 };
 </script>
-<style lang="scss" src="./main.scss"></style>
+<style lang="scss">
+    @import "./main.scss";
+</style>
