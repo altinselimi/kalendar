@@ -156,6 +156,21 @@ const formatAMPM = date => {
   return result;
 };
 
+const getFormattedWeekDayTime = (locale, date) => {
+  const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+  return formatter.format(date)
+};
+
+const getFormattedMonth = (locale, date) => {
+  const formatter = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' })
+  return formatter.format(date)
+};
+
+const getFormattedTime = (locale, date) => {
+  const formatter = new Intl.DateTimeFormat(locale, { timeStyle: 'short' })
+  return formatter.format(date)
+};
+
 export {
   addDays,
   addMinutes,
@@ -175,4 +190,7 @@ export {
   isWeekend,
   formatAMPM,
   getTime,
+  getFormattedWeekDayTime,
+  getFormattedMonth,
+  getFormattedTime,
 };

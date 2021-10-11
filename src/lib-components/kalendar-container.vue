@@ -169,9 +169,12 @@ import {
     getTime,
     endOfWeek,
     generateUUID,
-    getDatelessHour,
+    addTimezoneInfo,
     getHourlessDate,
     startOfWeek,
+    getFormattedWeekDayTime,
+    getFormattedMonth,
+    getFormattedTime
 } from './utils.js';
 
 export default {
@@ -225,22 +228,22 @@ export default {
                 overlap: true, // перекрытие событий
                 past_event_creation: true,
                 formatLeftHours: date => {
-                    return getDatelessHour(
-                        date,
-                        this.configuration.military_time
-                    );
+                    let isoDate = new Date(addTimezoneInfo(date));
+                    return getFormattedTime(this.locale, isoDate)
                 },
                 formatDayTitle: date => {
                     let isoDate = new Date(date);
-                    let dayName = isoDate.toUTCString().slice(0, 3);
+                    let dayName = getFormattedWeekDayTime(this.locale, isoDate).split(',')[0];
                     let dayNumber = isoDate.getUTCDate();
                     return [dayName, dayNumber];
                 },
                 formatWeekNavigator: isoDate => {
                     let startDate = startOfWeek(isoDate);
                     let endDate = endOfWeek(isoDate);
-                    let startString = startDate.toUTCString().slice(5, 11);
-                    let endString = endDate.toUTCString().slice(5, 11);
+                    let startString = getFormattedMonth(this.locale, startDate);
+                    let endString = getFormattedMonth(this.locale, endDate);
+                    
+                    console.log(getFormattedMonth(this.locale, endDate))
                     return `${startString} - ${endString}`;
                 },
                 formatDayNavigator: isoDate => {
@@ -252,6 +255,12 @@ export default {
             kalendar_work_hours: null,
             new_appointment: {},
             scrollable: true,
+            locale: (() => {
+                // If not running in the browser, cannot determine a default, return the code for unknown (blank is invalid)
+                if (typeof navigator === "undefined") return "unk"
+                // Return the browser's language setting, implementation is browser-specific
+                return (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language).toLowerCase()
+            })(),
         };
     },
     computed: {
@@ -264,7 +273,7 @@ export default {
                 start_day: val => !isNaN(Date.parse(val)),
                 view_type: val => ['week', 'day'].includes(val),
                 cell_height: val => !isNaN(val),
-                height: val => !this.isString(val),
+                height: val => this.isString(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
                 working_hours: val => typeof val === 'boolean',

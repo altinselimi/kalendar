@@ -10,7 +10,7 @@
         }"
         :style="`height: ${kalendar_options.cell_height}px;`"
     >
-        {{ getTime(cellData.value) }}
+        <span>{{ getTime(cellData.value) }}</span>
     </li>
 </template>
 <script>
@@ -71,7 +71,7 @@ ul.building-blocks {
         &.--work-time {
             justify-content: flex-end;
             font-size: 8px;
-            color: #dddada;
+            color: #000;
             // border-bottom: dotted 1px var(--green);
             user-select: none;
         }
@@ -95,7 +95,19 @@ ul.building-blocks {
         
         &.selected-work-time {
             background: #7AFFD766;
-            color: #fff;
+        }
+        
+        > span {
+            display: none;
+        }
+        
+        &:hover {
+            border-bottom: 1px solid #000;
+            span {
+                text-align: right;
+                display: block;
+                padding-bottom: 5px;
+            }
         }
     }
 }
