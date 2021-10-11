@@ -264,7 +264,7 @@ export default {
                 start_day: val => !isNaN(Date.parse(val)),
                 view_type: val => ['week', 'day'].includes(val),
                 cell_height: val => !isNaN(val),
-                height: val => !isString(val),
+                height: val => !this.isString(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
                 working_hours: val => typeof val === 'boolean',
@@ -386,6 +386,9 @@ export default {
         closePopups() {
             this.$kalendar.closePopups();
         },
+        isString(val) {
+            return (typeof val === "string" || val instanceof String);
+        }
     },
 };
 </script>
