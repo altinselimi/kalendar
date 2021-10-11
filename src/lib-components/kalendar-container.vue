@@ -211,7 +211,7 @@ export default {
             default_options: {
                 cell_height: 10,
                 scrollToNow: false,
-                height: '80vh',
+                height: 'calc(100vh - 100px)',
                 start_day: getHourlessDate(),
                 view_type: 'week',
                 style: 'material_design',
@@ -264,7 +264,7 @@ export default {
                 start_day: val => !isNaN(Date.parse(val)),
                 view_type: val => ['week', 'day'].includes(val),
                 cell_height: val => !isNaN(val),
-                height: val => !isNaN(val),
+                height: val => !isString(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
                 working_hours: val => typeof val === 'boolean',
