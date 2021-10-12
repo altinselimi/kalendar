@@ -1,4 +1,4 @@
-import { k as getTime, d as __vue_normalize__, e as __vue_create_injector__ } from './index-1d13dd00.js';
+import { k as getTime, d as __vue_normalize__, e as __vue_create_injector__ } from './index-2753e69d.js';
 import 'vue';
 
 //
@@ -77,8 +77,8 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-5f1d3f90_0", {
-    source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0}ul.building-blocks li.--work-time{justify-content:flex-end;font-size:8px;color:#000;user-select:none}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.selected-work-time{background:#7afFD766}ul.building-blocks li>span{display:none}ul.building-blocks li:hover{border-bottom:1px solid #000}ul.building-blocks li:hover span{text-align:right;display:block;padding-bottom:5px}",
+  inject("data-v-4e6cfde0_0", {
+    source: "li[data-v-4e6cfde0]{font-size:13px;position:relative}.created-events[data-v-4e6cfde0]{height:100%}ul.building-blocks li[data-v-4e6cfde0]{z-index:0}ul.building-blocks li.--work-time[data-v-4e6cfde0]{justify-content:flex-end;font-size:9px;color:var(--main-color);user-select:none;font-weight:700}ul.building-blocks li.first_of_appointment[data-v-4e6cfde0]{z-index:1;opacity:1}ul.building-blocks li.is-an-hour[data-v-4e6cfde0]{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events[data-v-4e6cfde0]{z-index:unset}ul.building-blocks li.being-created[data-v-4e6cfde0]{z-index:11}ul.building-blocks li.selected-work-time[data-v-4e6cfde0]{background:#7afFD766}ul.building-blocks li>span[data-v-4e6cfde0]{display:none}ul.building-blocks li[data-v-4e6cfde0]:hover{border-bottom:1px solid var(--main-color)}ul.building-blocks li:hover span[data-v-4e6cfde0]{text-align:right;display:block;padding-bottom:5px}",
     map: undefined,
     media: undefined
   });
@@ -86,7 +86,7 @@ var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__ = undefined;
+var __vue_scope_id__ = "data-v-4e6cfde0";
 /* module identifier */
 
 var __vue_module_identifier__ = undefined;

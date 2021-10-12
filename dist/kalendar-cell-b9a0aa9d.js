@@ -1,4 +1,4 @@
-import { g as getLocaleTime, c as cloneObject, b as _objectSpread2, d as __vue_normalize__, e as __vue_create_injector__ } from './index-1d13dd00.js';
+import { g as getLocaleTime, c as cloneObject, b as _objectSpread2, d as __vue_normalize__, e as __vue_create_injector__ } from './index-2753e69d.js';
 import 'vue';
 
 var script = {
@@ -6,7 +6,7 @@ var script = {
   inject: ['kalendar_options'],
   components: {
     KalendarEvent: function KalendarEvent() {
-      return import('./kalendar-event-9b5acab0.js');
+      return import('./kalendar-event-b2c4270d.js');
     }
   },
   computed: {
@@ -81,6 +81,8 @@ var script = {
         }
       } // if overlap is set to false, prevent selection on top of
       // other events
+
+
       if (!overlap && this.cell_events.length > 0) return; // close any open popups in the whole kalendar instance
       // before starting a new one
 
@@ -195,7 +197,7 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-5d4dab30_0", {
+  inject("data-v-6759440b_0", {
     source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0;border-bottom:dotted 1px var(--odd-cell-border-color)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.work-time{background-color:#7afFD766}",
     map: undefined,
     media: undefined

@@ -1,4 +1,4 @@
-import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-1d13dd00.js';
+import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-2753e69d.js';
 import 'vue';
 
 function PromiseWorker (worker) {
@@ -115,7 +115,15 @@ var myWorker = {
 };
 
 var script = {
-  props: ["day", "passedTime"],
+  props: {
+    'day': {},
+    'passedTime': {},
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: function _default() {}
+    }
+  },
   created: function created() {
     // get and render day cells
     // and then render any event
@@ -124,10 +132,10 @@ var script = {
   },
   components: {
     kalendarCell: function kalendarCell() {
-      return import('./kalendar-cell-dff61994.js');
+      return import('./kalendar-cell-b9a0aa9d.js');
     },
     kalendarWorkingTimeCell: function kalendarWorkingTimeCell() {
-      return import('./kalendar-working-time-cell-22ed778d.js');
+      return import('./kalendar-working-time-cell-8ce7e1fc.js');
     }
   },
   provide: function provide() {
@@ -139,7 +147,7 @@ var script = {
     };
   },
   // inject kalendar options from parent component
-  inject: ["kalendar_options"],
+  inject: ['kalendar_options'],
   mounted: function mounted() {
     if (this.kalendar_options.scrollToNow && this.isToday) this.scrollView();
   },
@@ -149,6 +157,11 @@ var script = {
     },
     isToday: function isToday$1() {
       return isToday(this.day.value);
+    }
+  },
+  watch: {
+    kalendar_work_hours: function kalendar_work_hours(value) {
+      this.day_work_hours = value;
     }
   },
   data: function data() {
@@ -587,7 +600,7 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-cc96e8cc_0", {
+  inject("data-v-a6f6feae_0", {
     source: "ul.kalendar-day{position:relative;background-color:#fff}ul.kalendar-day:hover{background:rgba(32,137,255,.1)}ul.kalendar-day.is-weekend{background-color:var(--weekend-color)}ul.kalendar-day.is-today{border-left:1px solid var(--main-color)}ul.kalendar-day .clear{position:absolute;z-index:1;top:-20px;right:0;font-size:10px}ul.kalendar-day.creating{z-index:11}ul.kalendar-day.creating .created-event{pointer-events:none}",
     map: undefined,
     media: undefined
@@ -621,6 +634,11 @@ var script$1 = {
       validator: function validator(d) {
         return !isNaN(Date.parse(d));
       }
+    },
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: function _default() {}
     }
   },
   components: {
@@ -635,7 +653,7 @@ var script$1 = {
     }, 1000 * 60);
     this.constructWeek();
   },
-  inject: ["kalendar_options", "kalendar_events", "kalendar_work_hours"],
+  inject: ["kalendar_options", "kalendar_events"],
   data: function data() {
     return {
       hours: null,
@@ -862,7 +880,8 @@ var __vue_render__$1 = function __vue_render__() {
       class: "day-" + (index + 1),
       attrs: {
         "day": day,
-        "passed-time": _vm.passedTime.distance
+        "passed-time": _vm.passedTime.distance,
+        "kalendar_work_hours": _vm.kalendar_work_hours
       }
     });
   })], 2)]) : _vm._e()]);
@@ -873,8 +892,8 @@ var __vue_staticRenderFns__$1 = [];
 
 var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-3196e71e_0", {
-    source: ".calendar-wrap{display:flex;flex-direction:column}.calendar-wrap ul{list-style:none;padding:0}.calendar-wrap ul>li{display:flex}.sticky-top{position:sticky;top:0;z-index:20}.sticky-top .days{margin:0;display:flex;margin-left:55px}.sticky-top .days li{display:inline-flex;align-items:flex-end;padding-top:10px;flex:1;font-size:1.1rem;color:#666;font-weight:300;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5;padding-bottom:5px;position:relative;font-size:18px}.sticky-top .days li span{margin-right:3px}.sticky-top .days li span:first-child{font-size:20px;font-weight:500}.sticky-top .days .today{border-bottom-color:var(--main-color);color:var(--main-color)!important}.sticky-top .days .today::after{content:\"\";position:absolute;height:2px;bottom:0;left:0;width:100%;background-color:var(--main-color)}.sticky-top .all-day{display:flex;margin-bottom:0;margin-top:0;border-bottom:solid 2px #e5e5e5}.sticky-top .all-day span{display:flex;align-items:center;padding:0 5px;width:55px;font-weight:500;font-size:.8rem;color:#b8bbca;text-transform:lowercase}.sticky-top .all-day li{flex:1;margin-right:var(--space-between-cols)}.sticky-top .all-day li.all-today{background-color:#fef4f4}.dummy-row{display:flex;padding-left:55px}.dummy-row ul{display:flex;flex:1;margin:0}.dummy-row li{flex:1;height:15px;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5}.blocks{display:flex;position:relative;height:100%}.blocks ul{margin-top:0}.blocks .building-blocks{flex:1;margin-right:var(--space-between-cols);margin-bottom:0;display:flex;flex-direction:column}.blocks .calendar-blocks{width:100%;display:flex;position:relative}.hours{display:flex;flex-direction:column;color:#b8bbca;font-weight:500;font-size:.85rem;width:55px;height:100%;margin-bottom:0}.hours li{color:var(--hour-row-color);border-bottom:solid 1px transparent;padding-left:8px}.hours li span{margin-top:-8px}",
+  inject("data-v-102d4fe7_0", {
+    source: ".calendar-wrap{display:flex;flex-direction:column}.calendar-wrap ul{list-style:none;padding:0}.calendar-wrap ul>li{display:flex}.sticky-top{position:sticky;top:0;z-index:20;background:#fff}.sticky-top .days{margin:0;display:flex;margin-left:55px}.sticky-top .days li{display:inline-flex;align-items:flex-end;padding-top:10px;flex:1;font-size:1.1rem;color:#666;font-weight:300;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5;padding-bottom:5px;position:relative;font-size:18px}.sticky-top .days li span{margin-right:3px}.sticky-top .days li span:first-child{font-size:20px;font-weight:500}.sticky-top .days .today{border-bottom-color:var(--main-color);color:var(--main-color)!important}.sticky-top .days .today::after{content:\"\";position:absolute;height:2px;bottom:0;left:0;width:100%;background-color:var(--main-color)}.sticky-top .all-day{display:flex;margin-bottom:0;margin-top:0;border-bottom:solid 2px #e5e5e5}.sticky-top .all-day span{display:flex;align-items:center;padding:0 5px;width:55px;font-weight:500;font-size:.8rem;color:#b8bbca;text-transform:lowercase}.sticky-top .all-day li{flex:1;margin-right:var(--space-between-cols)}.sticky-top .all-day li.all-today{background-color:#fef4f4}.dummy-row{display:flex;padding-left:55px}.dummy-row ul{display:flex;flex:1;margin:0}.dummy-row li{flex:1;height:15px;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5}.blocks{display:flex;position:relative;height:100%}.blocks ul{margin-top:0}.blocks .building-blocks{flex:1;margin-right:var(--space-between-cols);margin-bottom:0;display:flex;flex-direction:column}.blocks .calendar-blocks{width:100%;display:flex;position:relative}.hours{display:flex;flex-direction:column;color:#b8bbca;font-weight:500;font-size:.85rem;width:55px;height:100%;margin-bottom:0}.hours li{color:var(--hour-row-color);border-bottom:solid 1px transparent;padding-left:8px}.hours li span{margin-top:-8px}.hours li:first-child span{padding-top:5px}",
     map: undefined,
     media: undefined
   });
