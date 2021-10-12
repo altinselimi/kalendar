@@ -67,6 +67,7 @@
           v-for="(day, index) in days"
           :passed-time="passedTime.distance"
           :ref="day.value.slice(0, 10)"
+          :kalendar_work_hours="kalendar_work_hours"
         >
         </kalendar-day>
       </div>
@@ -90,6 +91,11 @@ export default {
       required: true,
       type: String,
       validator: d => !isNaN(Date.parse(d)),
+    },
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: () => {}
     }
   },
   components: {
@@ -100,7 +106,7 @@ export default {
     setInterval(() => (this.kalendar_options.now = new Date()), 1000 * 60);
     this.constructWeek();
   },
-  inject: ["kalendar_options", "kalendar_events", "kalendar_work_hours"],
+  inject: ["kalendar_options", "kalendar_events"],
   data: () => ({
     hours: null,
     days: []
@@ -251,6 +257,7 @@ $theme-color: #e5e5e5;
   position: sticky;
   top: 0;
   z-index: 20;
+  background: #fff;
 
   .days {
     margin: 0px;
@@ -387,7 +394,7 @@ $theme-color: #e5e5e5;
     }
 
     &:first-child span {
-      // visibility: hidden;
+      padding-top: 5px;
     }
   }
 }

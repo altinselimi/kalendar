@@ -124,7 +124,6 @@ export default {
 
             // if overlap is set to false, prevent selection on top of
             // other events
-            console.log('Cell events:', this.cell_events.length);
             if (!overlap && this.cell_events.length > 0) return;
 
             // close any open popups in the whole kalendar instance

@@ -60,7 +60,19 @@ import { isToday, isWeekend, cloneObject, getLocaleTime } from "./utils";
 import myWorker from "@/lib-components/workers";
 
 export default {
-  props: ["day", "passedTime"],
+  props: {
+    'day': {
+      
+    },
+    'passedTime': {
+      
+    },
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: () => {}
+    }
+  },
   created() {
     // get and render day cells
     // and then render any event
@@ -80,7 +92,7 @@ export default {
     };
   },
   // inject kalendar options from parent component
-  inject: ["kalendar_options"],
+  inject: ['kalendar_options'],
   mounted() {
     if (this.kalendar_options.scrollToNow && this.isToday) this.scrollView();
   },
@@ -90,6 +102,11 @@ export default {
     },
     isToday() {
       return isToday(this.day.value);
+    }
+  },
+  watch: {
+    kalendar_work_hours (value) {
+      this.day_work_hours = value
     }
   },
   data: () => ({

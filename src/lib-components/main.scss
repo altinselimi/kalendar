@@ -21,6 +21,7 @@
     --previous-events: #c6dafc;
     --previous-text-color: #727d8f;
     --green: #0abc83;
+    --red: #ec4d3d;
 
     &.gstyle {
         --hour-row-color: #212121;
@@ -35,6 +36,7 @@
         .week-navigator {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             background: white;
             border-bottom: none;
             padding: 20px;
@@ -273,18 +275,21 @@
 
         span {
             white-space: nowrap;
+            line-height: 1.6;
+            color: #333333;
         }
     }
 
     button {
         background: transparent;
         border: none;
-        padding: 5px 0 0;
         display: inline-flex;
         margin: 0 10px;
         color: #ec4d3d;
         align-items: center;
         font-size: 14px;
+        cursor: pointer;
+        padding: 0;
     }
 }
 
@@ -348,10 +353,61 @@ ul.kalendar-day li.kalendar-cell:last-child {
             stroke: var(--main-color);
         }
     }
+    .gstyle & {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid var(--main-color);
+        border-radius: 100%;
+        transition: all .2s;
+        svg {
+            position: relative;
+            left: 1px;
+            stroke: var(--main-color);
+        }
+        &:hover {
+            border: 2px solid #fff;
+            background: var(--main-color);
+            svg {
+                stroke: #fff;
+            }
+        }
+    }
 }
 .kalendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    & > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
+
+.main-button {
+    padding: 11px 42px;
+    background: #2089FF;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    &:active {
+        box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    &.--gray {
+        background: var(--green);
+    }
+    &.--red {
+        background: var(--red);
+    }
+}
+
+.button-today {
+    margin: 0 20px 0 0;
+}
+

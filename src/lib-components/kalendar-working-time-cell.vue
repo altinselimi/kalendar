@@ -50,7 +50,7 @@ export default {
     },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 $creator-bg: #34aadc;
 $creator-content: white;
 
@@ -70,10 +70,10 @@ ul.building-blocks {
         
         &.--work-time {
             justify-content: flex-end;
-            font-size: 8px;
-            color: #000;
-            // border-bottom: dotted 1px var(--green);
+            font-size: 9px;
+            color: var(--main-color);
             user-select: none;
+            font-weight: bold;
         }
 
         &.first_of_appointment {
@@ -102,7 +102,7 @@ ul.building-blocks {
         }
         
         &:hover {
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid var(--main-color);
             span {
                 text-align: right;
                 display: block;

@@ -85,7 +85,20 @@
 				</div>
 			</div>
 			<div slot="workTimeEdit">
-				<button @click="addWorkTime()">addWorkTime</button>
+				<button class="main-button" @click="addWorkTime()" v-if="!calendar_settings.working_hours">
+					Время работы
+				</button>
+				<template v-else>
+					<button class="main-button --gray" @click="resetWorkTime()">
+						Сбросить
+					</button>
+					<button class="main-button --red" @click="cancelWorkTime()">
+						Отменить
+					</button>
+					<button class="main-button" @click="saveWorkTime()">
+						Сохранить
+					</button>
+				</template>	
 			</div>
 		</kalendar>
 	</div>
@@ -239,9 +252,23 @@ export default {
 				id: kalendarEvent.kalendar_id,
 			});
 		},
-		addWorkTime() {
+		changeWorkTime() {
 			this.calendar_settings.working_hours = !this.calendar_settings.working_hours
 			this.calendar_settings.read_only = !this.calendar_settings.read_only
+		},
+		addWorkTime() {
+			this.changeWorkTime()
+		},
+		saveWorkTime() {
+			this.changeWorkTime()
+			this.$kalendar.saveWorkHours()
+		},
+		resetWorkTime() {
+			this.$kalendar.resetWorkHours()
+		},
+		cancelWorkTime() {
+			this.changeWorkTime()
+			this.$kalendar.cancelWorkHours()
 		}
 	},
 };
