@@ -6,7 +6,7 @@ export default {
     },
     backgroundBar: {
       type: String,
-      default: '#00ADB6'
+      default: '#C4C4C4'
     }
   },
   computed: {
@@ -80,7 +80,7 @@ export default {
 
 .vb > .vb-dragger {
   z-index: 5;
-  width: .6rem;
+  width: 10px;
   right: 0;
 }
 
