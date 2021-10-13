@@ -199,7 +199,7 @@ export default {
 				read_only: false,
 				day_starts_at: 7,
 				day_ends_at: 19,
-				overlap: true, // перекрытие событий
+				overlap: false, // перекрытие событий
 				hide_dates: ['2019-08-09'],
 				hide_days: [],
 				past_event_creation: true,

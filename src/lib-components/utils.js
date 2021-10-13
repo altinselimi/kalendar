@@ -70,14 +70,15 @@ const addHours = (date, hours) => {
 const startOfWeek = date => {
   let d = new Date(date);
   let day = d.getDay(),
-    diff = d.getDate() - day;
+    diff = d.getDate() - day + 1;
+  
   return new Date(d.setDate(diff));
 };
 
 const endOfWeek = date => {
   let dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
-  let toAdd = 6 - dateObj.getDay();
+  let toAdd = 7 - dateObj.getDay();
   return addDays(dateObj, toAdd);
 };
 
