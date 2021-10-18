@@ -37,6 +37,8 @@
         @initiatePopup="initiatePopup()"
         :temporary-event="temporary_event"
         :constructed-work-hours="day_work_hours"
+        :kalendar_events="kalendar_events"
+        :isEditing="isEditing"
       />
     </template>  
     <template v-else>
@@ -67,10 +69,20 @@ export default {
     'passedTime': {
       
     },
+    kalendar_events: {
+      required: true,
+      type: Array,
+      default: () => []
+    },
     kalendar_work_hours: {
       required: true,
       type: Object,
       default: () => {}
+    },
+    isEditing: {
+      required: true,
+      type: Boolean,
+      default: false
     }
   },
   created() {

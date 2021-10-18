@@ -264,13 +264,13 @@ export default {
             this.$kalendar.removeEvent({
                 day,
                 key: kalendarEvent.key,
-                id: kalendarEvent.kalendar_id,
+                id: kalendarEvent.id,
             });
         },
     },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 $green: #00f0b5;
 $red: #f61067;
 $blue: #007fff;

@@ -67,7 +67,9 @@
           v-for="(day, index) in days"
           :passed-time="passedTime.distance"
           :ref="day.value.slice(0, 10)"
+          :kalendar_events="kalendar_events"
           :kalendar_work_hours="kalendar_work_hours"
+          :isEditing="isEditing"
         >
         </kalendar-day>
       </div>
@@ -96,6 +98,16 @@ export default {
       required: true,
       type: Object,
       default: () => {}
+    },
+    kalendar_events: {
+      required: true,
+      type: Array,
+      default: () => []
+    },
+    isEditing: {
+      required: true,
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -106,7 +118,7 @@ export default {
     setInterval(() => (this.kalendar_options.now = new Date()), 1000 * 60);
     this.constructWeek();
   },
-  inject: ["kalendar_options", "kalendar_events"],
+  inject: ["kalendar_options"],
   data: () => ({
     hours: null,
     days: []
@@ -196,6 +208,7 @@ export default {
         if (to.slice(-4) === "000Z") payload.to = addTimezoneInfo(to);
         let targetRef = payload.from.slice(0, 10);
         const refObject = this.$refs[targetRef];
+        console.log('refObject', refObject)
         if (refObject && refObject[0]) {
           refObject[0].addEvent(payload);
         } else {
@@ -204,6 +217,19 @@ export default {
           events.push(payload);
           this.$kalendar.updateEvents(events);
         }
+      };
+      this.$kalendar.saveEvent = payload => {
+        let events = this.$kalendar.getEvents();
+        let findEventIndex = events.findIndex(ev => payload.id === ev.id);
+
+        if (findEventIndex !== -1) {
+          events[findEventIndex] = payload
+        } else {
+          events.push(payload);
+        }
+
+        this.$kalendar.updateEvents(events);
+        console.log('saveEvent')
       };
 
       this.$kalendar.removeEvent = options => {
@@ -371,6 +397,7 @@ $theme-color: #e5e5e5;
     width: 100%;
     display: flex;
     position: relative;
+    padding: 0 50px 0 0;
   }
 }
 

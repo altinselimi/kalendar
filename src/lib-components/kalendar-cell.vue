@@ -15,7 +15,6 @@
         :style="`height: ${kalendar_options.cell_height}px;`"
     >
         <KalendarEvent
-            :style="`z-index: 10`"
             v-if="cell_events && cell_events.length"
             v-for="(event, eventIndex) in cell_events"
             :event="event"
@@ -23,6 +22,8 @@
             :total="cell_events.length"
             :index="eventIndex"
             :overlaps="overlapValue"
+            :kalendar_events="kalendar_events"
+            :isEditing="isEditing"
         />
     </li>
 </template>
@@ -37,6 +38,8 @@ export default {
         'constructedEvents',
         'constructedWorkHours',
         'temporaryEvent',
+        'kalendar_events',
+        'isEditing'
     ],
     inject: ['kalendar_options'],
     components: {
