@@ -1,5 +1,6 @@
-import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-eaaed81e.js';
+import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-aeb62c75.js';
 import 'vue';
+import 'vue2-timepicker/src/vue-timepicker.vue';
 
 function PromiseWorker (worker) {
   var messageIds = 0;
@@ -149,10 +150,10 @@ var script = {
   },
   components: {
     kalendarCell: function kalendarCell() {
-      return import('./kalendar-cell-76f5f45a.js');
+      return import('./kalendar-cell-b963fb98.js');
     },
     kalendarWorkingTimeCell: function kalendarWorkingTimeCell() {
-      return import('./kalendar-working-time-cell-600c7b3d.js');
+      return import('./kalendar-working-time-cell-c81c2ae9.js');
     }
   },
   provide: function provide() {

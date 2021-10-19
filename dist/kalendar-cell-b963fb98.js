@@ -1,12 +1,13 @@
-import { g as getLocaleTime, c as cloneObject, b as _objectSpread2, d as __vue_normalize__, e as __vue_create_injector__ } from './index-eaaed81e.js';
+import { g as getLocaleTime, c as cloneObject, b as _objectSpread2, d as __vue_normalize__, e as __vue_create_injector__ } from './index-aeb62c75.js';
 import 'vue';
+import 'vue2-timepicker/src/vue-timepicker.vue';
 
 var script = {
   props: ['creator', 'index', 'cellData', 'constructedEvents', 'constructedWorkHours', 'temporaryEvent', 'kalendar_events', 'isEditing', 'isShowEditPopup'],
   inject: ['kalendar_options'],
   components: {
     KalendarEvent: function KalendarEvent() {
-      return import('./kalendar-event-c4e0b5ee.js');
+      return import('./kalendar-event-8b52b471.js');
     }
   },
   computed: {

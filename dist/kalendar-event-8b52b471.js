@@ -1,5 +1,6 @@
-import { g as getLocaleTime, f as isBefore, b as _objectSpread2, j as addTimezoneInfo, d as __vue_normalize__, e as __vue_create_injector__ } from './index-eaaed81e.js';
+import { g as getLocaleTime, f as isBefore, b as _objectSpread2, j as addTimezoneInfo, d as __vue_normalize__, e as __vue_create_injector__ } from './index-aeb62c75.js';
 import 'vue';
+import 'vue2-timepicker/src/vue-timepicker.vue';
 
 var script = {
   props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
