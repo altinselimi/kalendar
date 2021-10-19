@@ -70,6 +70,7 @@
           :kalendar_events="kalendar_events"
           :kalendar_work_hours="kalendar_work_hours"
           :isEditing="isEditing"
+          :isShowEditPopup="isShowEditPopup"
         >
         </kalendar-day>
       </div>
@@ -105,6 +106,11 @@ export default {
       default: () => []
     },
     isEditing: {
+      required: true,
+      type: Boolean,
+      default: false
+    },
+    isShowEditPopup: {
       required: true,
       type: Boolean,
       default: false
@@ -206,9 +212,10 @@ export default {
         let { from, to } = payload;
         if (from.slice(-4) === "000Z") payload.from = addTimezoneInfo(from);
         if (to.slice(-4) === "000Z") payload.to = addTimezoneInfo(to);
+
         let targetRef = payload.from.slice(0, 10);
         const refObject = this.$refs[targetRef];
-        console.log('refObject', refObject)
+
         if (refObject && refObject[0]) {
           refObject[0].addEvent(payload);
         } else {
@@ -229,7 +236,6 @@ export default {
         }
 
         this.$kalendar.updateEvents(events);
-        console.log('saveEvent')
       };
 
       this.$kalendar.removeEvent = options => {
@@ -237,10 +243,11 @@ export default {
         if (day.length > 10) {
           day = day.slice(0, 10);
         }
-        console.log("Options:", options);
+
         if (!day) return Promise.reject("Day wasn't provided");
         if (!id) return Promise.reject("No ID was provided");
         if (!key) return Promise.reject("No key was provided in the object");
+
         let targetRef = day;
         this.$refs[targetRef][0].removeEvent({ id, key });
       };

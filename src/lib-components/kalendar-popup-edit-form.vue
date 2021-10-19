@@ -170,7 +170,7 @@ import {
   getFormattedWeekDayTime,
   getFormattedMonth,
   getLocaleTime,
-  getFormattedTime,
+  getFormattedTime, addTimezoneInfo,
 } from './utils.js';
 
 const EVENT = {
@@ -263,6 +263,9 @@ export default {
   },
   methods: {
     editEvent () {
+      this.start_time = addTimezoneInfo(this.start_time);
+      this.end_time = addTimezoneInfo(this.end_time);
+
       let payload = {
         data: {
           title: this.new_event_data.title,
@@ -272,19 +275,21 @@ export default {
         },
         from: this.start_time,
         to: this.end_time,
+        id: this.popup_information.id
       };
-
-      console.log(payload);
 
       this.clearFormData();
       this.$kalendar.saveEvent(payload);
+      this.$kalendar.closePopups();
+      this.$kalendar.toggleEditing();
+      this.$kalendar.toggleEditPopup(false)
       this.isEdit = false
     },
     clearFormData () {
       this.new_event_data = {...EVENT};
     },
     close () {
-      this.$kalendar.setEditing(false)
+      this.$kalendar.toggleEditPopup(false)
     },
     addStudent (value) {
       this.addedStudents.push(value);
@@ -316,7 +321,7 @@ export default {
       const newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm))
 
       this[timeName] = getLocaleTime(newDate.toISOString()) // this.startTime or this.endTime
-      this[`${timeName}_h`] = +eventData.data.h
+      this[`${timeName}_h`] = +eventData.data.H
     },
     showMaterialSelect () {
       this.isShowMaterialSelect = true
@@ -344,7 +349,7 @@ export default {
       this.filterMaterials()
     },
     edit () {
-      this.isEdit = true
+      this.isEdit = !this.isEdit
     },
     deleteEvent () {
       this.$emit('removeEvent')

@@ -187,11 +187,6 @@ export default {
 		};
 	},
 	methods: {
-		saveEvent(popup_info) {
-			this.$kalendar.saveEvent(popup_info);
-			this.$kalendar.closePopups();
-			this.clearFormData()
-		},
 		closePopups() {
 			this.$kalendar.closePopups();
 		},

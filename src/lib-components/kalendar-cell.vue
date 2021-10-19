@@ -24,6 +24,7 @@
             :overlaps="overlapValue"
             :kalendar_events="kalendar_events"
             :isEditing="isEditing"
+            :isShowEditPopup="isShowEditPopup"
         />
     </li>
 </template>
@@ -39,7 +40,8 @@ export default {
         'constructedWorkHours',
         'temporaryEvent',
         'kalendar_events',
-        'isEditing'
+        'isEditing',
+        'isShowEditPopup'
     ],
     inject: ['kalendar_options'],
     components: {

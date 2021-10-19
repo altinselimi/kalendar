@@ -48,7 +48,6 @@
               :slot-props="information"
               slim
               v-click-outside="closeEditFormEvent"
-              @edit="alert(2324324)"
             />
         </div>
     </div>
@@ -57,14 +56,14 @@
 import { isBefore, getLocaleTime, addTimezoneInfo } from './utils.js';
 
 export default {
-    props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isEditing'],
+    props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
     created() {},
     inject: ['kalendar_options'],
     data: () => ({
         editing: false,
     }),
     watch: {
-      isEditing (value) {
+      isShowEditPopup (value) {
         if (!value) {
           this.closeEditFormEvent()
         }
@@ -111,12 +110,13 @@ export default {
     },
     methods: {
         editEvent () {
-          this.$kalendar.setEditing(true)
+          this.$kalendar.toggleEditPopup(true)
           this.editing = true
         },
         closeEditFormEvent () {
-            this.editing = false;
-            this.$kalendar.closePopups()
+          this.editing = false;
+          this.$kalendar.closePopups()
+          this.$kalendar.toggleEditPopup(false)
         }
     }
 };

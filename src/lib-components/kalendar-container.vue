@@ -111,6 +111,7 @@
                   :current_day="current_day"
                   :kalendar_events="kalendar_events"
                   :isEditing="isEditing"
+                  :isShowEditPopup="isShowEditPopup"
                 />
             </scroll-container>
         </div>
@@ -295,8 +296,11 @@ export default {
                     let day = new Date(isoDate);
                     return day.toUTCString().slice(5, 11);
                 },
-                setEditing: (value) => {
-                  this.isEditing = value
+                toggleEditing: () => {
+                  this.isEditing = !this.isEditing
+                },
+                toggleEditPopup: (value) => {
+                  this.isShowEditPopup = value
                 }
             },
             kalendar_events: null,
@@ -304,7 +308,8 @@ export default {
             kalendar_work_hours_temp: {},
             new_appointment: {},
             scrollable: true,
-            isEditing: false
+            isEditing: false,
+            isShowEditPopup: false,
         };
     },
     computed: {
@@ -364,7 +369,6 @@ export default {
         }
         
         this.$kalendar.updateEvents = events => {
-          console.log(this.kalendar_events);
             this.kalendar_events = events.map(event => ({
                 ...event,
                 id: event.id || generateUUID()
@@ -373,7 +377,6 @@ export default {
                 'update:events',
               this.kalendar_events
             );
-            console.log('updateEvents')
         };
 
         this.$kalendar.getWorkHours = () => {
@@ -410,7 +413,8 @@ export default {
         };
         
         this.$kalendar.formatLeftHours = this.kalendar_options.formatLeftHours;
-        this.$kalendar.setEditing = this.kalendar_options.setEditing;
+        this.$kalendar.toggleEditing = this.kalendar_options.toggleEditing;
+        this.$kalendar.toggleEditPopup = this.kalendar_options.toggleEditPopup;
         this.$kalendar.options = this.kalendar_options;
     },
     provide() {
@@ -458,8 +462,6 @@ export default {
             return (typeof val === "string" || val instanceof String);
         },
         saveAppointment(popup_info) {
-            console.log(popup_info);
-
             this.$kalendar.saveEvent(popup_info);
             this.$kalendar.closePopups();
         },

@@ -38,7 +38,7 @@
         :temporary-event="temporary_event"
         :constructed-work-hours="day_work_hours"
         :kalendar_events="kalendar_events"
-        :isEditing="isEditing"
+        :isShowEditPopup="isShowEditPopup"
       />
     </template>  
     <template v-else>
@@ -83,6 +83,11 @@ export default {
       required: true,
       type: Boolean,
       default: false
+    },
+    isShowEditPopup: {
+      required: true,
+      type: Boolean,
+      default: false
     }
   },
   created() {
@@ -119,6 +124,9 @@ export default {
   watch: {
     kalendar_work_hours (value) {
       this.day_work_hours = value
+    },
+    isEditing () {
+      this.renderDay()
     }
   },
   data: () => ({
@@ -194,7 +202,6 @@ export default {
             this.$set(this.day_events, key, [constructed_event]);
           }
           let events = this.$kalendar.getEvents();
-          console.log("Adding event to kalendar", payload);
           events.push({
             ...payload,
             id: constructed_event.id
