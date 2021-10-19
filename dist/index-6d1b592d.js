@@ -247,6 +247,21 @@ var getFormattedTime = function getFormattedTime(date) {
   return formatter.format(date);
 };
 
+var getTimeRemaining = function getTimeRemaining(endTime) {
+  var total = Date.parse(endTime) - Date.parse(new Date());
+  var seconds = Math.floor(total / 1000 % 60);
+  var minutes = Math.floor(total / 1000 / 60 % 60);
+  var hours = Math.floor(total / (1000 * 60 * 60) % 24);
+  var days = Math.floor(total / (1000 * 60 * 60 * 24));
+  return {
+    total: total,
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds
+  };
+};
+
 //
 var script = {
   name: "kalendar-created-card-slot",
@@ -1382,12 +1397,7 @@ var __vue_component__$5 = /*#__PURE__*/normalizeComponent({
   staticRenderFns: __vue_staticRenderFns__$5
 }, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, createInjector, undefined, undefined);
 
-var EVENT$1 = {
-  title: 'Новое занятие',
-  description: null,
-  userId: null,
-  materials: []
-};
+//
 var STUDENTS$1 = {
   '10001': {
     name: 'Иванов Сергей'
@@ -1423,7 +1433,6 @@ var script$6 = {
   props: ['popup_information'],
   data: function data() {
     return {
-      new_event_data: _objectSpread2({}, EVENT$1),
       studentSelect: {
         value: {},
         list: Object.keys(STUDENTS$1).map(function (m) {
@@ -1458,10 +1467,11 @@ var script$6 = {
     };
   },
   created: function created() {
-    var _this$popup_informati = this.popup_information,
-        start_time = _this$popup_informati.start_time,
-        end_time = _this$popup_informati.end_time,
-        data = _this$popup_informati.data;
+    var _cloneObject = cloneObject(this.popup_information),
+        start_time = _cloneObject.start_time,
+        end_time = _cloneObject.end_time,
+        data = _cloneObject.data;
+
     this.start_time = start_time;
     this.end_time = end_time;
     this.addedStudents = data.students;
@@ -1476,6 +1486,15 @@ var script$6 = {
     },
     errorSelectedTime: function errorSelectedTime() {
       return this.end_time_h - this.start_time_h < 0;
+    },
+    beforeTime: function beforeTime() {
+      var rt = getTimeRemaining(this.start_time);
+
+      if (rt.days === 0 && rt.minutes > 0) {
+        return rt.minutes;
+      }
+
+      return 0;
     }
   },
   mounted: function mounted() {
@@ -1488,8 +1507,6 @@ var script$6 = {
       this.end_time = addTimezoneInfo(this.end_time);
       var payload = {
         data: {
-          title: this.new_event_data.title,
-          description: this.new_event_data.description,
           students: this.addedStudents,
           materials: this.addedMaterials
         },
@@ -1497,15 +1514,11 @@ var script$6 = {
         to: this.end_time,
         id: this.popup_information.id
       };
-      this.clearFormData();
       this.$kalendar.saveEvent(payload);
       this.$kalendar.closePopups();
       this.$kalendar.toggleEditing();
       this.$kalendar.toggleEditPopup(false);
       this.isEdit = false;
-    },
-    clearFormData: function clearFormData() {
-      this.new_event_data = _objectSpread2({}, EVENT$1);
     },
     close: function close() {
       this.$kalendar.toggleEditPopup(false);
@@ -1895,7 +1908,32 @@ var __vue_render__$6 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1)] : _vm._e()], 2)]);
+  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.beforeTime > 0 ? _c('div', {
+    staticClass: "b-before-time"
+  }, [_c('svg', {
+    attrs: {
+      "width": "22",
+      "height": "21",
+      "viewBox": "0 0 22 21",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    }
+  }, [_c('path', {
+    attrs: {
+      "d": "M17.1111 7.51191C17.1111 5.96162 16.4673 4.47481 15.3212 3.37859C14.1752 2.28236 12.6208 1.6665 11 1.6665C9.37923 1.6665 7.82485 2.28236 6.67879 3.37859C5.53274 4.47481 4.88889 5.96162 4.88889 7.51191C4.88889 12.267 2.99823 14.6538 1.85347 15.6632C1.65568 15.8376 1.79337 16.28 2.05706 16.28H7.2351C7.35207 16.28 7.45419 16.3608 7.48974 16.4723C7.6956 17.1176 8.54266 19.1665 11 19.1665C13.4573 19.1665 14.3044 17.1176 14.5103 16.4723C14.5458 16.3608 14.6479 16.28 14.7649 16.28H19.9429C20.2066 16.28 20.3443 15.8376 20.1465 15.6632C19.0018 14.6538 17.1111 12.267 17.1111 7.51191Z",
+      "stroke": "#6E7191",
+      "stroke-width": "2",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round"
+    }
+  })]), _vm._v("\n          " + _vm._s(_vm.beforeTime) + " мин\n        ")]) : _vm._e(), _vm._v(" "), _c('ul', {
+    staticClass: "b-materials__list"
+  }, _vm._l(_vm.addedMaterials, function (student) {
+    return _c('li', {
+      key: student.value,
+      staticClass: "b-materials__list-item"
+    }, [_vm._v("\n            " + _vm._s(student.name) + "\n          ")]);
+  }), 0)] : _vm._e()], 2)]);
 };
 
 var __vue_staticRenderFns__$6 = [function () {
@@ -1923,8 +1961,8 @@ var __vue_staticRenderFns__$6 = [function () {
 
 var __vue_inject_styles__$6 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-e5017a8a_0", {
-    source: ".b-edit-card{display:flex;flex-direction:column;padding:4px 10px 10px 15px;position:relative}.b-edit-card__x{position:relative;right:-10px}.b-edit-card__header{display:flex;justify-content:flex-end;align-items:center;margin:0 0 20px 0}.b-edit-card__header-icon{display:flex;justify-content:center;align-items:center;width:20px;height:20px;margin:0 10px}.b-edit-card__header-icon>span{cursor:pointer}.b-edit-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-edit-students{display:flex;flex-wrap:wrap;margin:10px 0 0 0!important}.b-added-edit-students__item{border-right:none!important;margin:0 20px 0 0;display:flex;align-items:center;font-size:16px;color:#0967d1}.b-added-edit-students__item>span{width:20px;height:20px;display:inline-block;margin:0 10px 0 0;background:#0967d1;border-radius:3px}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-edit-lesson{width:100%;color:#777;display:flex;justify-content:flex-start;align-items:center;margin:0 0 0 25px}.b-open-edit-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:10px 0 20px 30px}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 10px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}",
+  inject("data-v-cb4c1c9a_0", {
+    source: ".b-edit-card{display:flex;flex-direction:column;padding:4px 10px 10px 15px;position:relative}.b-edit-card__x{position:relative;right:-10px}.b-edit-card__header{display:flex;justify-content:flex-end;align-items:center;margin:0 0 20px 0}.b-edit-card__header-icon{display:flex;justify-content:center;align-items:center;width:20px;height:20px;margin:0 10px}.b-edit-card__header-icon>span{cursor:pointer}.b-edit-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-edit-students{display:flex;flex-wrap:wrap;margin:10px 0 0 0!important}.b-added-edit-students__item{border-right:none!important;margin:0 20px 0 0;display:flex;align-items:center;font-size:16px;color:#0967d1}.b-added-edit-students__item>span{width:20px;height:20px;display:inline-block;margin:0 10px 0 0;background:#0967d1;border-radius:3px}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-edit-lesson{width:100%;color:#777;display:flex;justify-content:flex-start;align-items:center;margin:0 0 0 25px}.b-open-edit-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:10px 0 20px 30px}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 30px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-before-time{margin:18px 0 10px;display:flex;align-items:center;font-size:14px;color:#333}.b-before-time>svg{margin:0 8px 0 0}",
     map: undefined,
     media: undefined
   });
@@ -1951,10 +1989,10 @@ var __vue_component__$6 = /*#__PURE__*/normalizeComponent({
 var script$7 = {
   components: {
     KalendarWeekView: function KalendarWeekView() {
-      return import('./kalendar-weekview-1a4e3ee0.js');
+      return import('./kalendar-weekview-bd31c730.js');
     },
     ScrollContainer: function ScrollContainer() {
-      return import('./scroll-container-2f5b20ba.js');
+      return import('./scroll-container-6e85f21f.js');
     },
     KalendarCreatedCardSlot: __vue_component__,
     KalendarPopupCardSlot: __vue_component__$5,
