@@ -5,50 +5,6 @@
 			:events.sync="events"
 			:work_time.sync="work_time"
 		>
-			<!-- CREATED CARD SLOT -->
-      <div
-          slot="created-card"
-          slot-scope="{ event_information }"
-      >
-        <kalendar-created-card-slot
-            :event_information="event_information"
-        />
-      </div>
-			
-			<!-- CREATING CARD SLOT -->
-			<div slot="creating-card" slot-scope="{ event_information }">
-        <h4>
-          Новое занятие
-        </h4>
-				<span class="time">
-					{{ event_information.start_time | formatToHours }}
-					-
-					{{ event_information.end_time | formatToHours }}
-				</span>
-			</div>
-			
-			<!-- POPUP CARD SLOT -->
-			<div
-				slot="popup-form"
-				slot-scope="{ popup_information }"
-			>
-        <kalendar-popup-card-slot
-            :popup_information="popup_information"
-            @close="closePopups"
-        />
-			</div>
-
-			<div
-				slot="popup-edit-form"
-				slot-scope="{ popup_information }"
-			>
-        <kalendar-popup-edit-form
-            :popup_information="popup_information"
-            @close="closePopups"
-            @removeEvent="removeEvent(popup_information)"
-        />
-			</div>
-			
 			<div slot="workTimeEdit">
 				<button class="main-button" @click="addWorkTime()" v-if="!calendar_settings.working_hours">
 					Время работы
@@ -119,15 +75,6 @@ const _existing_working_hours = {
 }
 
 let today = new Date();
-
-function getCurrentDay() {
-	today.setHours(0);
-	today.setMinutes(0);
-	today.setSeconds(0);
-	today.setMilliseconds(0);
-	return today.toISOString();
-}
-
 // change the dates on _existing events to this week
 const startDate = new Date(_existing_events[0].from).getUTCDate();
 
@@ -143,27 +90,11 @@ const existing_events = _existing_events.map(ev => ({
 	from: makeNow(ev.from),
 	to: makeNow(ev.to),
 }));
-
-import Vue from 'vue';
-
 import Kalendar from '@/lib-components/kalendar-container.vue';
-import KalendarCreatedCardSlot from '@/lib-components/kalendar-created-card-slot';
-import KalendarPopupCardSlot from '@/lib-components/kalendar-popup-card-slot';
-import KalendarPopupEditForm from '@/lib-components/kalendar-popup-edit-form';
-import { DateTime } from 'luxon';
 
 export default {
-	created() {
-		Vue.filter('formatToHours', (value, how) => {
-			let dt = DateTime.fromISO(value);
-			return dt.toLocaleString(DateTime.TIME_24_SIMPLE);
-		});
-	},
 	components: {
 		Kalendar,
-    KalendarCreatedCardSlot,
-    KalendarPopupCardSlot,
-    KalendarPopupEditForm
 	},
 	data() {
 		return {
@@ -187,35 +118,6 @@ export default {
 		};
 	},
 	methods: {
-		closePopups() {
-			this.$kalendar.closePopups();
-		},
-		clearFormData() {
-			this.new_event_data = {
-				description: null,
-				title: null,
-			};
-		},
-		addManually() {
-			let title = 'New one';
-			let description = 'Lorem dsr';
-			let from = makeNow('2019-07-12T10:22:00+02:00');
-			let to = makeNow('2019-07-13T11:20:00+02:00');
-			let payload = {
-				data: { title, description },
-				from,
-				to,
-			};
-			this.$kalendar.addNewEvent(payload);
-		},
-		removeEvent(kalendarEvent) {
-			let day = kalendarEvent.start_time.slice(0, 10);
-			this.$kalendar.removeEvent({
-				day,
-				key: kalendarEvent.key,
-				id: kalendarEvent.id,
-			});
-		},
 		changeWorkTime() {
 			this.calendar_settings.working_hours = !this.calendar_settings.working_hours
 			this.calendar_settings.read_only = !this.calendar_settings.read_only

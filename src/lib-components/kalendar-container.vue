@@ -119,14 +119,14 @@
         <portal to="event-creation" class="slotable">
             <div slot-scope="information" class="creating-event">
                 <slot name="creating-card" :event_information="information">
-                    <h4 class="appointment-title" style="text-align: left;">
-                        New Appointment
-                    </h4>
-                    <span class="time">
-                        {{ getTime(information.start_time) }}
-                        -
-                        {{ getTime(information.end_time) }}
-                    </span>
+                  <h4>
+                    Новое занятие
+                  </h4>
+                  <span class="time">
+                    {{ formatDate(information.start_time) }}
+                    -
+                    {{ formatDate(information.end_time) }}
+                  </span>
                 </slot>
             </div>
         </portal>
@@ -134,31 +134,10 @@
         <portal to="event-popup-form" class="slotable">
             <div slot-scope="information" class="popup-event">
                 <slot name="popup-form" :popup_information="information">
-                    <h4 style="margin-bottom: 10px">
-                        New Appointment
-                    </h4>
-                    <input
-                        v-model="new_appointment['title']"
-                        type="text"
-                        name="title"
-                        placeholder="Title"
-                        style="width: 100%;"
-                    />
-                    <textarea
-                        v-model="new_appointment['description']"
-                        type="text"
-                        name="description"
-                        placeholder="Description"
-                        rows="2"
-                    ></textarea>
-                    <div class="buttons">
-                        <button class="cancel" @click="closePopups()">
-                            Cancel
-                        </button>
-                        <button @click="saveAppointment(information)">
-                            Save
-                        </button>
-                    </div>
+                  <kalendar-popup-card-slot
+                      :popup_information="information"
+                      @close="closePopups"
+                  />
                 </slot>
             </div>
         </portal>
@@ -166,11 +145,9 @@
         <portal to="event-details" class="slotable">
             <div slot-scope="information" class="created-event">
                 <slot name="created-card" :event_information="information">
-                    <h4 style="margin-bottom: 5px">{{ information.data }}</h4>
-                    <p>
-                        {{ information.start_time.substr(11, 5) }} -
-                        {{ information.end_time.substr(11, 5) }}
-                    </p>
+                  <kalendar-created-card-slot
+                      :event_information="information"
+                  />
                 </slot>
             </div>
         </portal>
@@ -178,31 +155,11 @@
         <portal to="event-edit-form" class="slotable">
             <div slot-scope="information" class="popup-event">
                 <slot name="popup-edit-form" :popup_information="information">
-                    <h4 style="margin-bottom: 10px">
-                        New Appointment
-                    </h4>
-                    <input
-                      v-model="information.data['title']"
-                      type="text"
-                      name="title"
-                      placeholder="Title"
-                      style="width: 100%;"
-                    />
-                    <textarea
-                      v-model="information.data['description']"
-                      type="text"
-                      name="description"
-                      placeholder="Description"
-                      rows="2"
-                    ></textarea>
-                    <div class="buttons">
-                        <button class="cancel" @click="closePopups()">
-                            Cancel
-                        </button>
-                        <button @click="saveAppointment(information)">
-                            Save
-                        </button>
-                    </div>
+                  <kalendar-popup-edit-form
+                      :popup_information="information"
+                      @close="closePopups"
+                      @removeEvent="removeEvent(information)"
+                  />
                 </slot>
             </div>
         </portal>
@@ -210,6 +167,9 @@
 </template>
 <script>
 import Vue from 'vue';
+import KalendarCreatedCardSlot from '@/lib-components/kalendar-created-card-slot';
+import KalendarPopupCardSlot from '@/lib-components/kalendar-popup-card-slot';
+import KalendarPopupEditForm from '@/lib-components/kalendar-popup-edit-form';
 
 import {
     addDays,
@@ -226,8 +186,11 @@ import {
 
 export default {
     components: {
-        KalendarWeekView: () => import('./kalendar-weekview.vue'),
-        ScrollContainer: () => import('./scroll-container.vue'),
+      KalendarWeekView: () => import('./kalendar-weekview.vue'),
+      ScrollContainer: () => import('./scroll-container.vue'),
+      KalendarCreatedCardSlot,
+      KalendarPopupCardSlot,
+      KalendarPopupEditForm
     },
     props: {
         // this provided array will be kept in sync
@@ -461,9 +424,17 @@ export default {
         isString(val) {
             return (typeof val === "string" || val instanceof String);
         },
-        saveAppointment(popup_info) {
-            this.$kalendar.saveEvent(popup_info);
-            this.$kalendar.closePopups();
+        formatDate (date) {
+          let isoDate = new Date(date);
+          return getFormattedTime(isoDate)
+        },
+        removeEvent(kalendarEvent) {
+          let day = kalendarEvent.start_time.slice(0, 10);
+          this.$kalendar.removeEvent({
+            day,
+            key: kalendarEvent.key,
+            id: kalendarEvent.id,
+          });
         },
     },
 };

@@ -17,17 +17,12 @@
 </template>
 
 <script>
-import mixFormatToHours from '../lib-components/mixins/formatToHours';
 import {
-  addTimezoneInfo,
   getFormattedTime
 } from './utils.js';
 export default {
   name: "kalendar-created-card-slot",
   props: ['event_information'],
-  mixins: [
-    mixFormatToHours
-  ],
   computed: {
     studentList () {
       return this.event_information.data.students.map(s => {
