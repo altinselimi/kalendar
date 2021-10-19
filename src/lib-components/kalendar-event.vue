@@ -1,44 +1,53 @@
 <template>
     <div
         class="event-card"
-        :ref="`kalendarEventRef-${event.id}`"
+        :ref="`${event.id}`"
         :style="
             `
-      height: ${distance}; 
-      width: calc(${width_value}); 
-      left: calc(${left_offset});
-      top: ${top_offset};
-    `
+              height: ${distance}; 
+              width: calc(${width_value}); 
+              left: calc(${left_offset});
+              top: ${top_offset};
+            `
         "
-        @click="inspecting = true"
-        @mouseleave="inspecting = false"
         :class="{
+            'editing': editing,
             'is-past': isPast,
             overlaps: overlaps > 0,
             'two-in-one': total > 1,
-            inspecting: !!inspecting,
             'event-card__mini': event.distance <= 10,
             'event-card__small':
                 (event.distance > 10 && event.distance < 40) || overlaps > 1,
         }"
     >
-        <portal-target
-            v-if="status === 'creating' || status === 'popup-initiated'"
-            :slot-props="information"
-            name="event-creation"
-            slim
-        />
-        <portal-target
-            v-else
-            name="event-details"
-            :slot-props="information"
-            slim
-        />
-        <div v-if="status === 'popup-initiated'" class="popup-wrapper">
+        <div @click="editEvent" v-if="status === 'creating' || status === 'popup-initiated'">
+          <portal-target
+              :slot-props="information"
+              name="event-creation"
+              slim
+          />
+        </div>
+        <div @click="editEvent" v-else>
+          <portal-target
+              name="event-details"
+              :slot-props="information"
+              slim
+          />
+        </div>
+        <div class="popup-wrapper" v-if="status === 'popup-initiated'">
             <portal-target
                 name="event-popup-form"
                 slim
                 :slot-props="information"
+                v-click-outside="closeEditFormEvent"
+            />
+        </div>
+        <div class="popup-wrapper" v-if="editing && status !== 'popup-initiated'">
+            <portal-target
+              name="event-edit-form"
+              :slot-props="information"
+              slim
+              v-click-outside="closeEditFormEvent"
             />
         </div>
     </div>
@@ -47,13 +56,19 @@
 import { isBefore, getLocaleTime, addTimezoneInfo } from './utils.js';
 
 export default {
-    props: ['event', 'total', 'index', 'overlaps'],
+    props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
     created() {},
     inject: ['kalendar_options'],
     data: () => ({
-        inspecting: false,
         editing: false,
     }),
+    watch: {
+      isShowEditPopup (value) {
+        if (!value) {
+          this.closeEditFormEvent()
+        }
+      }
+    },
     computed: {
         isPast() {
             let now = getLocaleTime(new Date().toISOString());
@@ -82,24 +97,28 @@ export default {
             return (this.event && this.event.status) || this.editing;
         },
         information() {
-            let { start, end, data, id, key } = this.event;
+            let { start, end, data, id, key } = {...this.event};
             let payload = {
                 start_time: addTimezoneInfo(start.value),
                 end_time: addTimezoneInfo(end.value),
-                kalendar_id: id,
+                id: id,
                 key,
                 data,
             };
             return payload;
         },
-        editEvent() {
-            this.$kalendar.closePopups();
-            this.editing = true;
-        },
-        closeEventPopup() {
-            this.editing = false;
-        },
     },
+    methods: {
+        editEvent () {
+          this.$kalendar.toggleEditPopup(true)
+          this.editing = true
+        },
+        closeEditFormEvent () {
+          this.editing = false;
+          this.$kalendar.closePopups()
+          this.$kalendar.toggleEditPopup(false)
+        }
+    }
 };
 </script>
 <style lang="scss">
@@ -112,15 +131,20 @@ $creator-content: white;
     height: 100%;
     width: 100%;
 
+    z-index: 5;
+
     h4,
-    p,
-    span {
-        margin: 0px;
+    p {
+        margin: 0;
     }
 
     > * {
         flex: 1;
         position: relative;
+    }
+
+    &.editing {
+      z-index: 10;
     }
 
     &.creating {
@@ -131,28 +155,17 @@ $creator-content: white;
         border: solid 1px white !important;
     }
 
-    &.inspecting {
-        z-index: 11 !important;
-
-        .created-event {
-            box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
-                0 1px 18px 0 rgba(0, 0, 0, 0.12),
-                0 3px 5px -1px rgba(0, 0, 0, 0.2);
-            transition: opacity 100ms linear;
-        }
-    }
-
     &__mini {
-        .created-event > .details-card > * {
+        .created-event > div > .details-card  small  {
             display: none;
         }
 
         .appointment-title,
         .time {
-            display: block !important;
             position: absolute;
             top: 0;
             font-size: 9px;
+            line-height: 1;
             z-index: 1;
             overflow: visible;
             height: 100%;
@@ -242,13 +255,6 @@ $creator-content: white;
     > .details-card {
         max-width: 100%;
         width: 100%;
-        overflow: hidden;
-        position: relative;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
 
         > h1,
         h2,
@@ -265,7 +271,7 @@ $creator-content: white;
     }
 }
 
-ul:last-child .popup-wrapper {
+ul:nth-last-child(-n+3) .popup-wrapper {
     left: auto;
     right: 100%;
     margin-right: 10px;

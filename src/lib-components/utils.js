@@ -157,18 +157,25 @@ const formatAMPM = date => {
   return result;
 };
 
-const getFormattedWeekDayTime = (locale, date) => {
-  const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+const locale = () => {
+  // If not running in the browser, cannot determine a default, return the code for unknown (blank is invalid)
+  if (typeof navigator === "undefined") return "unk"
+  // Return the browser's language setting, implementation is browser-specific
+  return (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language).toLowerCase()
+};
+
+const getFormattedWeekDayTime = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { weekday: 'short' })
   return formatter.format(date)
 };
 
-const getFormattedMonth = (locale, date) => {
-  const formatter = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' })
+const getFormattedMonth = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long' })
   return formatter.format(date)
 };
 
-const getFormattedTime = (locale, date) => {
-  const formatter = new Intl.DateTimeFormat(locale, { timeStyle: 'short' })
+const getFormattedTime = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { timeStyle: 'short' })
   return formatter.format(date)
 };
 

@@ -1,5 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Rubik:wght@400,600&display=swap');
+
 * {
     box-sizing: border-box;
+
+    font-family: 'Rubik', Helvetica, Arial, sans-serif
+}
+* {
+    box-sizing: border-box;
+    user-select: none;
+    &:before, &:after {
+        box-sizing: border-box;
+        user-select: none
+    }
+}
+
+html {
+    font-size: 10px !important
+}
+
+@media only screen and (max-width: 1100px) {
+    html {
+        font-size: 8px !important
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    html {
+        font-size: 10px !important
+    }
 }
 
 .kalendar-wrapper {
@@ -61,8 +89,26 @@
             border-radius: 10px;
             opacity: 1;
             border-bottom: solid 1px rgba(0, 0, 0, 0.03);
-            font-size: 16px;
-            padding: 20px;
+            font-size: 14px;
+            padding: 0 5px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .creating-event {
+            color: var(--main-color);
+            background-color: #7AFFD7;
+            font-size: 12px;
+            padding: 0 20px;
+            border-radius: 10px;
+            align-items: flex-start;
+            .time {
+                color: var(--main-color);
+                display: flex;
+                align-items: center;
+            }
         }
 
         .is-past {
@@ -78,6 +124,13 @@
 
             .time {
                 right: 2px;
+            }
+            &:hover {
+                cursor: pointer;
+                background-color: var(--main-color);
+                * {
+                    color: #fff;
+                }
             }
         }
 
@@ -206,11 +259,15 @@
             }
         }
 
-        .creating-event,
+        .creating-event {
+            border-radius: 10px;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+            transition: opacity 100ms linear;
+        }
         .popup-wrapper {
-            box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
-                0 1px 18px 0 rgba(0, 0, 0, 0.12),
-                0 3px 5px -1px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            min-height: 116px;
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
             transition: opacity 100ms linear;
         }
     }
@@ -394,6 +451,7 @@ ul.kalendar-day li.kalendar-cell:last-child {
     cursor: pointer;
     border: none;
     color: #fff;
+
     &:active {
         box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.15);
     }

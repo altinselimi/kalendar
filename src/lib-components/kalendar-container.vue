@@ -103,14 +103,19 @@
             </div>
             <slot name="workTimeEdit"></slot>
         </div>
+
         <div class="b-scroll-container" :style="{ height: kalendar_options.height }">
             <scroll-container>
                 <kalendar-week-view
                   :kalendar_work_hours="kalendar_work_hours"
-                  :current_day="current_day" 
+                  :current_day="current_day"
+                  :kalendar_events="kalendar_events"
+                  :isEditing="isEditing"
+                  :isShowEditPopup="isShowEditPopup"
                 />
             </scroll-container>
         </div>
+        
         <portal to="event-creation" class="slotable">
             <div slot-scope="information" class="creating-event">
                 <slot name="creating-card" :event_information="information">
@@ -125,6 +130,7 @@
                 </slot>
             </div>
         </portal>
+        
         <portal to="event-popup-form" class="slotable">
             <div slot-scope="information" class="popup-event">
                 <slot name="popup-form" :popup_information="information">
@@ -149,13 +155,14 @@
                         <button class="cancel" @click="closePopups()">
                             Cancel
                         </button>
-                        <button @click="addAppointment(information)">
+                        <button @click="saveAppointment(information)">
                             Save
                         </button>
                     </div>
                 </slot>
             </div>
         </portal>
+        
         <portal to="event-details" class="slotable">
             <div slot-scope="information" class="created-event">
                 <slot name="created-card" :event_information="information">
@@ -164,6 +171,38 @@
                         {{ information.start_time.substr(11, 5) }} -
                         {{ information.end_time.substr(11, 5) }}
                     </p>
+                </slot>
+            </div>
+        </portal>
+        
+        <portal to="event-edit-form" class="slotable">
+            <div slot-scope="information" class="popup-event">
+                <slot name="popup-edit-form" :popup_information="information">
+                    <h4 style="margin-bottom: 10px">
+                        New Appointment
+                    </h4>
+                    <input
+                      v-model="information.data['title']"
+                      type="text"
+                      name="title"
+                      placeholder="Title"
+                      style="width: 100%;"
+                    />
+                    <textarea
+                      v-model="information.data['description']"
+                      type="text"
+                      name="description"
+                      placeholder="Description"
+                      rows="2"
+                    ></textarea>
+                    <div class="buttons">
+                        <button class="cancel" @click="closePopups()">
+                            Cancel
+                        </button>
+                        <button @click="saveAppointment(information)">
+                            Save
+                        </button>
+                    </div>
                 </slot>
             </div>
         </portal>
@@ -237,19 +276,19 @@ export default {
                 past_event_creation: true,
                 formatLeftHours: date => {
                     let isoDate = new Date(addTimezoneInfo(date));
-                    return getFormattedTime(this.locale, isoDate)
+                    return getFormattedTime(isoDate)
                 },
                 formatDayTitle: date => {
                     let isoDate = new Date(date);
-                    let dayName = getFormattedWeekDayTime(this.locale, isoDate).split(',')[0];
+                    let dayName = getFormattedWeekDayTime( isoDate).split(',')[0];
                     let dayNumber = isoDate.getUTCDate();
                     return [dayName, dayNumber];
                 },
                 formatWeekNavigator: isoDate => {
                     let startDate = startOfWeek(isoDate);
                     let endDate = endOfWeek(isoDate);
-                    let startString = getFormattedMonth(this.locale, startDate);
-                    let endString = getFormattedMonth(this.locale, endDate);
+                    let startString = getFormattedMonth(startDate);
+                    let endString = getFormattedMonth(endDate);
                     
                     return `${startString} - ${endString}`;
                 },
@@ -257,18 +296,20 @@ export default {
                     let day = new Date(isoDate);
                     return day.toUTCString().slice(5, 11);
                 },
+                toggleEditing: () => {
+                  this.isEditing = !this.isEditing
+                },
+                toggleEditPopup: (value) => {
+                  this.isShowEditPopup = value
+                }
             },
             kalendar_events: null,
             kalendar_work_hours: {},
             kalendar_work_hours_temp: {},
             new_appointment: {},
             scrollable: true,
-            locale: (() => {
-                // If not running in the browser, cannot determine a default, return the code for unknown (blank is invalid)
-                if (typeof navigator === "undefined") return "unk"
-                // Return the browser's language setting, implementation is browser-specific
-                return (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language).toLowerCase()
-            })(),
+            isEditing: false,
+            isShowEditPopup: false,
         };
     },
     computed: {
@@ -309,10 +350,12 @@ export default {
     },
     created() {
         this.current_day = this.kalendar_options.start_day;
-        this.kalendar_events = this.events.map(event => ({
+        this.kalendar_events = this.events.map(event => {
+          return {
             ...event,
             id: event.id || generateUUID(),
-        }));
+          }
+        });
         
         this.kalendar_work_hours = {...this.work_time};
         this.kalendar_work_hours_temp = {...this.work_time};
@@ -321,31 +364,32 @@ export default {
             Vue.prototype.$kalendar = {};
         }
 
-        this.$kalendar.getEvents = () => this.kalendar_events.slice(0);
-        this.$kalendar.updateEvents = payload => {
-            this.kalendar_events = payload.map(event => ({
+        this.$kalendar.getEvents = () => {
+            return this.kalendar_events.slice(0);
+        }
+        
+        this.$kalendar.updateEvents = events => {
+            this.kalendar_events = events.map(event => ({
                 ...event,
-                id: event.id || generateUUID(),
+                id: event.id || generateUUID()
             }));
             this.$emit(
                 'update:events',
-                payload.map(event => ({
-                    from: event.from,
-                    to: event.to,
-                    data: event.data,
-                }))
+              this.kalendar_events
             );
         };
 
         this.$kalendar.getWorkHours = () => {
             return {...this.kalendar_work_hours}
         };
+        
         this.$kalendar.updateWorkHours = payload => {
             this.kalendar_work_hours = {
                 ...this.kalendar_work_hours,
                 ...payload
             };
         };
+        
         this.$kalendar.saveWorkHours = () => {
             this.$emit(
               'update:work_time',
@@ -353,27 +397,31 @@ export default {
             );
             this.kalendar_work_hours_temp = this.kalendar_work_hours
         };
+        
         this.$kalendar.removeWorkHours = payload => {
             delete this.kalendar_work_hours[payload]
         };
+        
         this.$kalendar.resetWorkHours = () => {
             this.kalendar_work_hours = {};
             this.kalendar_work_hours_temp = this.kalendar_work_hours
         };
+        
         this.$kalendar.cancelWorkHours = () => {
             this.kalendar_work_hours = {...this.work_time};
             this.$kalendar.saveWorkHours()
         };
+        
+        this.$kalendar.formatLeftHours = this.kalendar_options.formatLeftHours;
+        this.$kalendar.toggleEditing = this.kalendar_options.toggleEditing;
+        this.$kalendar.toggleEditPopup = this.kalendar_options.toggleEditPopup;
+        this.$kalendar.options = this.kalendar_options;
     },
     provide() {
         const provider = {};
         Object.defineProperty(provider, 'kalendar_options', {
             enumerable: true,
             get: () => this.kalendar_options,
-        });
-        Object.defineProperty(provider, 'kalendar_events', {
-            enumerable: true,
-            get: () => this.kalendar_events,
         });
         return provider;
     },
@@ -412,7 +460,11 @@ export default {
         },
         isString(val) {
             return (typeof val === "string" || val instanceof String);
-        }
+        },
+        saveAppointment(popup_info) {
+            this.$kalendar.saveEvent(popup_info);
+            this.$kalendar.closePopups();
+        },
     },
 };
 </script>
