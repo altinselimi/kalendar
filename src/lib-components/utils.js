@@ -156,6 +156,55 @@ const formatAMPM = date => {
   return result;
 };
 
+const beginningOfMonth = (d) => new Date(d.getFullYear(), d.getMonth())
+
+const lastDayOfMonth = (d) => {
+  let date = new Date(d)
+  return new Date(date.getFullYear(), today.getMonth()+1, 0)
+}
+
+const beginningOfWeek = (d, startDow) => {
+  return addDays(d, (startDow - d.getDay() - 7) % -7)
+}
+
+const endOfWeekInMonth = (d, startDow) => {
+  return addDays(beginningOfWeek(d, startDow), 7)
+}
+
+const daysInMonth = function() {
+  let d = new Date()
+  return 33 - new Date(d.getFullYear(), d.getMonth(), 33).getDate();
+}
+
+const incrementPeriod = (d, uom, count) => {
+  return new Date(
+      d.getFullYear() + (uom === "year" ? count : 0),
+      d.getMonth() + (uom === "month" ? count : 0),
+      d.getDate() + (uom === "week" ? count * 7 : 0))
+}
+
+// Number of whole days between two dates. If present, time of day is ignored.
+// Treats dates as UTC to avoid DST changes within the perioud leading to incorrect
+// answers.
+const dayDiff = (d1, d2) => {
+  const endDate = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()),
+      startDate = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())
+  return (endDate - startDate) / 86400000
+}
+
+const beginningOfPeriod = (d, periodUom, startDow) => {
+  switch (periodUom) {
+    case "year":
+      return new Date(d.getFullYear(), 0)
+    case "month":
+      return new Date(d.getFullYear(), d.getMonth())
+    case "week":
+      return this.beginningOfWeek(d, startDow)
+    default:
+      return d
+  }
+}
+
 export {
   addDays,
   addMinutes,
@@ -175,4 +224,12 @@ export {
   isWeekend,
   formatAMPM,
   getTime,
+  beginningOfMonth,
+  lastDayOfMonth,
+  beginningOfWeek,
+  endOfWeekInMonth,
+  daysInMonth,
+  incrementPeriod,
+  dayDiff,
+  beginningOfPeriod
 };

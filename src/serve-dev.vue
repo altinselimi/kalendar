@@ -164,7 +164,7 @@ export default {
 		return {
 			events: existing_events,
 			calendar_settings: {
-				view_type: 'week',
+				view_type: 'month',
 				cell_height: 10,
 				scrollToNow: false,
 				//start_day: getCurrentDay(),

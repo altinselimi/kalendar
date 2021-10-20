@@ -100,7 +100,7 @@ export default {
     renderDay() {
       myWorker
         .send("getDayCells", {
-          day: this.day.value,
+          day: !!this.day.value ? this.day.value : this.day,
           hourOptions: {
             start_hour: this.kalendar_options.day_starts_at,
             end_hour: this.kalendar_options.day_ends_at

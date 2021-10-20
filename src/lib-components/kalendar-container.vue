@@ -93,7 +93,8 @@
                 </button>
             </div>
         </div>
-        <kalendar-week-view :current_day="current_day" />
+        <kalendar-monthview v-if="kalendar_options.view_type === 'month'" :current_day="current_day" />
+        <kalendar-week-view v-else :current_day="current_day" />
         <portal to="event-creation" class="slotable">
             <div slot-scope="information" class="creating-event">
                 <slot name="creating-card" :event_information="information">
@@ -167,6 +168,7 @@ import {
 
 export default {
     components: {
+        KalendarMonthview: () => import('./kalendar-monthview.vue'),
         KalendarWeekView: () => import('./kalendar-weekview.vue'),
     },
     props: {
@@ -242,7 +244,7 @@ export default {
             let conditions = {
                 scrollToNow: val => typeof val === 'boolean',
                 start_day: val => !isNaN(Date.parse(val)),
-                view_type: val => ['week', 'day'].includes(val),
+                view_type: val => ['week', 'day', 'month'].includes(val),
                 cell_height: val => !isNaN(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
                 military_time: val => typeof val === 'boolean',
