@@ -24,18 +24,36 @@
         v-show="kalendar_options.style === 'material_design'"
       ></span>
     </div>
-    <kalendar-cell
-      v-for="(cell, index) in day_cells"
-      :constructed-events="day_events"
-      :key="`cell-${index}`"
-      :creator="creator"
-      :cell-data="cell"
-      :index="index"
-      @select="updateCreator"
-      @reset="resetEvents()"
-      @initiatePopup="initiatePopup()"
-      :temporary-event="temporary_event"
-    />
+    <template v-if="!kalendar_options.working_hours">
+      <kalendar-cell
+        v-for="(cell, index) in day_cells"
+        :constructed-events="day_events"
+        :key="`cell-${index}`"
+        :creator="creator"
+        :cell-data="cell"
+        :index="index"
+        @select="updateCreator"
+        @reset="resetEvents()"
+        @initiatePopup="initiatePopup()"
+        :temporary-event="temporary_event"
+        :constructed-work-hours="day_work_hours"
+        :kalendar_events="kalendar_events"
+        :isShowEditPopup="isShowEditPopup"
+      />
+    </template>  
+    <template v-else>
+      <kalendar-working-time-cell
+        v-for="(cell, index) in day_cells"
+        :key="`cell1-${index}`"
+        :creatingWorkTime="creatingWorkTime"
+        :cell-data="cell"
+        :index="index"
+        @selectWorkHours="selectCellWorkHours"
+        @addSelectWorkHours="addSelectWorkHours"
+        :constructed-work-hours="day_work_hours"
+        :temporaryWorkHours="temporary_work_hours"
+      />
+    </template>  
   </ul>
 </template>
 <script>
@@ -44,7 +62,34 @@ import { isToday, isWeekend, cloneObject, getLocaleTime } from "./utils";
 import myWorker from "@/lib-components/workers";
 
 export default {
-  props: ["day", "passedTime"],
+  props: {
+    'day': {
+      
+    },
+    'passedTime': {
+      
+    },
+    kalendar_events: {
+      required: true,
+      type: Array,
+      default: () => []
+    },
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: () => {}
+    },
+    isEditing: {
+      required: true,
+      type: Boolean,
+      default: false
+    },
+    isShowEditPopup: {
+      required: true,
+      type: Boolean,
+      default: false
+    }
+  },
   created() {
     // get and render day cells
     // and then render any event
@@ -52,7 +97,8 @@ export default {
     this.renderDay();
   },
   components: {
-    kalendarCell: () => import("./kalendar-cell.vue")
+    kalendarCell: () => import("./kalendar-cell.vue"),
+    kalendarWorkingTimeCell: () => import("./kalendar-working-time-cell.vue")
   },
   provide() {
     // provide these methods to children components
@@ -63,7 +109,7 @@ export default {
     };
   },
   // inject kalendar options from parent component
-  inject: ["kalendar_options"],
+  inject: ['kalendar_options'],
   mounted() {
     if (this.kalendar_options.scrollToNow && this.isToday) this.scrollView();
   },
@@ -73,6 +119,14 @@ export default {
     },
     isToday() {
       return isToday(this.day.value);
+    }
+  },
+  watch: {
+    kalendar_work_hours (value) {
+      this.day_work_hours = value
+    },
+    isEditing () {
+      this.renderDay()
     }
   },
   data: () => ({
@@ -91,10 +145,15 @@ export default {
     // that holds values of creator
     // when the popup is initiated
     temporary_event: null,
+    
+    temporary_work_hours: {},
 
     // day cells and events are used for rendering purposes
     day_cells: [],
-    day_events: null
+    day_events: null,
+    
+    day_work_hours: null,
+    creatingWorkTime: false
   }),
   methods: {
     renderDay() {
@@ -108,6 +167,7 @@ export default {
         })
         .then(reply => {
           this.day_cells = reply;
+          this.getDayWorkHours();
           return this.getDayEvents(this.$kalendar.getEvents());
         });
     },
@@ -142,7 +202,6 @@ export default {
             this.$set(this.day_events, key, [constructed_event]);
           }
           let events = this.$kalendar.getEvents();
-          console.log("Adding event to kalendar", payload);
           events.push({
             ...payload,
             id: constructed_event.id
@@ -188,6 +247,7 @@ export default {
           this.day_events = constructed_events;
         });
     },
+    
     clearCreatingLeftovers() {
       for (let key in this.day_events) {
         let hasPending = this.day_events[key].some(event => {
@@ -209,6 +269,7 @@ export default {
     },
     resetEvents() {
       if (!this.creator.creating && this.creator.status === null) return;
+      
       this.creator = {
         creating: false,
         starting_cell: null,
@@ -262,6 +323,7 @@ export default {
     },
     selectCell() {
       if (!this.creator.creating) return;
+      
       let {
         creating,
         ending_cell,
@@ -273,8 +335,7 @@ export default {
       let real_ending_cell_index = ending_cell.index + 1;
       ending_cell = this.day_cells[real_ending_cell_index];
 
-      const diffInMs =
-        new Date(ending_cell.value) - new Date(starting_cell.value);
+      const diffInMs = new Date(ending_cell.value) - new Date(starting_cell.value);
       const diffInHrs = Math.floor((diffInMs % 86400000) / 3600000);
       const diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
       let startDate = new Date(starting_cell.value);
@@ -301,6 +362,7 @@ export default {
     },
     initiatePopup() {
       if (this.creating && this.creator.status !== "creating") return;
+      
       this.creator = {
         ...this.creator,
         status: "popup-initiated",
@@ -396,10 +458,38 @@ export default {
     },
     scrollView() {
       let topoffset = this.$refs.nowIndicator.offsetTop;
-      console.log("Scrolling to :", topoffset);
+      // console.log("Scrolling to :", topoffset);
       setTimeout(() => {
         window.scroll({ top: topoffset, left: 0, behavior: "smooth" });
       }, 500);
+    },
+    /* working hours */
+    getDayWorkHours() {
+      this.day_work_hours = this.$kalendar.getWorkHours();
+    },
+    selectCellWorkHours(value) {
+      this.creatingWorkTime = true;
+      
+      if (this.day_work_hours[value] !== undefined) {
+        this.$kalendar.removeWorkHours(value)
+        this.$delete(this.temporary_work_hours, value);
+        this.getDayWorkHours();
+      } else {
+        this.$set(this.temporary_work_hours, value, '');
+      }
+    },
+    addSelectWorkHours () {
+      this.creatingWorkTime = false;
+      
+      const hours = {
+        ...this.day_work_hours,
+        ...this.temporary_work_hours
+      };
+    
+      this.$kalendar.updateWorkHours(hours);
+      this.getDayWorkHours();
+      
+      this.temporary_work_hours = {};
     }
   }
 };
@@ -408,13 +498,17 @@ export default {
 ul.kalendar-day {
   position: relative;
   background-color: white;
+  
+  &:hover {
+    background: rgba(#2089FF, .1);
+  }
 
   &.is-weekend {
     background-color: var(--weekend-color);
   }
 
   &.is-today {
-    background-color: var(--current-day-color);
+    border-left: 1px solid var(--main-color)
   }
 
   .clear {

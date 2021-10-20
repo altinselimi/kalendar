@@ -46,7 +46,9 @@
             v-for="(hour, index) in hoursVisible"
             :style="`height:${hourHeight}px`"
           >
-            <span>{{ kalendar_options.formatLeftHours(hour.value) }}</span>
+            <span>
+              {{ kalendar_options.formatLeftHours(hour.value) }}
+            </span>
           </li>
         </ul>
         <div
@@ -57,7 +59,7 @@
           <span class="time-value">{{ passedTime.value }}</span>
           <span class="line"></span>
         </div>
-        <kalendar-days
+        <kalendar-day
           :day="day"
           class="building-blocks"
           :class="`day-${index + 1}`"
@@ -65,14 +67,18 @@
           v-for="(day, index) in days"
           :passed-time="passedTime.distance"
           :ref="day.value.slice(0, 10)"
+          :kalendar_events="kalendar_events"
+          :kalendar_work_hours="kalendar_work_hours"
+          :isEditing="isEditing"
+          :isShowEditPopup="isShowEditPopup"
         >
-        </kalendar-days>
+        </kalendar-day>
       </div>
     </div>
   </div>
 </template>
 <script>
-import KalendarDays from "./kalendar-day.vue";
+import KalendarDay from "./kalendar-day.vue";
 import myWorker from "@/lib-components/workers";
 import {
   isBefore,
@@ -88,17 +94,37 @@ export default {
       required: true,
       type: String,
       validator: d => !isNaN(Date.parse(d)),
+    },
+    kalendar_work_hours: {
+      required: true,
+      type: Object,
+      default: () => {}
+    },
+    kalendar_events: {
+      required: true,
+      type: Array,
+      default: () => []
+    },
+    isEditing: {
+      required: true,
+      type: Boolean,
+      default: false
+    },
+    isShowEditPopup: {
+      required: true,
+      type: Boolean,
+      default: false
     }
   },
   components: {
-    KalendarDays
+    KalendarDay
   },
   created() {
     this.addHelperMethods();
     setInterval(() => (this.kalendar_options.now = new Date()), 1000 * 60);
     this.constructWeek();
   },
-  inject: ["kalendar_options", "kalendar_events"],
+  inject: ["kalendar_options"],
   data: () => ({
     hours: null,
     days: []
@@ -186,8 +212,10 @@ export default {
         let { from, to } = payload;
         if (from.slice(-4) === "000Z") payload.from = addTimezoneInfo(from);
         if (to.slice(-4) === "000Z") payload.to = addTimezoneInfo(to);
+
         let targetRef = payload.from.slice(0, 10);
         const refObject = this.$refs[targetRef];
+
         if (refObject && refObject[0]) {
           refObject[0].addEvent(payload);
         } else {
@@ -197,16 +225,29 @@ export default {
           this.$kalendar.updateEvents(events);
         }
       };
+      this.$kalendar.saveEvent = payload => {
+        let events = this.$kalendar.getEvents();
+        let findEventIndex = events.findIndex(ev => payload.id === ev.id);
+
+        if (findEventIndex !== -1) {
+          events[findEventIndex] = payload
+        } else {
+          events.push(payload);
+        }
+
+        this.$kalendar.updateEvents(events);
+      };
 
       this.$kalendar.removeEvent = options => {
         let { day, key, id } = options;
         if (day.length > 10) {
           day = day.slice(0, 10);
         }
-        console.log("Options:", options);
+
         if (!day) return Promise.reject("Day wasn't provided");
         if (!id) return Promise.reject("No ID was provided");
         if (!key) return Promise.reject("No key was provided in the object");
+
         let targetRef = day;
         this.$refs[targetRef][0].removeEvent({ id, key });
       };
@@ -249,7 +290,7 @@ $theme-color: #e5e5e5;
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color: white;
+  background: #fff;
 
   .days {
     margin: 0px;
@@ -363,6 +404,7 @@ $theme-color: #e5e5e5;
     width: 100%;
     display: flex;
     position: relative;
+    padding: 0 50px 0 0;
   }
 }
 
@@ -386,7 +428,7 @@ $theme-color: #e5e5e5;
     }
 
     &:first-child span {
-      visibility: hidden;
+      padding-top: 5px;
     }
   }
 }

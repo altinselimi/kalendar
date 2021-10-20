@@ -70,14 +70,15 @@ const addHours = (date, hours) => {
 const startOfWeek = date => {
   let d = new Date(date);
   let day = d.getDay(),
-    diff = d.getDate() - day;
+    diff = d.getDate() - day + 1;
+
   return new Date(d.setDate(diff));
 };
 
 const endOfWeek = date => {
   let dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
-  let toAdd = 6 - dateObj.getDay();
+  let toAdd = 7 - dateObj.getDay();
   return addDays(dateObj, toAdd);
 };
 
@@ -156,6 +157,44 @@ const formatAMPM = date => {
   return result;
 };
 
+const locale = () => {
+  // If not running in the browser, cannot determine a default, return the code for unknown (blank is invalid)
+  if (typeof navigator === "undefined") return "unk"
+  // Return the browser's language setting, implementation is browser-specific
+  return (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language).toLowerCase()
+};
+
+const getFormattedWeekDayTime = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { weekday: 'short' })
+  return formatter.format(date)
+};
+
+const getFormattedMonth = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long' })
+  return formatter.format(date)
+};
+
+const getFormattedTime = (date) => {
+  const formatter = new Intl.DateTimeFormat(locale(), { timeStyle: 'short' })
+  return formatter.format(date)
+};
+
+const getTimeRemaining = (endTime) => {
+  const total = Date.parse(endTime) - Date.parse(new Date());
+  const seconds = Math.floor( (total/1000) % 60 );
+  const minutes = Math.floor( (total/1000/60) % 60 );
+  const hours = Math.floor( (total/(1000*60*60)) % 24 );
+  const days = Math.floor( total/(1000*60*60*24) );
+
+  return {
+    total,
+    days,
+    hours,
+    minutes,
+    seconds
+  };
+}
+
 const beginningOfMonth = (d) => new Date(d.getFullYear(), d.getMonth())
 
 const lastDayOfMonth = (d) => {
@@ -224,6 +263,10 @@ export {
   isWeekend,
   formatAMPM,
   getTime,
+  getFormattedWeekDayTime,
+  getFormattedMonth,
+  getFormattedTime,
+  getTimeRemaining,
   beginningOfMonth,
   lastDayOfMonth,
   beginningOfWeek,

@@ -51,6 +51,7 @@
                         {{ event_information.end_time | formatToHours }}</span
                     >
                     <button
+                        v-if="!calendar_settings.read_only"
                         @click="removeEvent(event_information)"
                         class="remove"
                     >
@@ -199,6 +200,7 @@ export default {
                 scrollToNow: false,
                 //start_day: getCurrentDay(),
                 military_time: false,
+                working_hours: false,
                 read_only: false,
                 day_starts_at: 0,
                 day_ends_at: 24,
@@ -262,13 +264,13 @@ export default {
             this.$kalendar.removeEvent({
                 day,
                 key: kalendarEvent.key,
-                id: kalendarEvent.kalendar_id,
+                id: kalendarEvent.id,
             });
         },
     },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 $green: #00f0b5;
 $red: #f61067;
 $blue: #007fff;

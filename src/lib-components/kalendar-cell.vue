@@ -10,15 +10,11 @@
             'is-an-hour': (index + 1) % (60 / 10) === 0,
             'has-events': cell_events && cell_events.length > 0,
             'being-created': !!being_created || hasPopups,
+            'work-time': isConstructed,
         }"
-        :style="
-            `
-      height: ${kalendar_options.cell_height}px;
-    `
-        "
+        :style="`height: ${kalendar_options.cell_height}px;`"
     >
         <KalendarEvent
-            :style="`z-index: 10`"
             v-if="cell_events && cell_events.length"
             v-for="(event, eventIndex) in cell_events"
             :event="event"
@@ -26,6 +22,9 @@
             :total="cell_events.length"
             :index="eventIndex"
             :overlaps="overlapValue"
+            :kalendar_events="kalendar_events"
+            :isEditing="isEditing"
+            :isShowEditPopup="isShowEditPopup"
         />
     </li>
 </template>
@@ -38,7 +37,11 @@ export default {
         'index',
         'cellData',
         'constructedEvents',
+        'constructedWorkHours',
         'temporaryEvent',
+        'kalendar_events',
+        'isEditing',
+        'isShowEditPopup'
     ],
     inject: ['kalendar_options'],
     components: {
@@ -94,6 +97,9 @@ export default {
                 !!this.cell_events.find(ev => ev.status === 'popup-initiated')
             );
         },
+        isConstructed() {
+            return this.cellData.value in this.constructedWorkHours
+        },
     },
     methods: {
         mouseDown() {
@@ -108,6 +114,7 @@ export default {
                 overlap,
                 past_event_creation,
             } = this.kalendar_options;
+            
             if (read_only) return;
 
             // if past_event_creation is set to false, check if cell value is
@@ -122,7 +129,6 @@ export default {
 
             // if overlap is set to false, prevent selection on top of
             // other events
-            console.log('Cell events:', this.cell_events.length);
             if (!overlap && this.cell_events.length > 0) return;
 
             // close any open popups in the whole kalendar instance
@@ -146,8 +152,11 @@ export default {
         mouseMove() {
             // same guards like in the mouseDown function
             let { read_only, overlap } = this.kalendar_options;
+            
             if (read_only) return;
+            
             if (this.creator && !this.creator.creating) return;
+            
             let {
                 starting_cell,
                 original_starting_cell,
@@ -215,6 +224,10 @@ ul.building-blocks {
 
         &.being-created {
             z-index: 11;
+        }
+
+        &.work-time {
+            background-color: #7AFFD766;
         }
     }
 }
