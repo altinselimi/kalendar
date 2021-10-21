@@ -74,8 +74,20 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -123,6 +135,10 @@ function _arrayLikeToArray(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
   return arr2;
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
@@ -197,7 +213,7 @@ var getLocaleTime = function getLocaleTime(dateString) {
 };
 
 var addTimezoneInfo = function addTimezoneInfo(ISOdate) {
-  if (new Date(ISOdate).toISOString() !== ISOdate) return;
+  if (new Date(ISOdate).toISOString() !== ISOdate && ISOdate.indexOf('000Z') !== -1) return;
   return "".concat(ISOdate.slice(0, 19)).concat(creators_offset);
 };
 
@@ -260,6 +276,43 @@ var getTimeRemaining = function getTimeRemaining(endTime) {
     minutes: minutes,
     seconds: seconds
   };
+};
+
+var beginningOfWeek = function beginningOfWeek(d, startDow) {
+  return addDays(d, (startDow - d.getDay() - 7) % -7);
+};
+
+var endOfWeekInMonth = function endOfWeekInMonth(d, startDow) {
+  return addDays(beginningOfWeek(d, startDow), 7);
+};
+
+var incrementPeriod = function incrementPeriod(d, uom, count) {
+  return new Date(d.getFullYear() + (uom === "year" ? count : 0), d.getMonth() + (uom === "month" ? count : 0), d.getDate() + (uom === "week" ? count * 7 : 0));
+}; // Number of whole days between two dates. If present, time of day is ignored.
+// Treats dates as UTC to avoid DST changes within the perioud leading to incorrect
+// answers.
+
+
+var dayDiff = function dayDiff(d1, d2) {
+  var endDate = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()),
+      startDate = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate());
+  return (endDate - startDate) / 86400000;
+};
+
+var beginningOfPeriod = function beginningOfPeriod(d, periodUom, startDow) {
+  switch (periodUom) {
+    case "year":
+      return new Date(d.getFullYear(), 0);
+
+    case "month":
+      return new Date(d.getFullYear(), d.getMonth());
+
+    case "week":
+      return beginningOfWeek(d, startDow);
+
+    default:
+      return d;
+  }
 };
 
 //
@@ -660,6 +713,10 @@ var script$3 = {
         var values = ['text', 'class'];
         return values.indexOf(value) !== -1;
       }
+    },
+    error: {
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -720,7 +777,10 @@ var __vue_render__$3 = function __vue_render__() {
       }
     }
   }, [_vm._v("\n    " + _vm._s(_vm.label) + "\n  ")]) : _vm._e(), _vm._v(" "), _c('div', {
-    staticClass: "b-pth-base-select"
+    staticClass: "b-pth-base-select",
+    class: {
+      '--error': _vm.error
+    }
   }, [_c('div', {
     staticClass: "b-pth-base-select__container",
     on: {
@@ -804,8 +864,8 @@ var __vue_staticRenderFns__$3 = [];
 
 var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-6e96159a_0", {
-    source: ".b-pth-base-select[data-v-6e96159a]{width:100%;height:3.4rem;max-width:50rem;position:relative;display:flex;background-color:#fff;border-bottom:1px solid #dadada;transition:border-color .2s ease;cursor:pointer}.b-pth-base-select *[data-v-6e96159a]{user-select:none}.b-pth-base-select__container[data-v-6e96159a]{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.5rem 1.5rem}.b-pth-base-select__name[data-v-6e96159a]{font-size:1.4rem;line-height:1.8rem;color:#777;cursor:pointer;white-space:nowrap;max-width:95%;overflow:hidden;text-overflow:ellipsis}.b-pth-base-select__name input[data-v-6e96159a]{border:transparent solid 1px}.b-pth-base-select__arrow[data-v-6e96159a]{width:.8rem}.b-pth-base-select__icon[data-v-6e96159a]{margin:0;display:block!important}.b-pth-base-select__icon_up[data-v-6e96159a]{transform:rotate(-180deg);transition:all .2s cubic-bezier(1,.5,.8,1);fill:#000}.b-pth-base-select__dropdown[data-v-6e96159a]{transition:all .2s cubic-bezier(1,.5,.8,1);border-top:none;overflow:hidden;background:#fff;position:absolute;top:100%;left:0;right:0;z-index:999;margin:.2rem .1rem;padding:0;box-shadow:0 4px 4px rgba(0,0,0,.25);border-radius:5px}.b-pth-base-select__options[data-v-6e96159a]{margin:0;padding:0;min-height:6rem}.b-pth-base-select__options._mt[data-v-6e96159a]{margin:1rem 0 0}.b-pth-base-select__options-item[data-v-6e96159a]{padding:1.2rem 24px;line-height:1.6rem;font-size:1.4rem;list-style:none;color:#272727;transition:all .2s cubic-bezier(1,.5,.8,1)}.b-pth-base-select__options-item._fixed[data-v-6e96159a]{top:0;right:0;left:0}.b-pth-base-select__options-item._fixed input[data-v-6e96159a]{width:100%}.b-pth-base-select__options-item[data-v-6e96159a]:last-child{border-bottom:none}.b-pth-base-select__options-item.selected[data-v-6e96159a],.b-pth-base-select__options-item[data-v-6e96159a]:hover{background-color:rgba(0,173,182,.05)}.vue-scrollbar__scrollbar-vertical[data-v-6e96159a]{width:.4rem;height:92%;top:.4rem;bottom:.4rem;right:.4rem}.vue-scrollbar__scrollbar-vertical .scrollbar[data-v-6e96159a]{width:.4rem;border-radius:.4rem}",
+  inject("data-v-3ce90245_0", {
+    source: ".b-pth-base-select[data-v-3ce90245]{width:100%;height:3.4rem;max-width:50rem;position:relative;display:flex;background-color:#fff;border-bottom:1px solid #dadada;transition:border-color .2s ease;cursor:pointer}.b-pth-base-select.--error[data-v-3ce90245]{border-bottom:1px solid #f50d0a}.b-pth-base-select *[data-v-3ce90245]{user-select:none}.b-pth-base-select__container[data-v-3ce90245]{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.5rem 1.5rem .5rem 0}.b-pth-base-select__name[data-v-3ce90245]{font-size:1.4rem;line-height:1.8rem;color:#777;cursor:pointer;white-space:nowrap;max-width:95%;overflow:hidden;text-overflow:ellipsis}.--error .b-pth-base-select__name[data-v-3ce90245]{color:#f50d0a}.b-pth-base-select__name input[data-v-3ce90245]{border:transparent solid 1px}.b-pth-base-select__arrow[data-v-3ce90245]{width:.8rem;max-width:5%}.b-pth-base-select__icon[data-v-3ce90245]{margin:0;display:block!important}.b-pth-base-select__icon_up[data-v-3ce90245]{transform:rotate(-180deg);transition:all .2s cubic-bezier(1,.5,.8,1);fill:#000}.b-pth-base-select__dropdown[data-v-3ce90245]{transition:all .2s cubic-bezier(1,.5,.8,1);border-top:none;overflow:hidden;background:#fff;position:absolute;top:100%;left:-2rem;right:-1rem;z-index:999;margin:.2rem .1rem;padding:0;box-shadow:0 4px 4px rgba(0,0,0,.25);border-radius:5px}.b-pth-base-select__options[data-v-3ce90245]{margin:0;padding:0;min-height:6rem}.b-pth-base-select__options._mt[data-v-3ce90245]{margin:1rem 0 0}.b-pth-base-select__options-item[data-v-3ce90245]{padding:1.2rem 2.4rem;line-height:1.6rem;font-size:1.4rem;list-style:none;color:#272727;transition:all .2s cubic-bezier(1,.5,.8,1)}.b-pth-base-select__options-item._fixed[data-v-3ce90245]{top:0;right:0;left:0}.b-pth-base-select__options-item._fixed input[data-v-3ce90245]{width:100%}.b-pth-base-select__options-item[data-v-3ce90245]:last-child{border-bottom:none}.b-pth-base-select__options-item.selected[data-v-3ce90245],.b-pth-base-select__options-item[data-v-3ce90245]:hover{background-color:rgba(0,173,182,.05)}.vue-scrollbar__scrollbar-vertical[data-v-3ce90245]{width:.4rem;height:92%;top:.4rem;bottom:.4rem;right:.4rem}.vue-scrollbar__scrollbar-vertical .scrollbar[data-v-3ce90245]{width:.4rem;border-radius:.4rem}",
     map: undefined,
     media: undefined
   });
@@ -813,7 +873,7 @@ var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$3 = "data-v-6e96159a";
+var __vue_scope_id__$3 = "data-v-3ce90245";
 /* module identifier */
 
 var __vue_module_identifier__$3 = undefined;
@@ -931,6 +991,15 @@ var __vue_component__$4 = /*#__PURE__*/normalizeComponent({
   staticRenderFns: __vue_staticRenderFns__$4
 }, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, createInjector, undefined, undefined);
 
+var hourUtils = {
+  getAllHours: function getAllHours() {
+    return ["00:00:00", "00:10:00", "00:20:00", "00:30:00", "00:40:00", "00:50:00", "01:00:00", "01:10:00", "01:20:00", "01:30:00", "01:40:00", "01:50:00", "02:00:00", "02:10:00", "02:20:00", "02:30:00", "02:40:00", "02:50:00", "03:00:00", "03:10:00", "03:20:00", "03:30:00", "03:40:00", "03:50:00", "04:00:00", "04:10:00", "04:20:00", "04:30:00", "04:40:00", "04:50:00", "05:00:00", "05:10:00", "05:20:00", "05:30:00", "05:40:00", "05:50:00", "06:00:00", "06:10:00", "06:20:00", "06:30:00", "06:40:00", "06:50:00", "07:00:00", "07:10:00", "07:20:00", "07:30:00", "07:40:00", "07:50:00", "08:00:00", "08:10:00", "08:20:00", "08:30:00", "08:40:00", "08:50:00", "09:00:00", "09:10:00", "09:20:00", "09:30:00", "09:40:00", "09:50:00", "10:00:00", "10:10:00", "10:20:00", "10:30:00", "10:40:00", "10:50:00", "11:00:00", "11:10:00", "11:20:00", "11:30:00", "11:40:00", "11:50:00", "12:00:00", "12:10:00", "12:20:00", "12:30:00", "12:40:00", "12:50:00", "13:00:00", "13:10:00", "13:20:00", "13:30:00", "13:40:00", "13:50:00", "14:00:00", "14:10:00", "14:20:00", "14:30:00", "14:40:00", "14:50:00", "15:00:00", "15:10:00", "15:20:00", "15:30:00", "15:40:00", "15:50:00", "16:00:00", "16:10:00", "16:20:00", "16:30:00", "16:40:00", "16:50:00", "17:00:00", "17:10:00", "17:20:00", "17:30:00", "17:40:00", "17:50:00", "18:00:00", "18:10:00", "18:20:00", "18:30:00", "18:40:00", "18:50:00", "19:00:00", "19:10:00", "19:20:00", "19:30:00", "19:40:00", "19:50:00", "20:00:00", "20:10:00", "20:20:00", "20:30:00", "20:40:00", "20:50:00", "21:00:00", "21:10:00", "21:20:00", "21:30:00", "21:40:00", "21:50:00", "22:00:00", "22:10:00", "22:20:00", "22:30:00", "22:40:00", "22:50:00", "23:00:00", "23:10:00", "23:20:00", "23:30:00", "23:40:00", "23:50:00", "24:00:00"];
+  },
+  getFullHours: function getFullHours() {
+    return ["00:00:00", "01:00:00", "02:00:00", "03:00:00", "04:00:00", "05:00:00", "06:00:00", "07:00:00", "08:00:00", "09:00:00", "10:00:00", "11:00:00", "12:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00", "20:00:00", "21:00:00", "22:00:00", "23:00:00"];
+  }
+};
+
 var EVENT = {
   title: 'Новое занятие',
   description: null,
@@ -1001,7 +1070,18 @@ var script$5 = {
       addedMaterials: [],
       isShowMaterialSelect: false,
       start_time_h: 0,
-      end_time_h: 0
+      end_time_h: 0,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     };
   },
   computed: {
@@ -1015,11 +1095,31 @@ var script$5 = {
       return this.end_time_h - this.start_time_h < 0;
     }
   },
+  created: function created() {
+    var _cloneObject = cloneObject(this.popup_information),
+        start_time = _cloneObject.start_time,
+        end_time = _cloneObject.end_time,
+        data = _cloneObject.data,
+        day_events = _cloneObject.day_events;
+
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.day_events = day_events;
+  },
   mounted: function mounted() {
     this.filterStudents();
     this.filterMaterials();
+    this.filterTimes();
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes: function filterTimes() {
+      this.filterTime('start');
+      this.filterTime('end');
+    },
     addEvent: function addEvent() {
       var payload = {
         data: {
@@ -1069,13 +1169,6 @@ var script$5 = {
       var dayMonth = getFormattedMonth(isoDate);
       return "".concat(dayName, ", ").concat(dayMonth);
     },
-    changeTime: function changeTime(eventData, timeName) {
-      var date = new Date(this.popup_information[timeName]);
-      var newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm));
-      this[timeName] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
-
-      this["".concat(timeName, "_h")] = +eventData.data.h;
-    },
     showMaterialSelect: function showMaterialSelect() {
       this.isShowMaterialSelect = true;
     },
@@ -1104,6 +1197,81 @@ var script$5 = {
     removeMaterial: function removeMaterial(index) {
       this.addedMaterials.splice(index, 1);
       this.filterMaterials();
+    },
+    changeTime: function changeTime(value, timeName) {
+      var dataTime = value.split(':');
+      var date = new Date(this["".concat(timeName, "_time")]);
+      var newDate = new Date(date.setHours(dataTime[0], dataTime[1]));
+      this["".concat(timeName, "_time")] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
+
+      this["".concat(timeName, "_time_h")] = +dataTime[0] * 100;
+      this.filterTimes();
+
+      if (this.start_time_h > this.end_time_h) {
+        // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0];
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':', '');
+        this.changeTime(this.endTimeSelect.selected.value, 'end');
+      }
+    },
+    filterTime: function filterTime(prop) {
+      var _this3 = this;
+
+      var maxStartTime = this.hourRange[0] * 100;
+      var maxEndTime = this.hourRange[1] * 100;
+      Object.keys(this.day_events).forEach(function (key) {
+        var eventStartTime = +_this3.getNumHour(_this3.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+
+        var eventEndTime = +_this3.getNumHour(_this3.day_events[key][0].end.value); //
+
+        if (eventStartTime <= _this3.start_time_h && eventEndTime <= _this3.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime;
+          }
+        }
+
+        if (eventStartTime >= _this3.end_time_h && eventEndTime >= _this3.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime;
+          }
+        }
+      });
+      var all_hours = hourUtils.getAllHours().filter(function (h) {
+        var numHour = +h.slice(0, 2); // берем время в виде 10
+
+        var numHour10 = +h.slice(0, 5).replace(':', ''); // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < _this3.hourRange[0] || numHour > _this3.hourRange[1]) {
+          // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false;
+        }
+
+        if (prop === 'start' && numHour10 === _this3.getNumHour(_this3.end_time)) {
+          return false;
+        }
+
+        if (prop === 'end' && numHour10 <= _this3.getNumHour(_this3.start_time)) {
+          return false;
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime; // выбираем только кратные 30мин
+      });
+      this["".concat(prop, "TimeSelect")].filteredList = all_hours.map(function (h) {
+        return {
+          name: h.slice(0, 5),
+          value: h.slice(0, 5)
+        };
+      });
+    },
+    setTime: function setTime(prop) {
+      var time = this["".concat(prop, "_time")].slice(11, 16);
+      return {
+        name: time,
+        value: time
+      };
+    },
+    getNumHour: function getNumHour(time) {
+      return +time.slice(11, 16).replace(':', ''); // 2021-10-22T18:00:00+03:00 => 1800
     }
   }
 };
@@ -1256,28 +1424,42 @@ var __vue_render__$5 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n      " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n    ")]), _vm._v(" "), _c('base-time-select', {
+  }, [_vm._v("\n      " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n    ")]), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.start_time,
-      "hour-range": _vm.hourRange
+      "defaultText": "Начало",
+      "options": _vm.startTimeSelect.filteredList
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'start_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.startTimeSelect.selected.value, 'start');
       }
+    },
+    model: {
+      value: _vm.startTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.startTimeSelect, "selected", $$v);
+      },
+      expression: "startTimeSelect.selected"
     }
   }), _vm._v(" "), _c('span', {
     staticClass: "b-delimiter"
-  }), _vm._v(" "), _c('base-time-select', {
+  }), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.end_time,
-      "hour-range": _vm.hourRange,
+      "defaultText": "Конец",
+      "options": _vm.endTimeSelect.filteredList,
       "error": _vm.errorSelectedTime
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'end_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.endTimeSelect.selected.value, 'end');
       }
+    },
+    model: {
+      value: _vm.endTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.endTimeSelect, "selected", $$v);
+      },
+      expression: "endTimeSelect.selected"
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "b-materials"
@@ -1372,7 +1554,7 @@ var __vue_staticRenderFns__$5 = [function () {
 
 var __vue_inject_styles__$5 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-07d7150d_0", {
+  inject("data-v-d2d361fe_0", {
     source: ".created-card{display:flex;flex-direction:column;padding:20px 20px 10px 30px;position:relative}.created-card__x{position:absolute;top:0;right:0}.created-card__header{display:flex;align-items:center;margin:0 0 20px 0}.created-card__header-icon{display:inline-block;width:20px;height:20px;margin:0 10px 0 0}.created-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-lesson{width:100%;color:#777;display:flex;justify-content:center;align-items:center;margin:10px}.b-open-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:20px 0}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 10px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}",
     map: undefined,
     media: undefined
@@ -1427,14 +1609,12 @@ var script$6 = {
   name: "kalendar-popup-edit-form",
   components: {
     KalendarXButton: __vue_component__$1,
-    BaseSelect: __vue_component__$3,
-    BaseTimeSelect: __vue_component__$4
+    BaseSelect: __vue_component__$3
   },
   props: ['popup_information'],
   data: function data() {
     return {
       studentSelect: {
-        value: {},
         list: Object.keys(STUDENTS$1).map(function (m) {
           return {
             value: m,
@@ -1445,7 +1625,6 @@ var script$6 = {
         selected: {}
       },
       materialSelect: {
-        value: {},
         list: Object.keys(MATERIALS$1).map(function (m) {
           return {
             value: m,
@@ -1463,23 +1642,23 @@ var script$6 = {
       isShowMaterialSelect: false,
       start_time_h: 0,
       end_time_h: 0,
-      isEdit: false
+      isEdit: false,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     };
-  },
-  created: function created() {
-    var _cloneObject = cloneObject(this.popup_information),
-        start_time = _cloneObject.start_time,
-        end_time = _cloneObject.end_time,
-        data = _cloneObject.data;
-
-    this.start_time = start_time;
-    this.end_time = end_time;
-    this.addedStudents = data.students;
-    this.addedMaterials = data.materials;
   },
   computed: {
     hourRange: function hourRange() {
-      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at];
+      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at - 1];
     },
     enabledSave: function enabledSave() {
       return this.addedStudents.length > 0 && !this.errorSelectedTime;
@@ -1490,18 +1669,40 @@ var script$6 = {
     beforeTime: function beforeTime() {
       var rt = getTimeRemaining(this.start_time);
 
-      if (rt.days === 0 && rt.minutes > 0) {
-        return rt.minutes;
+      if (rt.days === 0 && rt.minutes >= 0 && rt.hours < 8 && rt.hours >= 0) {
+        return [rt.hours, rt.minutes];
       }
 
-      return 0;
+      return [];
     }
+  },
+  created: function created() {
+    var _cloneObject = cloneObject(this.popup_information),
+        start_time = _cloneObject.start_time,
+        end_time = _cloneObject.end_time,
+        data = _cloneObject.data,
+        day_events = _cloneObject.day_events;
+
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.addedStudents = data.students;
+    this.addedMaterials = data.materials;
+    this.day_events = day_events;
   },
   mounted: function mounted() {
     this.filterStudents();
     this.filterMaterials();
+    this.filterTimes();
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes: function filterTimes() {
+      this.filterTime('start');
+      this.filterTime('end');
+    },
     editEvent: function editEvent() {
       this.start_time = addTimezoneInfo(this.start_time);
       this.end_time = addTimezoneInfo(this.end_time);
@@ -1551,12 +1752,21 @@ var script$6 = {
       var dayMonth = getFormattedMonth(isoDate);
       return "".concat(dayName, ", ").concat(dayMonth);
     },
-    changeTime: function changeTime(eventData, timeName) {
-      var date = new Date(this[timeName]);
-      var newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm));
-      this[timeName] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
+    changeTime: function changeTime(value, timeName) {
+      var dataTime = value.split(':');
+      var date = new Date(this["".concat(timeName, "_time")]);
+      var newDate = new Date(date.setHours(dataTime[0], dataTime[1]));
+      this["".concat(timeName, "_time")] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
 
-      this["".concat(timeName, "_h")] = +eventData.data.H;
+      this["".concat(timeName, "_time_h")] = +dataTime[0] * 100;
+      this.filterTimes();
+
+      if (this.start_time_h > this.end_time_h) {
+        // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0];
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':', '');
+        this.changeTime(this.endTimeSelect.selected.value, 'end');
+      }
     },
     showMaterialSelect: function showMaterialSelect() {
       this.isShowMaterialSelect = true;
@@ -1599,6 +1809,65 @@ var script$6 = {
     formatDate: function formatDate(date) {
       var isoDate = new Date(date);
       return getFormattedTime(isoDate);
+    },
+    filterTime: function filterTime(prop) {
+      var _this3 = this;
+
+      var maxStartTime = this.hourRange[0] * 100;
+      var maxEndTime = this.hourRange[1] * 100;
+      Object.keys(this.day_events).forEach(function (key) {
+        var eventStartTime = +_this3.getNumHour(_this3.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+
+        var eventEndTime = +_this3.getNumHour(_this3.day_events[key][0].end.value); //
+
+        if (eventStartTime <= _this3.start_time_h && eventEndTime <= _this3.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime;
+          }
+        }
+
+        if (eventStartTime >= _this3.end_time_h && eventEndTime >= _this3.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime;
+          }
+        }
+      });
+      var all_hours = hourUtils.getAllHours().filter(function (h) {
+        var numHour = +h.slice(0, 2); // берем время в виде 10
+
+        var numHour10 = +h.slice(0, 5).replace(':', ''); // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < _this3.hourRange[0] || numHour > _this3.hourRange[1]) {
+          // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false;
+        }
+
+        if (prop === 'start' && numHour10 === _this3.getNumHour(_this3.end_time)) {
+          return false;
+        }
+
+        if (prop === 'end' && numHour10 <= _this3.getNumHour(_this3.start_time)) {
+          return false;
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime; // выбираем только кратные 30мин
+      });
+      this["".concat(prop, "TimeSelect")].filteredList = all_hours.map(function (h) {
+        return {
+          name: h.slice(0, 5),
+          value: h.slice(0, 5)
+        };
+      });
+    },
+    setTime: function setTime(prop) {
+      var time = this["".concat(prop, "_time")].slice(11, 16);
+      return {
+        name: time,
+        value: time
+      };
+    },
+    getNumHour: function getNumHour(time) {
+      return +time.slice(11, 16).replace(':', ''); // 2021-10-22T18:00:00+03:00 => 1800
     }
   }
 };
@@ -1782,7 +2051,6 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "defaultText": "Выбрать студента...",
       "options": _vm.studentSelect.filteredList,
-      "value": _vm.studentSelect.value,
       "search": true
     },
     on: {
@@ -1801,28 +2069,42 @@ var __vue_render__$6 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n          " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n        ")]), _vm._v(" "), _c('base-time-select', {
+  }, [_vm._v("\n          " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n        ")]), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.start_time,
-      "hour-range": _vm.hourRange
+      "defaultText": "Начало",
+      "options": _vm.startTimeSelect.filteredList
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'start_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.startTimeSelect.selected.value, 'start');
       }
+    },
+    model: {
+      value: _vm.startTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.startTimeSelect, "selected", $$v);
+      },
+      expression: "startTimeSelect.selected"
     }
   }), _vm._v(" "), _c('span', {
     staticClass: "b-delimiter"
-  }), _vm._v(" "), _c('base-time-select', {
+  }), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.end_time,
-      "hour-range": _vm.hourRange,
+      "defaultText": "Конец",
+      "options": _vm.endTimeSelect.filteredList,
       "error": _vm.errorSelectedTime
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'end_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.endTimeSelect.selected.value, 'end');
       }
+    },
+    model: {
+      value: _vm.endTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.endTimeSelect, "selected", $$v);
+      },
+      expression: "endTimeSelect.selected"
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "b-materials"
@@ -1848,7 +2130,6 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "defaultText": "Выбрать материал к уроку...",
       "options": _vm.materialSelect.filteredList,
-      "value": _vm.materialSelect.value,
       "search": true
     },
     on: {
@@ -1908,7 +2189,7 @@ var __vue_render__$6 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.beforeTime > 0 ? _c('div', {
+  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.beforeTime[0] > 0 || _vm.beforeTime[1] > 0 ? _c('div', {
     staticClass: "b-before-time"
   }, [_c('svg', {
     attrs: {
@@ -1926,7 +2207,7 @@ var __vue_render__$6 = function __vue_render__() {
       "stroke-linecap": "round",
       "stroke-linejoin": "round"
     }
-  })]), _vm._v("\n          " + _vm._s(_vm.beforeTime) + " мин\n        ")]) : _vm._e(), _vm._v(" "), _c('ul', {
+  })]), _vm._v(" "), _vm.beforeTime[0] > 0 ? [_vm._v("\n            " + _vm._s(_vm.beforeTime[0]) + " час.\n          ")] : _vm._e(), _vm._v(" "), _vm.beforeTime[1] > 0 ? [_vm._v("\n            " + _vm._s(_vm.beforeTime[1]) + " мин.\n          ")] : _vm._e()], 2) : _vm._e(), _vm._v(" "), _c('ul', {
     staticClass: "b-materials__list"
   }, _vm._l(_vm.addedMaterials, function (student) {
     return _c('li', {
@@ -1961,7 +2242,7 @@ var __vue_staticRenderFns__$6 = [function () {
 
 var __vue_inject_styles__$6 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-cb4c1c9a_0", {
+  inject("data-v-8eb136f0_0", {
     source: ".b-edit-card{display:flex;flex-direction:column;padding:4px 10px 10px 15px;position:relative}.b-edit-card__x{position:relative;right:-10px}.b-edit-card__header{display:flex;justify-content:flex-end;align-items:center;margin:0 0 20px 0}.b-edit-card__header-icon{display:flex;justify-content:center;align-items:center;width:20px;height:20px;margin:0 10px}.b-edit-card__header-icon>span{cursor:pointer}.b-edit-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-edit-students{display:flex;flex-wrap:wrap;margin:10px 0 0 0!important}.b-added-edit-students__item{border-right:none!important;margin:0 20px 0 0;display:flex;align-items:center;font-size:16px;color:#0967d1}.b-added-edit-students__item>span{width:20px;height:20px;display:inline-block;margin:0 10px 0 0;background:#0967d1;border-radius:3px}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-edit-lesson{width:100%;color:#777;display:flex;justify-content:flex-start;align-items:center;margin:0 0 0 25px}.b-open-edit-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:10px 0 20px 30px}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 30px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-before-time{margin:18px 0 10px;display:flex;align-items:center;font-size:14px;color:#333}.b-before-time>svg{margin:0 8px 0 0}",
     map: undefined,
     media: undefined
@@ -1988,11 +2269,14 @@ var __vue_component__$6 = /*#__PURE__*/normalizeComponent({
 
 var script$7 = {
   components: {
+    KalendarMonthview: function KalendarMonthview() {
+      return import('./kalendar-monthview-67b89be2.js');
+    },
     KalendarWeekView: function KalendarWeekView() {
-      return import('./kalendar-weekview-bd31c730.js');
+      return import('./kalendar-weekview-debc3503.js');
     },
     ScrollContainer: function ScrollContainer() {
-      return import('./scroll-container-6e85f21f.js');
+      return import('./scroll-container-1f224c8d.js');
     },
     KalendarCreatedCardSlot: __vue_component__,
     KalendarPopupCardSlot: __vue_component__$5,
@@ -2097,7 +2381,7 @@ var script$7 = {
           return !isNaN(Date.parse(val));
         },
         view_type: function view_type(val) {
-          return ['week', 'day'].includes(val);
+          return ['week', 'day', 'month'].includes(val);
         },
         cell_height: function cell_height(val) {
           return !isNaN(val);
@@ -2420,7 +2704,11 @@ var __vue_render__$7 = function __vue_render__() {
     attrs: {
       "points": "9 18 15 12 9 6"
     }
-  })])])]) : _vm._e()])]), _vm._v(" "), _vm._t("workTimeEdit")], 2), _vm._v(" "), _c('div', {
+  })])])]) : _vm._e()])]), _vm._v(" "), _vm._t("workTimeEdit")], 2), _vm._v(" "), _vm.kalendar_options.view_type === 'month' ? _c('kalendar-monthview', {
+    attrs: {
+      "current_day": _vm.current_day
+    }
+  }) : _c('div', {
     staticClass: "b-scroll-container",
     style: {
       height: _vm.kalendar_options.height
@@ -2532,8 +2820,8 @@ var __vue_staticRenderFns__$7 = [];
 
 var __vue_inject_styles__$7 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-24780dbc_0", {
-    source: "@import url(https://fonts.googleapis.com/css?family=Rubik:wght@400,600&display=swap);*{box-sizing:border-box;font-family:Rubik,Helvetica,Arial,sans-serif}*{box-sizing:border-box;user-select:none}:after,:before{box-sizing:border-box;user-select:none}html{font-size:10px!important}@media only screen and (max-width:1100px){html{font-size:8px!important}}@media only screen and (max-width:768px){html{font-size:10px!important}}.kalendar-wrapper{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\";--main-color:#ec4d3d;--weekend-color:#f7f7f7;--current-day-color:#7AFFD7;--table-cell-border-color:#e5e5e5;--odd-cell-border-color:#e5e5e5;--hour-row-color:inherit;--dark:#212121;--lightg:#9e9e9e;--card-bgcolor:#04A675;--card-color:white;--max-hours:10;--previous-events:#c6dafc;--previous-text-color:#727d8f;--green:#0abc83;--red:#ec4d3d}.kalendar-wrapper.gstyle{--hour-row-color:#212121;--main-color:#4285f4;--weekend-color:transparent;--table-cell-border-color:#dadada;--odd-cell-border-color:transparent;font-family:\"Google Sans\",Roboto,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Arial,sans-serif}.kalendar-wrapper.gstyle .week-navigator{display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:none;padding:20px;color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .week-navigator button{color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .created-event,.kalendar-wrapper.gstyle .creating-event{background-color:var(--card-bgcolor);color:var(--card-color);text-shadow:none;border-left:none;border-radius:10px;opacity:1;border-bottom:solid 1px rgba(0,0,0,.03);font-size:14px;padding:0 5px;display:flex;justify-content:space-between;align-items:center}.kalendar-wrapper.gstyle .created-event>*,.kalendar-wrapper.gstyle .creating-event>*{text-shadow:none}.kalendar-wrapper.gstyle .creating-event{color:var(--main-color);background-color:#7affd7;font-size:12px;padding:0 20px;border-radius:10px;align-items:flex-start}.kalendar-wrapper.gstyle .creating-event .time{color:var(--main-color);display:flex;align-items:center}.kalendar-wrapper.gstyle .is-past .created-event,.kalendar-wrapper.gstyle .is-past .creating-event{background-color:var(--previous-events);color:var(--previous-text-color)}.kalendar-wrapper.gstyle .created-event{width:100%}.kalendar-wrapper.gstyle .created-event .time{right:2px}.kalendar-wrapper.gstyle .created-event:hover{cursor:pointer;background-color:var(--main-color)}.kalendar-wrapper.gstyle .created-event:hover *{color:#fff}.kalendar-wrapper.gstyle .sticky-top .days{margin-left:0;padding-left:55px}.kalendar-wrapper.gstyle .all-day{display:none}.kalendar-wrapper.gstyle ul.building-blocks.day-1 li.is-an-hour::before{content:\"\";position:absolute;bottom:-1px;left:-10px;width:10px;height:1px;background-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hours,.kalendar-wrapper.gstyle ul.building-blocks li{border-right:solid 1px var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hour-indicator-line>span.line{height:2px;background-color:#db4437}.kalendar-wrapper.gstyle .hour-indicator-line>span.line:before{content:\"\";width:12px;height:12px;display:block;background-color:#db4437;position:absolute;top:-1px;left:0;border-radius:100%}.kalendar-wrapper.gstyle .days{position:relative}.kalendar-wrapper.gstyle .days:before{content:\"\";position:absolute;height:1px;width:55px;left:0;bottom:0}.kalendar-wrapper.gstyle .day-indicator{display:flex;flex-direction:column;align-items:center;color:var(--dark);font-size:13px;padding-left:0;background:#fff}.kalendar-wrapper.gstyle .day-indicator>div{display:flex;flex-direction:column;align-items:center}.kalendar-wrapper.gstyle .day-indicator.is-before{color:#757575}.kalendar-wrapper.gstyle .day-indicator .number-date{margin-left:0;margin-right:0;order:2;font-size:18px;font-weight:600;width:32px;height:32px;border-radius:100%;align-items:center;justify-content:center;display:flex;margin-top:4px}.kalendar-wrapper.gstyle .day-indicator.today{border-bottom-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .day-indicator.today:after{display:none}.kalendar-wrapper.gstyle .day-indicator.today .number-date{background-color:var(--main-color);color:#fff}.kalendar-wrapper.gstyle .day-indicator .letters-date{margin-left:0;margin-right:0;font-weight:500;text-transform:uppercase;font-size:11px}.kalendar-wrapper.gstyle .day-indicator:first-child{position:relative}.kalendar-wrapper.gstyle .day-indicator:first-child::before{content:\"\";position:absolute;left:-1px;top:0;width:1px;height:100%}.kalendar-wrapper.gstyle .creating-event{border-radius:10px;box-shadow:0 2px 2px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.gstyle .popup-wrapper{width:400px;min-height:116px;box-shadow:0 4px 4px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.non-desktop .building-blocks{pointer-events:none}.kalendar-wrapper.day-view .day-indicator{align-items:flex-start;text-align:center;padding-left:10px}.created-event,.creating-event{padding:4px 6px;cursor:default;word-break:break-word;height:100%;width:100%;font-size:14px}.created-event h4,.creating-event h4{font-weight:400}.creating-event{background-color:#34aadc;opacity:.9}.creating-event>*{text-shadow:0 0 7px rgba(0,0,0,.25)}.created-event{background-color:#bfecff;opacity:.74;border-left:solid 3px #34aadc;color:#1f6570}.week-navigator{display:flex;align-items:center;background:linear-gradient(#fdfdfd,#f9f9f9);border-bottom:solid 1px #ec4d3d;padding:10px 20px}.week-navigator .nav-wrapper{display:flex;align-items:center;justify-content:space-between;font-size:22px}.week-navigator .nav-wrapper span{white-space:nowrap;line-height:1.6;color:#333}.week-navigator button{background:0 0;border:none;display:inline-flex;margin:0 10px;color:#ec4d3d;align-items:center;font-size:14px;cursor:pointer;padding:0}.kalendar-wrapper{background-color:#fff;min-width:300px}.no-scroll{overflow-y:hidden;max-height:100%}.hour-indicator-line{position:absolute;z-index:2;width:100%;height:10px;display:flex;align-items:center;pointer-events:none;user-select:none}.hour-indicator-line>span.line{background-color:var(--main-color);height:1px;display:block;flex:1}.hour-indicator-line>span.time-value{font-size:14px;width:48px;color:var(--main-color);font-weight:600;background-color:#fff}.hour-indicator-tooltip{position:absolute;z-index:0;background-color:var(--main-color);width:10px;height:10px;display:block;border-radius:100%;pointer-events:none;user-select:none}ul.kalendar-day li.kalendar-cell:last-child{display:none}.week-navigator-button{outline:0}.week-navigator-button:active svg,.week-navigator-button:hover svg{stroke:var(--main-color)}.gstyle .week-navigator-button{width:32px;height:32px;display:flex;justify-content:center;align-items:center;border:2px solid var(--main-color);border-radius:100%;transition:all .2s}.gstyle .week-navigator-button svg{position:relative;left:1px;stroke:var(--main-color)}.gstyle .week-navigator-button:hover{border:2px solid #fff;background:var(--main-color)}.gstyle .week-navigator-button:hover svg{stroke:#fff}.kalendar-header{display:flex;justify-content:space-between;align-items:center}.kalendar-header>div{display:flex;justify-content:space-between;align-items:center}.main-button{padding:11px 42px;background:#2089ff;box-shadow:5px 5px 15px rgba(0,0,0,.15);border-radius:10px;margin:0 5px;cursor:pointer;border:none;color:#fff}.main-button:active{box-shadow:inset 5px 5px 15px rgba(0,0,0,.15)}.main-button.--gray{background:var(--green)}.main-button.--red{background:var(--red)}.button-today{margin:0 20px 0 0}",
+  inject("data-v-e7abf1f8_0", {
+    source: "@import url(https://fonts.googleapis.com/css?family=Rubik:wght@400,600&display=swap);*{box-sizing:border-box;font-family:Rubik,Helvetica,Arial,sans-serif}*{box-sizing:border-box}:after,:before{box-sizing:border-box}html{font-size:10px!important}@media only screen and (max-width:1100px){html{font-size:8px!important}}@media only screen and (max-width:768px){html{font-size:10px!important}}.kalendar-wrapper{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\";--main-color:#ec4d3d;--weekend-color:#f7f7f7;--current-day-color:#7AFFD7;--table-cell-border-color:#e5e5e5;--odd-cell-border-color:#e5e5e5;--hour-row-color:inherit;--dark:#212121;--lightg:#9e9e9e;--card-bgcolor:#04A675;--card-color:white;--max-hours:10;--previous-events:#c6dafc;--previous-text-color:#727d8f;--green:#0abc83;--red:#ec4d3d}.kalendar-wrapper.gstyle{--hour-row-color:#212121;--main-color:#4285f4;--weekend-color:transparent;--table-cell-border-color:#dadada;--odd-cell-border-color:transparent;font-family:\"Google Sans\",Roboto,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Arial,sans-serif}.kalendar-wrapper.gstyle .week-navigator{display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:none;padding:20px;color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .week-navigator button{color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .created-event,.kalendar-wrapper.gstyle .creating-event{background-color:var(--card-bgcolor);color:var(--card-color);text-shadow:none;border-left:none;border-radius:10px;opacity:1;border-bottom:solid 1px rgba(0,0,0,.03);font-size:14px;padding:0 5px;display:flex;justify-content:space-between;align-items:center}.kalendar-wrapper.gstyle .created-event>*,.kalendar-wrapper.gstyle .creating-event>*{text-shadow:none}.kalendar-wrapper.gstyle .creating-event{color:var(--main-color);background-color:#7affd7;font-size:12px;padding:0 20px;border-radius:10px;align-items:flex-start}.kalendar-wrapper.gstyle .creating-event .time{color:var(--main-color);display:flex;align-items:center}.kalendar-wrapper.gstyle .is-past .created-event,.kalendar-wrapper.gstyle .is-past .creating-event{background-color:var(--previous-events);color:var(--previous-text-color)}.kalendar-wrapper.gstyle .created-event{width:100%}.kalendar-wrapper.gstyle .created-event .time{right:2px}.kalendar-wrapper.gstyle .created-event:hover{cursor:pointer;background-color:var(--main-color)}.kalendar-wrapper.gstyle .created-event:hover *{color:#fff}.kalendar-wrapper.gstyle .sticky-top .days{margin-left:0;padding-left:55px}.kalendar-wrapper.gstyle .all-day{display:none}.kalendar-wrapper.gstyle ul.building-blocks.day-1 li.is-an-hour::before{content:\"\";position:absolute;bottom:-1px;left:-10px;width:10px;height:1px;background-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hours,.kalendar-wrapper.gstyle ul.building-blocks li{border-right:solid 1px var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hour-indicator-line>span.line{height:2px;background-color:#db4437}.kalendar-wrapper.gstyle .hour-indicator-line>span.line:before{content:\"\";width:12px;height:12px;display:block;background-color:#db4437;position:absolute;top:-1px;left:0;border-radius:100%}.kalendar-wrapper.gstyle .days{position:relative}.kalendar-wrapper.gstyle .days:before{content:\"\";position:absolute;height:1px;width:55px;left:0;bottom:0}.kalendar-wrapper.gstyle .day-indicator{display:flex;flex-direction:column;align-items:center;color:var(--dark);font-size:13px;padding-left:0;background:#fff}.kalendar-wrapper.gstyle .day-indicator>div{display:flex;flex-direction:column;align-items:center}.kalendar-wrapper.gstyle .day-indicator.is-before{color:#757575}.kalendar-wrapper.gstyle .day-indicator .number-date{margin-left:0;margin-right:0;order:2;font-size:18px;font-weight:600;width:32px;height:32px;border-radius:100%;align-items:center;justify-content:center;display:flex;margin-top:4px}.kalendar-wrapper.gstyle .day-indicator.today{border-bottom-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .day-indicator.today:after{display:none}.kalendar-wrapper.gstyle .day-indicator.today .number-date{background-color:var(--main-color);color:#fff}.kalendar-wrapper.gstyle .day-indicator .letters-date{margin-left:0;margin-right:0;font-weight:500;text-transform:uppercase;font-size:11px}.kalendar-wrapper.gstyle .day-indicator:first-child{position:relative}.kalendar-wrapper.gstyle .day-indicator:first-child::before{content:\"\";position:absolute;left:-1px;top:0;width:1px;height:100%}.kalendar-wrapper.gstyle .creating-event{border-radius:10px;box-shadow:0 2px 2px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.gstyle .popup-wrapper{width:400px;min-height:116px;box-shadow:0 4px 4px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.non-desktop .building-blocks{pointer-events:none}.kalendar-wrapper.day-view .day-indicator{align-items:flex-start;text-align:center;padding-left:10px}.created-event,.creating-event{padding:4px 6px;cursor:default;word-break:break-word;height:100%;width:100%;font-size:14px}.created-event h4,.creating-event h4{font-weight:400}.creating-event{background-color:#34aadc;opacity:.9}.creating-event>*{text-shadow:0 0 7px rgba(0,0,0,.25)}.created-event{background-color:#bfecff;opacity:.74;border-left:solid 3px #34aadc;color:#1f6570}.week-navigator{display:flex;align-items:center;background:linear-gradient(#fdfdfd,#f9f9f9);border-bottom:solid 1px #ec4d3d;padding:10px 20px}.week-navigator .nav-wrapper{display:flex;align-items:center;justify-content:space-between;font-size:22px}.week-navigator .nav-wrapper span{white-space:nowrap;line-height:1.6;color:#333}.week-navigator button{background:0 0;border:none;display:inline-flex;margin:0 10px;color:#ec4d3d;align-items:center;font-size:14px;cursor:pointer;padding:0}.kalendar-wrapper{background-color:#fff;min-width:300px}.no-scroll{overflow-y:hidden;max-height:100%}.hour-indicator-line{position:absolute;z-index:10;width:106%;height:10px;display:flex;align-items:center;pointer-events:none;user-select:none;margin:0 0 0 -10px}.hour-indicator-line>span.line{background-color:var(--main-color);height:1px;display:block;flex:1}.hour-indicator-line>span.time-value{font-size:14px;width:48px;color:var(--main-color);font-weight:600;background-color:#fff}.hour-indicator-tooltip{position:absolute;z-index:0;background-color:var(--main-color);width:10px;height:10px;display:block;border-radius:100%;pointer-events:none;user-select:none}ul.kalendar-day li.kalendar-cell:last-child{display:none}.week-navigator-button{outline:0}.week-navigator-button:active svg,.week-navigator-button:hover svg{stroke:var(--main-color)}.gstyle .week-navigator-button{width:32px;height:32px;display:flex;justify-content:center;align-items:center;border:2px solid var(--main-color);border-radius:100%;transition:all .2s}.gstyle .week-navigator-button svg{position:relative;left:1px;stroke:var(--main-color)}.gstyle .week-navigator-button:hover{border:2px solid #fff;background:var(--main-color)}.gstyle .week-navigator-button:hover svg{stroke:#fff}.kalendar-header{display:flex;justify-content:space-between;align-items:center}.kalendar-header>div{display:flex;justify-content:space-between;align-items:center}.main-button{padding:11px 42px;background:#2089ff;box-shadow:5px 5px 15px rgba(0,0,0,.15);border-radius:10px;margin:0 5px;cursor:pointer;border:none;color:#fff}.main-button:active{box-shadow:inset 5px 5px 15px rgba(0,0,0,.15)}.main-button.--gray{background:var(--green)}.main-button.--red{background:var(--red)}.button-today{margin:0 20px 0 0}",
     map: undefined,
     media: undefined
   });
@@ -2597,4 +2885,4 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 } // Default export is library as a whole, registered via Vue.use()
 
-export { __vue_component__$7 as _, isToday as a, _objectSpread2 as b, cloneObject as c, normalizeComponent as d, createInjector as e, isBefore as f, getLocaleTime as g, getHourlessDate as h, isWeekend as i, addTimezoneInfo as j, getTime as k, plugin as p };
+export { __vue_component__$7 as _, addDays as a, beginningOfPeriod as b, beginningOfWeek as c, dayDiff as d, endOfWeekInMonth as e, _toConsumableArray as f, getLocaleTime as g, normalizeComponent as h, incrementPeriod as i, createInjector as j, isWeekend as k, isToday as l, _objectSpread2 as m, cloneObject as n, isBefore as o, plugin as p, getHourlessDate as q, addTimezoneInfo as r, getTime as s };

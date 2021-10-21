@@ -1,9 +1,10 @@
-import { g as getLocaleTime, f as isBefore, b as _objectSpread2, j as addTimezoneInfo, d as __vue_normalize__, e as __vue_create_injector__ } from './index-6d1b592d.js';
+import { g as getLocaleTime, o as isBefore, m as _objectSpread2, r as addTimezoneInfo, h as __vue_normalize__, j as __vue_create_injector__ } from './index-02b4b942.js';
 import 'vue';
 import 'vue2-timepicker/src/vue-timepicker.vue';
 
 var script = {
-  props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
+  props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup', 'day_events', 'flat' // for month view
+  ],
   created: function created() {},
   inject: ['kalendar_options'],
   data: function data() {
@@ -34,7 +35,8 @@ var script = {
     },
     distance: function distance() {
       if (!this.event) return;
-      var multiplier = this.kalendar_options.cell_height / 10; // 0.5 * multiplier for an offset so next cell is easily selected
+      if (this.flat) return "auto";
+      var multiplier = this.kalendar_options.cell_height / 30; // 0.5 * multiplier for an offset so next cell is easily selected
 
       return "".concat(this.event.distance * multiplier - 0.2 * multiplier, "px");
     },
@@ -54,7 +56,8 @@ var script = {
         end_time: addTimezoneInfo(end.value),
         id: id,
         key: key,
-        data: data
+        data: data,
+        day_events: this.day_events
       };
       return payload;
     }
@@ -88,13 +91,14 @@ var __vue_render__ = function __vue_render__() {
     staticClass: "event-card",
     class: {
       'editing': _vm.editing,
+      'is-flat': _vm.flat,
       'is-past': _vm.isPast,
-      overlaps: _vm.overlaps > 0,
+      overlaps: _vm.overlaps > 1,
       'two-in-one': _vm.total > 1,
-      'event-card__mini': _vm.event.distance <= 10,
-      'event-card__small': _vm.event.distance > 10 && _vm.event.distance < 40 || _vm.overlaps > 1
+      'event-card__mini': _vm.event.distance <= 30,
+      'event-card__small': _vm.event.distance > 30 && _vm.event.distance < 60 || _vm.overlaps > 1
     },
-    style: "\n          height: " + _vm.distance + "; \n          width: calc(" + _vm.width_value + "); \n          left: calc(" + _vm.left_offset + ");\n          top: " + _vm.top_offset + ";\n        "
+    style: "\n          height: " + _vm.distance + ";\n          width: calc(" + _vm.width_value + ");\n          left: calc(" + _vm.left_offset + ");\n          top: " + _vm.top_offset + ";\n        "
   }, [_vm.status === 'creating' || _vm.status === 'popup-initiated' ? _c('div', {
     on: {
       "click": _vm.editEvent
@@ -151,8 +155,8 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-5bd69c90_0", {
-    source: ".event-card{display:flex;flex-direction:column;height:100%;width:100%;z-index:5;position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0;color:#fff;user-select:none;will-change:height}.event-card h4,.event-card p{margin:0}.event-card>*{flex:1;position:relative}.event-card.editing{z-index:10}.event-card.creating{z-index:-1}.event-card.overlaps>*{border:solid 1px #fff!important}.event-card__mini .created-event>div>.details-card small{display:none}.event-card__mini .appointment-title,.event-card__mini .time{position:absolute;top:0;font-size:9px;line-height:1;z-index:1;overflow:visible;height:100%}.event-card__small .appointment-title{font-size:80%}.event-card__small .time{font-size:70%}.event-card.two-in-one .details-card>*{font-size:60%}.event-card h1,.event-card h2,.event-card h3,.event-card h4,.event-card h5,.event-card h6,.event-card p{margin:0}.time{position:absolute;bottom:0;right:0;font-size:11px}.popup-wrapper{text-shadow:none;color:#000;z-index:10;position:absolute;top:0;left:calc(100% + 5px);display:flex;flex-direction:column;pointer-events:all;user-select:none;background-color:#fff;border:solid 1px rgba(0,0,0,.08);border-radius:4px;box-shadow:0 2px 12px -3px rgba(0,0,0,.3);padding:10px}.popup-wrapper h4{color:#000;font-weight:400}.popup-wrapper input,.popup-wrapper textarea{border:none;background-color:#ebebeb;color:#030303;border-radius:4px;padding:5px 8px;margin-bottom:5px}.created-event{pointer-events:all;position:relative}.created-event>.details-card{max-width:100%;width:100%}.created-event>.details-card h2,.created-event>.details-card h3,.created-event>.details-card h4,.created-event>.details-card p,.created-event>.details-card small,.created-event>.details-card span,.created-event>.details-card strong,.created-event>.details-card>h1{text-overflow:ellipsis;overflow:hidden;display:block}ul:nth-last-child(-n+3) .popup-wrapper{left:auto;right:100%;margin-right:10px}.day-view ul .popup-wrapper{left:auto;right:auto;width:calc(100% - 10px);top:10px}",
+  inject("data-v-1803549c_0", {
+    source: ".event-card{display:flex;flex-direction:column;height:100%;width:100%;z-index:5;color:#fff;user-select:none;will-change:height}.event-card h4,.event-card p{margin:0}.event-card>*{flex:1;position:relative}.event-card.editing{z-index:10}.event-card.creating{z-index:-1}.event-card.overlaps>*{border:solid 1px #fff!important}.event-card__mini .created-event>div>.details-card small{display:none}.event-card__mini .appointment-title,.event-card__mini .time{position:absolute;top:0;font-size:9px;line-height:1;z-index:1;overflow:visible;height:100%}.event-card__small .appointment-title{font-size:80%}.event-card__small .time{font-size:70%}.event-card.two-in-one .details-card>*{font-size:60%}.event-card.is-flat{margin-bottom:3px}.event-card.is-flat .details-card>small{display:none}.event-card.is-flat .remove{top:1px}.event-card:not(.is-flat){position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0}.event-card h1,.event-card h2,.event-card h3,.event-card h4,.event-card h5,.event-card h6,.event-card p{margin:0}.time{position:absolute;bottom:0;right:0;font-size:11px}.popup-wrapper{text-shadow:none;color:#000;z-index:10;position:absolute;top:0;left:calc(100% + 5px);display:flex;flex-direction:column;pointer-events:all;user-select:none;background-color:#fff;border:solid 1px rgba(0,0,0,.08);border-radius:4px;box-shadow:0 2px 12px -3px rgba(0,0,0,.3);padding:10px}.popup-wrapper h4{color:#000;font-weight:400}.popup-wrapper input,.popup-wrapper textarea{border:none;background-color:#ebebeb;color:#030303;border-radius:4px;padding:5px 8px;margin-bottom:5px}.created-event{pointer-events:all;position:relative}.created-event>.details-card{max-width:100%;width:100%}.created-event>.details-card h2,.created-event>.details-card h3,.created-event>.details-card h4,.created-event>.details-card p,.created-event>.details-card small,.created-event>.details-card span,.created-event>.details-card strong,.created-event>.details-card>h1{text-overflow:ellipsis;overflow:hidden;display:block}ul:nth-last-child(-n+3) .popup-wrapper{left:auto;right:100%;margin-right:10px}.day-view ul .popup-wrapper{left:auto;right:auto;width:calc(100% - 10px);top:10px}",
     map: undefined,
     media: undefined
   });

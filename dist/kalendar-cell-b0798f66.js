@@ -1,4 +1,4 @@
-import { g as getLocaleTime, c as cloneObject, b as _objectSpread2, d as __vue_normalize__, e as __vue_create_injector__ } from './index-6d1b592d.js';
+import { g as getLocaleTime, n as cloneObject, m as _objectSpread2, h as __vue_normalize__, j as __vue_create_injector__ } from './index-02b4b942.js';
 import 'vue';
 import 'vue2-timepicker/src/vue-timepicker.vue';
 
@@ -7,7 +7,7 @@ var script = {
   inject: ['kalendar_options'],
   components: {
     KalendarEvent: function KalendarEvent() {
-      return import('./kalendar-event-b6dfd88c.js');
+      return import('./kalendar-event-d0245837.js');
     }
   },
   computed: {
@@ -154,7 +154,7 @@ var __vue_render__ = function __vue_render__() {
     staticClass: "kalendar-cell",
     class: {
       selected: _vm.selected,
-      'is-an-hour': (_vm.index + 1) % (60 / 10) === 0,
+      'is-an-hour': (_vm.index + 1) % (60 / 30) === 0,
       'has-events': _vm.cell_events && _vm.cell_events.length > 0,
       'being-created': !!_vm.being_created || _vm.hasPopups,
       'work-time': _vm.isConstructed
@@ -187,6 +187,7 @@ var __vue_render__ = function __vue_render__() {
         "total": _vm.cell_events.length,
         "index": eventIndex,
         "overlaps": _vm.overlapValue,
+        "day_events": _vm.constructedEvents,
         "kalendar_events": _vm.kalendar_events,
         "isEditing": _vm.isEditing,
         "isShowEditPopup": _vm.isShowEditPopup
@@ -200,7 +201,7 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-105dadbe_0", {
+  inject("data-v-d02ce4b6_0", {
     source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0;border-bottom:dotted 1px var(--odd-cell-border-color)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.work-time{background-color:#7afFD766}",
     map: undefined,
     media: undefined
