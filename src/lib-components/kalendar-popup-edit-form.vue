@@ -293,7 +293,6 @@ export default {
     this.end_time_h = this.getNumHour(this.end_time);
     this.addedStudents = data.students;
     this.addedMaterials = data.materials;
-    this.addedMaterials = data.materials;
     this.day_events = day_events;
   },
   mounted () {

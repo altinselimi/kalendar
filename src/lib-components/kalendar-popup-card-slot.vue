@@ -57,16 +57,18 @@
       <span class="b-date-time__date">
         {{ formatDay(start_time) }}
       </span>
-      <base-time-select
-          :time="start_time"
-          :hour-range="hourRange"
-          @changeTime="(event) => changeTime(event, 'start_time')"
+      <base-select
+          defaultText="Начало"
+          :options="startTimeSelect.filteredList"
+          v-model="startTimeSelect.selected"
+          @input="() => changeTime(startTimeSelect.selected.value, 'start')"
       />
       <span class="b-delimiter" />
-      <base-time-select
-          :time="end_time"
-          :hour-range="hourRange"
-          @changeTime="(event) => changeTime(event, 'end_time')"
+      <base-select
+          defaultText="Конец"
+          :options="endTimeSelect.filteredList"
+          v-model="endTimeSelect.selected"
+          @input="() => changeTime(endTimeSelect.selected.value, 'end')"
           :error="errorSelectedTime"
       />
     </div>
@@ -123,8 +125,9 @@ import BaseTimeSelect from '@/lib-components/base/BaseTimeSelect';
 import {
   getFormattedWeekDayTime,
   getFormattedMonth,
-  getLocaleTime,
+  getLocaleTime, cloneObject,
 } from './utils.js';
+import hourUtils from "./hours";
 
 const EVENT = {
   title: 'Новое занятие',
@@ -187,7 +190,18 @@ export default {
       addedMaterials: [],
       isShowMaterialSelect: false,
       start_time_h: 0,
-      end_time_h: 0
+      end_time_h: 0,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     }
   },
   computed: {
@@ -201,11 +215,26 @@ export default {
       return this.end_time_h - this.start_time_h < 0
     }
   },
+  created () {
+    const { start_time, end_time, data, day_events } =  cloneObject(this.popup_information)
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.day_events = day_events;
+  },
   mounted () {
     this.filterStudents()
     this.filterMaterials()
+    this.filterTimes()
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes () {
+      this.filterTime('start')
+      this.filterTime('end')
+    },
     addEvent () {
       let payload = {
         data: {
@@ -253,13 +282,6 @@ export default {
       let dayMonth = getFormattedMonth(isoDate);
       return `${dayName}, ${dayMonth}`;
     },
-    changeTime (eventData, timeName) {
-      const date = new Date(this.popup_information[timeName])
-      const newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm))
-
-      this[timeName] = getLocaleTime(newDate.toISOString()) // this.startTime or this.endTime
-      this[`${timeName}_h`] = +eventData.data.h
-    },
     showMaterialSelect () {
       this.isShowMaterialSelect = true
     },
@@ -285,6 +307,75 @@ export default {
       this.addedMaterials.splice(index, 1);
       this.filterMaterials()
     },
+    changeTime (value, timeName) {
+      const dataTime = value.split(':');
+      const date = new Date(this[`${timeName}_time`])
+
+      const newDate = new Date(date.setHours(dataTime[0], dataTime[1]))
+
+      this[`${timeName}_time`] = getLocaleTime(newDate.toISOString()) // this.startTime or this.endTime
+      this[`${timeName}_time_h`] = +dataTime[0] * 100
+
+      this.filterTimes()
+
+      if (this.start_time_h > this.end_time_h) { // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0]
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':','')
+        this.changeTime(this.endTimeSelect.selected.value, 'end')
+      }
+    },
+    filterTime (prop) {
+      let maxStartTime = this.hourRange[0] * 100;
+      let maxEndTime = this.hourRange[1] * 100;
+
+      Object.keys(this.day_events).forEach(key => {
+        const eventStartTime = +this.getNumHour(this.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+        const eventEndTime = +this.getNumHour(this.day_events[key][0].end.value); //
+
+        if (eventStartTime <= this.start_time_h && eventEndTime <= this.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime
+          }
+        }
+
+        if (eventStartTime >= this.end_time_h && eventEndTime >= this.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime
+          }
+        }
+      })
+
+      let all_hours = hourUtils.getAllHours().filter(h => {
+        const numHour = +h.slice(0, 2) // берем время в виде 10
+        const numHour10 = +h.slice(0, 5).replace(':','') // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < this.hourRange[0] || numHour > this.hourRange[1]) { // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false
+        }
+
+        if (prop === 'start' && numHour10 === this.getNumHour(this.end_time)) {
+          return false
+        }
+
+        if (prop === 'end' && numHour10 <= this.getNumHour(this.start_time)) {
+          return false
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime// выбираем только кратные 30мин
+      });
+
+      this[`${prop}TimeSelect`].filteredList = all_hours.map(h => {
+        return { name: h.slice(0, 5), value: h.slice(0, 5)}
+      })
+    },
+    setTime (prop) {
+      const time = this[`${prop}_time`].slice(11, 16);
+
+      return { name: time, value: time}
+    },
+    getNumHour (time) {
+      return +time.slice(11, 16).replace(':','') // 2021-10-22T18:00:00+03:00 => 1800
+    }
   }
 }
 </script>
