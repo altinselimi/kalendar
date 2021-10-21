@@ -128,7 +128,7 @@ const getLocaleTime = dateString => {
 };
 
 const addTimezoneInfo = ISOdate => {
-  if (new Date(ISOdate).toISOString() !== ISOdate) return;
+  if (new Date(ISOdate).toISOString() !== ISOdate && ISOdate.indexOf('000Z') !== -1) return;
   return `${ISOdate.slice(0, 19)}${creators_offset}`;
 };
 

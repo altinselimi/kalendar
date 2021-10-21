@@ -7,10 +7,10 @@
 }
 * {
     box-sizing: border-box;
-    user-select: none;
+    /*user-select: none;*/
     &:before, &:after {
         box-sizing: border-box;
-        user-select: none
+        /*user-select: none*/
     }
 }
 
@@ -360,13 +360,15 @@ html {
 
 .hour-indicator-line {
     position: absolute;
-    z-index: 2;
-    width: 100%;
+    z-index: 10;
+    width: 106%;
     height: 10px;
     display: flex;
     align-items: center;
     pointer-events: none;
     user-select: none;
+
+    margin: 0 0 0 -10px;
 
     > span.line {
         background-color: var(--main-color);

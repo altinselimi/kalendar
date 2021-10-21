@@ -58,19 +58,22 @@ const _existing_events = [
 	// 	},
 	// },
 	{
-		from: '2019-07-11T10:22:00.000Z',
-		to: '2019-07-31T16:20:00.000Z',
+		from: '2019-06-11T10:00:00.000Z',
+		to: '2019-06-11T12:00:00.000Z',
 		data: {
-			title: 'Europe',
-			description: 'Final Countdown',
-      students: [],
+			title: '',
+			description: '',
+      students: [{
+        name: 'Иванов Сергей',
+        value: 10001
+      },],
       materials: [],
 		},
 	},
 ];
 
 const _existing_working_hours = {
-	'2021-10-05T07:20:00.000Z': '',
+	'2021-10-05T07:00:00.000Z': '',
 	'2021-10-05T07:30:00.000Z': ''
 }
 
@@ -102,14 +105,14 @@ export default {
 			work_time: _existing_working_hours,
 			calendar_settings: {
 				view_type: 'week',
-				cell_height: 10,
-				scrollToNow: false,
+				cell_height: 30,
+				scrollToNow: true,
 				//start_day: getCurrentDay(),
 				military_time: false,
 				working_hours: false,
 				read_only: false,
 				day_starts_at: 0,
-				day_ends_at: 19,
+				day_ends_at: 24,
 				overlap: false, // перекрытие событий
 				hide_dates: ['2019-08-09'],
 				hide_days: [],

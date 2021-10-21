@@ -68,7 +68,6 @@
             v-else
             defaultText="Выбрать студента..."
             :options="studentSelect.filteredList"
-            :value="studentSelect.value"
             v-model="studentSelect.selected"
             :search="true"
             @input="addStudent(studentSelect.selected)"
@@ -78,16 +77,18 @@
         <span class="b-date-time__date">
           {{ formatDay(start_time) }}
         </span>
-        <base-time-select
-            :time="start_time"
-            :hour-range="hourRange"
-            @changeTime="(event) => changeTime(event, 'start_time')"
+        <base-select
+            defaultText="Начало"
+            :options="startTimeSelect.filteredList"
+            v-model="startTimeSelect.selected"
+            @input="() => changeTime(startTimeSelect.selected.value, 'start')"
         />
         <span class="b-delimiter" />
-        <base-time-select
-            :time="end_time"
-            :hour-range="hourRange"
-            @changeTime="(event) => changeTime(event, 'end_time')"
+        <base-select
+            defaultText="Конец"
+            :options="endTimeSelect.filteredList"
+            v-model="endTimeSelect.selected"
+            @input="() => changeTime(endTimeSelect.selected.value, 'end')"
             :error="errorSelectedTime"
         />
       </div>
@@ -105,7 +106,6 @@
             v-else
             defaultText="Выбрать материал к уроку..."
             :options="materialSelect.filteredList"
-            :value="materialSelect.value"
             v-model="materialSelect.selected"
             :search="true"
             @input="addMaterial(materialSelect.selected)"
@@ -156,11 +156,16 @@
         <div class="b-open-edit-lesson">
           <button>Открыть урок</button> https://4smart.pro/4fx-dko-dl5
         </div>
-        <div class="b-before-time" v-if="beforeTime > 0">
+        <div class="b-before-time" v-if="beforeTime[0] > 0 || beforeTime[1] > 0">
           <svg width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.1111 7.51191C17.1111 5.96162 16.4673 4.47481 15.3212 3.37859C14.1752 2.28236 12.6208 1.6665 11 1.6665C9.37923 1.6665 7.82485 2.28236 6.67879 3.37859C5.53274 4.47481 4.88889 5.96162 4.88889 7.51191C4.88889 12.267 2.99823 14.6538 1.85347 15.6632C1.65568 15.8376 1.79337 16.28 2.05706 16.28H7.2351C7.35207 16.28 7.45419 16.3608 7.48974 16.4723C7.6956 17.1176 8.54266 19.1665 11 19.1665C13.4573 19.1665 14.3044 17.1176 14.5103 16.4723C14.5458 16.3608 14.6479 16.28 14.7649 16.28H19.9429C20.2066 16.28 20.3443 15.8376 20.1465 15.6632C19.0018 14.6538 17.1111 12.267 17.1111 7.51191Z" stroke="#6E7191" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          {{ beforeTime }} мин
+          <template v-if="beforeTime[0] > 0">
+            {{ beforeTime[0] }} час.
+          </template>
+          <template v-if="beforeTime[1] > 0">
+            {{ beforeTime[1] }} мин.
+          </template>
         </div>
         <ul class="b-materials__list">
           <li
@@ -179,8 +184,7 @@
 <script>
 import KalendarXButton from '@/lib-components/kalendar-x-button';
 import BaseSelect from '@/lib-components/base/BaseSelect';
-import BaseTimeSelect from '@/lib-components/base/BaseTimeSelect';
-
+import hourUtils from "./hours.js";
 import {
   getFormattedWeekDayTime,
   getFormattedMonth,
@@ -224,20 +228,17 @@ export default {
   name: "kalendar-popup-edit-form",
   components: {
     KalendarXButton,
-    BaseSelect,
-    BaseTimeSelect
+    BaseSelect
   },
   props: ['popup_information'],
   data () {
     return {
       studentSelect: {
-        value: {},
         list: Object.keys(STUDENTS).map(m => ({ value: m, name: STUDENTS[m].name})),
         filteredList: [],
         selected: {}
       },
       materialSelect: {
-        value: {},
         list: Object.keys(MATERIALS).map(m => ({ value: m, name: MATERIALS[m].name})),
         filteredList: [],
         selected: {}
@@ -250,19 +251,23 @@ export default {
       isShowMaterialSelect: false,
       start_time_h: 0,
       end_time_h: 0,
-      isEdit: false
+      isEdit: false,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     }
-  },
-  created () {
-    const { start_time, end_time, data } =  cloneObject(this.popup_information)
-    this.start_time = start_time;
-    this.end_time = end_time;
-    this.addedStudents = data.students;
-    this.addedMaterials = data.materials;
   },
   computed: {
     hourRange () {
-      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at]
+      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at - 1]
     },
     enabledSave () {
       return this.addedStudents.length > 0 && !this.errorSelectedTime
@@ -273,18 +278,36 @@ export default {
     beforeTime () {
       const rt = getTimeRemaining(this.start_time);
 
-      if (rt.days === 0 && rt.minutes > 0) {
-        return rt.minutes
+      if (rt.days === 0 && (rt.minutes >= 0 && (rt.hours < 8 && rt.hours >= 0))) {
+        return [rt.hours, rt.minutes]
       }
 
-      return 0
+      return []
     }
+  },
+  created () {
+    const { start_time, end_time, data, day_events } =  cloneObject(this.popup_information)
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.addedStudents = data.students;
+    this.addedMaterials = data.materials;
+    this.addedMaterials = data.materials;
+    this.day_events = day_events;
   },
   mounted () {
     this.filterStudents()
     this.filterMaterials()
+    this.filterTimes()
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes () {
+      this.filterTime('start')
+      this.filterTime('end')
+    },
     editEvent () {
       this.start_time = addTimezoneInfo(this.start_time);
       this.end_time = addTimezoneInfo(this.end_time);
@@ -329,16 +352,26 @@ export default {
     formatDay (date ) {
       let isoDate = new Date(date);
 
-      let dayName = getFormattedWeekDayTime( isoDate).split(',')[0];
+      let dayName = getFormattedWeekDayTime(isoDate).split(',')[0];
       let dayMonth = getFormattedMonth(isoDate);
       return `${dayName}, ${dayMonth}`;
     },
-    changeTime (eventData, timeName) {
-      const date = new Date(this[timeName])
-      const newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm))
+    changeTime (value, timeName) {
+      const dataTime = value.split(':');
+      const date = new Date(this[`${timeName}_time`])
 
-      this[timeName] = getLocaleTime(newDate.toISOString()) // this.startTime or this.endTime
-      this[`${timeName}_h`] = +eventData.data.H
+      const newDate = new Date(date.setHours(dataTime[0], dataTime[1]))
+
+      this[`${timeName}_time`] = getLocaleTime(newDate.toISOString()) // this.startTime or this.endTime
+      this[`${timeName}_time_h`] = +dataTime[0] * 100
+
+      this.filterTimes()
+
+      if (this.start_time_h > this.end_time_h) { // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0]
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':','')
+        this.changeTime(this.endTimeSelect.selected.value, 'end')
+      }
     },
     showMaterialSelect () {
       this.isShowMaterialSelect = true
@@ -377,6 +410,58 @@ export default {
     formatDate (date) {
       let isoDate = new Date(date);
       return getFormattedTime(isoDate)
+    },
+    filterTime (prop) {
+      let maxStartTime = this.hourRange[0] * 100;
+      let maxEndTime = this.hourRange[1] * 100;
+
+      Object.keys(this.day_events).forEach(key => {
+        const eventStartTime = +this.getNumHour(this.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+        const eventEndTime = +this.getNumHour(this.day_events[key][0].end.value); //
+
+        if (eventStartTime <= this.start_time_h && eventEndTime <= this.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime
+          }
+        }
+
+        if (eventStartTime >= this.end_time_h && eventEndTime >= this.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime
+          }
+        }
+      })
+
+      let all_hours = hourUtils.getAllHours().filter(h => {
+        const numHour = +h.slice(0, 2) // берем время в виде 10
+        const numHour10 = +h.slice(0, 5).replace(':','') // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < this.hourRange[0] || numHour > this.hourRange[1]) { // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false
+        }
+
+        if (prop === 'start' && numHour10 === this.getNumHour(this.end_time)) {
+          return false
+        }
+
+        if (prop === 'end' && numHour10 <= this.getNumHour(this.start_time)) {
+          return false
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime// выбираем только кратные 30мин
+      });
+
+      this[`${prop}TimeSelect`].filteredList = all_hours.map(h => {
+        return { name: h.slice(0, 5), value: h.slice(0, 5)}
+      })
+    },
+    setTime (prop) {
+      const time = this[`${prop}_time`].slice(11, 16);
+
+      return { name: time, value: time}
+    },
+    getNumHour (time) {
+      return +time.slice(11, 16).replace(':','') // 2021-10-22T18:00:00+03:00 => 1800
     }
   }
 }

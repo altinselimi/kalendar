@@ -7,7 +7,7 @@
         class="kalendar-cell"
         :class="{
             selected: selected,
-            'is-an-hour': (index + 1) % (60 / 10) === 0,
+            'is-an-hour': (index + 1) % (60 / 30) === 0,
             'has-events': cell_events && cell_events.length > 0,
             'being-created': !!being_created || hasPopups,
             'work-time': isConstructed,
@@ -22,6 +22,7 @@
             :total="cell_events.length"
             :index="eventIndex"
             :overlaps="overlapValue"
+            :day_events="constructedEvents"
             :kalendar_events="kalendar_events"
             :isEditing="isEditing"
             :isShowEditPopup="isShowEditPopup"

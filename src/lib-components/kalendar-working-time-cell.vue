@@ -1,12 +1,13 @@
 ﻿<template>
     <li
+        v-selectable="{ selectedSetter: selectedSetter }"
         @mouseover.self="mouseMove()"
         @mousedown.self="mouseDown()"
         @mouseup="mouseUp()"
         class="kalendar-cell --work-time"
         :class="{
             'selected-work-time': isConstructed || isSelectedTemp,
-            'is-an-hour': (index + 1) % 6 === 0, // у каждого шестого рисуем нижнию рамку для окончания часа
+            'is-an-hour': (index + 1) % 2 === 0, // у каждого шестого рисуем нижнию рамку для окончания часа
         }"
         :style="`height: ${kalendar_options.cell_height}px;`"
     >
@@ -15,6 +16,7 @@
 </template>
 <script>
 import { getTime } from './utils.js';
+import selectable from 'vue-selectable';
 export default {
     props: [
         'creatingWorkTime',
@@ -32,7 +34,14 @@ export default {
           return this.cellData.value in this.temporaryWorkHours
       }
     },
+    data () {
+        return {
+          selected: [],
+        }
+    },
+    directives: { selectable },
     methods: {
+        selectedSetter(v) { this.selected = v; },
         getTime,
         mouseDown() {
             this.$emit('selectWorkHours', this.cellData.value);

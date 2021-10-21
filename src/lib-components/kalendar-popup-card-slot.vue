@@ -249,7 +249,7 @@ export default {
     formatDay (date ) {
       let isoDate = new Date(date);
 
-      let dayName = getFormattedWeekDayTime( isoDate).split(',')[0];
+      let dayName = getFormattedWeekDayTime(isoDate).split(',')[0];
       let dayMonth = getFormattedMonth(isoDate);
       return `${dayName}, ${dayMonth}`;
     },

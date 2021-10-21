@@ -40,7 +40,11 @@ export default {
         ]
         return values.indexOf(value) !== -1
       }
-    }
+    },
+    error: {
+      type: Boolean,
+      default: false
+    },
   },
   data: () => ({
     showOptions: false,
@@ -79,7 +83,7 @@ export default {
     <base-label v-if="label" @click="showOptions = !showOptions">
       {{ label }}
     </base-label>
-    <div class="b-pth-base-select">
+    <div class="b-pth-base-select" :class="{'--error': error }" >
       <div class="b-pth-base-select__container" @click="showOptions = !showOptions">
         <span class="b-pth-base-select__name" v-if="typeItems === 'text'">
           {{ value && value.name ? value.name : defaultText }}
@@ -117,6 +121,7 @@ export default {
 
 <style lang="sass" scoped>
 .b-pth-base-select
+  $self: this
   width: 100%
   height: 3.4rem
   max-width: 50rem
@@ -130,6 +135,8 @@ export default {
 
   transition: border-color 0.2s ease
   cursor: pointer
+  &.--error
+    border-bottom: 1px solid rgba(#f50d0a,1)
   & *
     user-select: none
   &__container
@@ -138,7 +145,7 @@ export default {
     align-items: center
 
     width: 100%
-    padding: .5rem 1.5rem
+    padding: .5rem 1.5rem .5rem 0
   &__name
     font-size: 1.4rem
     line-height: 1.8rem
@@ -150,10 +157,14 @@ export default {
     overflow: hidden
     text-overflow: ellipsis
 
+    .--error &
+      color: #f50d0a
+
     & input
       border: transparent solid 1px
   &__arrow
     width: 0.8rem
+    max-width: 5%
   &__icon
     margin: 0
     display: block !important
@@ -170,8 +181,8 @@ export default {
 
     position: absolute
     top: 100%
-    left: 0
-    right: 0
+    left: -2rem
+    right: -1rem
     z-index: 999
 
     margin: .2rem .1rem
@@ -185,7 +196,7 @@ export default {
     &._mt
       margin: 1rem 0 0
     &-item
-      padding: 1.2rem 24px
+      padding: 1.2rem 2.4rem
       line-height: 1.6rem
       font-size: 1.4rem
       list-style: none

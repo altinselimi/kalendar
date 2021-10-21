@@ -99,20 +99,23 @@ function getHours(hour_options) {
 }
 
 const getDayCells = (dayString, day_options) => {
-  console.log(dayString, new Date(dayString).toISOString())
   if (new Date(dayString).toISOString() !== dayString) {
     throw new Error("Unsupported dayString parameter provided");
   }
 
   let cells = [];
   let date_part = dayString.slice(0, 10);
-  let all_hours = hourUtils.getAllHours();
+  let all_hours = hourUtils.getAllHours().filter(h => {
+    return h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1 // выбираем только получасовые интервалы
+  });
+
   if (day_options) {
     let { start_hour, end_hour } = day_options;
-    let start_index = start_hour * 6;
-    let end_index = end_hour * 6 + 1;
+    let start_index = start_hour * 2;
+    let end_index = end_hour * 2 + 1;
     all_hours = all_hours.slice(start_index, end_index);
   }
+
   for (let hourIdx = 0; hourIdx < all_hours.length; hourIdx++) {
     let hour = all_hours[hourIdx];
     let value = `${date_part}T${hour}.000Z`;
@@ -122,6 +125,7 @@ const getDayCells = (dayString, day_options) => {
       visible: true
     });
   }
+
   return cells;
 };
 
@@ -180,13 +184,13 @@ const constructNewEvent = event => {
     round_offset: null
   };
 
-  let multipleOf10 = dateStr => new Date(dateStr).getMinutes() % 10;
+  let multipleOf10 = dateStr => new Date(dateStr).getMinutes() % 30;
 
   if (multipleOf10(fromData.value) !== 0) {
     fromData.rounded = true;
     fromData.round_offset = multipleOf10(fromData.value);
     let minutes = new Date(fromData.value).getMinutes();
-    let maskedMinutes = Math.floor(minutes / 10) * 10;
+    let maskedMinutes = Math.floor(minutes / 30) * 30;
     masked_from.setMinutes(maskedMinutes);
     fromData.masked_value = masked_from.toISOString();
   }

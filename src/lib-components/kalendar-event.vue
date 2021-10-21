@@ -14,11 +14,11 @@
             'editing': editing,
             'is-flat': flat,
             'is-past': isPast,
-            overlaps: overlaps > 0,
+            overlaps: overlaps > 1,
             'two-in-one': total > 1,
-            'event-card__mini': event.distance <= 10,
+            'event-card__mini': event.distance <= 30,
             'event-card__small':
-                (event.distance > 10 && event.distance < 40) || overlaps > 1,
+                (event.distance > 30 && event.distance < 60) || overlaps > 1,
         }"
     >
         <div @click="editEvent" v-if="status === 'creating' || status === 'popup-initiated'">
@@ -64,6 +64,7 @@ export default {
         'overlaps',
         'kalendar_events',
         'isShowEditPopup',
+        'day_events',
         'flat' // for month view
     ],
     created() {},
@@ -88,8 +89,7 @@ export default {
                 this.total}px`;
         },
         left_offset() {
-            return `(${this.index} * (${this.width_value})) + ${this.overlaps *
-                50}px`;
+            return `(${this.index} * (${this.width_value})) + ${this.overlaps * 50}px`;
         },
         top_offset() {
             return this.event.start.round_offset
@@ -99,7 +99,7 @@ export default {
         distance() {
             if (!this.event) return;
             if (this.flat) return `auto`
-            let multiplier = this.kalendar_options.cell_height / 10;
+            let multiplier = this.kalendar_options.cell_height / 30;
             // 0.5 * multiplier for an offset so next cell is easily selected
             return `${this.event.distance * multiplier - 0.2 * multiplier}px`;
         },
@@ -114,6 +114,7 @@ export default {
                 id: id,
                 key,
                 data,
+                day_events: this.day_events
             };
             return payload;
         },
