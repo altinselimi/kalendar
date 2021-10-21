@@ -5,7 +5,9 @@ import {
   addMinutes,
   addHours,
   getYearMonthDay,
-  getLocaleTime
+  getLocaleTime,
+  beginningOfMonth,
+  daysInMonth
 } from "../utils.js";
 import hourUtils from "../hours.js";
 
@@ -33,21 +35,34 @@ function getDays(dayString, { hide_dates, hide_days, view_type }) {
   let date = new Date(`${dayString}T00:00:00.000Z`);
   let day_of_week = date.getUTCDay() - 1;
   let days = [];
-  if (view_type === "day") {
-    days = [
-      {
-        value: date.toISOString(),
-        index: 0
+
+  switch (view_type) {
+    case 'day':
+      days = [
+        {
+          value: date.toISOString(),
+          index: 0
+        }
+      ];
+      break;
+    case 'month':
+      for (let idx = 0; idx < daysInMonth(); idx++) {
+        days.push({
+          value: addDays(beginningOfMonth(date), idx).toISOString(),
+          index: idx
+        });
       }
-    ];
-  } else {
-    for (let idx = 0; idx < 7; idx++) {
-      days.push({
-        value: addDays(date, idx - day_of_week).toISOString(),
-        index: idx
-      });
-    }
+      break;
+    default:
+      for (let idx = 0; idx < 7; idx++) {
+        days.push({
+          value: addDays(date, idx - day_of_week).toISOString(),
+          index: idx
+        });
+      }
+      break;
   }
+
   if (hide_dates && hide_dates.length > 0) {
     days = days.filter(({ value }) => {
       return hide_dates.indexOf(value.slice(0, 10)) < 0;
@@ -84,6 +99,7 @@ function getHours(hour_options) {
 }
 
 const getDayCells = (dayString, day_options) => {
+  console.log(dayString, new Date(dayString).toISOString())
   if (new Date(dayString).toISOString() !== dayString) {
     throw new Error("Unsupported dayString parameter provided");
   }

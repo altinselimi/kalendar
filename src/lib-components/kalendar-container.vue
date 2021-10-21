@@ -15,7 +15,7 @@
                     <button class="main-button" @click="changeDay(0)">
                         Сегодня
                     </button>
-                </div>    
+                </div>
                 <div class="week-navigator">
                     <div
                         class="nav-wrapper"
@@ -104,7 +104,8 @@
             <slot name="workTimeEdit"></slot>
         </div>
 
-        <div class="b-scroll-container" :style="{ height: kalendar_options.height }">
+        <kalendar-monthview v-if="kalendar_options.view_type === 'month'" :current_day="current_day" />
+        <div v-else class="b-scroll-container" :style="{ height: kalendar_options.height }">
             <scroll-container>
                 <kalendar-week-view
                   :kalendar_work_hours="kalendar_work_hours"
@@ -115,7 +116,7 @@
                 />
             </scroll-container>
         </div>
-        
+
         <portal to="event-creation" class="slotable">
             <div slot-scope="information" class="creating-event">
                 <slot name="creating-card" :event_information="information">
@@ -130,7 +131,7 @@
                 </slot>
             </div>
         </portal>
-        
+
         <portal to="event-popup-form" class="slotable">
             <div slot-scope="information" class="popup-event">
                 <slot name="popup-form" :popup_information="information">
@@ -141,7 +142,7 @@
                 </slot>
             </div>
         </portal>
-        
+
         <portal to="event-details" class="slotable">
             <div slot-scope="information" class="created-event">
                 <slot name="created-card" :event_information="information">
@@ -151,7 +152,7 @@
                 </slot>
             </div>
         </portal>
-        
+
         <portal to="event-edit-form" class="slotable">
             <div slot-scope="information" class="popup-event">
                 <slot name="popup-edit-form" :popup_information="information">
@@ -186,8 +187,8 @@ import {
 
 export default {
     components: {
-      KalendarWeekView: () => import('./kalendar-weekview.vue'),
-      ScrollContainer: () => import('./scroll-container.vue'),
+      KalendarMonthview: () => import('./kalendar-monthview.vue'),
+        KalendarWeekView: () => import('./kalendar-weekview.vue'),ScrollContainer: () => import('./scroll-container.vue'),
       KalendarCreatedCardSlot,
       KalendarPopupCardSlot,
       KalendarPopupEditForm
@@ -252,7 +253,7 @@ export default {
                     let endDate = endOfWeek(isoDate);
                     let startString = getFormattedMonth(startDate);
                     let endString = getFormattedMonth(endDate);
-                    
+
                     return `${startString} - ${endString}`;
                 },
                 formatDayNavigator: isoDate => {
@@ -283,7 +284,7 @@ export default {
             let conditions = {
                 scrollToNow: val => typeof val === 'boolean',
                 start_day: val => !isNaN(Date.parse(val)),
-                view_type: val => ['week', 'day'].includes(val),
+                view_type: val => ['week', 'day', 'month'].includes(val),
                 cell_height: val => !isNaN(val),
                 height: val => this.isString(val),
                 style: val => ['material_design', 'flat_design'].includes(val),
@@ -319,7 +320,7 @@ export default {
             id: event.id || generateUUID(),
           }
         });
-        
+
         this.kalendar_work_hours = {...this.work_time};
         this.kalendar_work_hours_temp = {...this.work_time};
 
@@ -330,7 +331,7 @@ export default {
         this.$kalendar.getEvents = () => {
             return this.kalendar_events.slice(0);
         }
-        
+
         this.$kalendar.updateEvents = events => {
             this.kalendar_events = events.map(event => ({
                 ...event,
@@ -345,14 +346,14 @@ export default {
         this.$kalendar.getWorkHours = () => {
             return {...this.kalendar_work_hours}
         };
-        
+
         this.$kalendar.updateWorkHours = payload => {
             this.kalendar_work_hours = {
                 ...this.kalendar_work_hours,
                 ...payload
             };
         };
-        
+
         this.$kalendar.saveWorkHours = () => {
             this.$emit(
               'update:work_time',
@@ -360,21 +361,21 @@ export default {
             );
             this.kalendar_work_hours_temp = this.kalendar_work_hours
         };
-        
+
         this.$kalendar.removeWorkHours = payload => {
             delete this.kalendar_work_hours[payload]
         };
-        
+
         this.$kalendar.resetWorkHours = () => {
             this.kalendar_work_hours = {};
             this.kalendar_work_hours_temp = this.kalendar_work_hours
         };
-        
+
         this.$kalendar.cancelWorkHours = () => {
             this.kalendar_work_hours = {...this.work_time};
             this.$kalendar.saveWorkHours()
         };
-        
+
         this.$kalendar.formatLeftHours = this.kalendar_options.formatLeftHours;
         this.$kalendar.toggleEditing = this.kalendar_options.toggleEditing;
         this.$kalendar.toggleEditPopup = this.kalendar_options.toggleEditPopup;

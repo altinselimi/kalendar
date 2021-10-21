@@ -4,14 +4,15 @@
         :ref="`${event.id}`"
         :style="
             `
-              height: ${distance}; 
-              width: calc(${width_value}); 
+              height: ${distance};
+              width: calc(${width_value});
               left: calc(${left_offset});
               top: ${top_offset};
             `
         "
         :class="{
             'editing': editing,
+            'is-flat': flat,
             'is-past': isPast,
             overlaps: overlaps > 0,
             'two-in-one': total > 1,
@@ -56,7 +57,15 @@
 import { isBefore, getLocaleTime, addTimezoneInfo } from './utils.js';
 
 export default {
-    props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
+    props: [
+        'event',
+        'total',
+        'index',
+        'overlaps',
+        'kalendar_events',
+        'isShowEditPopup',
+        'flat' // for month view
+    ],
     created() {},
     inject: ['kalendar_options'],
     data: () => ({
@@ -89,6 +98,7 @@ export default {
         },
         distance() {
             if (!this.event) return;
+            if (this.flat) return `auto`
             let multiplier = this.kalendar_options.cell_height / 10;
             // 0.5 * multiplier for an offset so next cell is easily selected
             return `${this.event.distance * multiplier - 0.2 * multiplier}px`;
@@ -186,12 +196,27 @@ $creator-content: white;
         font-size: 60%;
     }
 
-    position: absolute;
-    pointer-events: none;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; //z-index: 20!important;
+    &.is-flat {
+        margin-bottom: 3px;
+
+        .details-card > small {
+            display: none;
+        }
+
+        .remove {
+            top: 1px
+        }
+    }
+
+    &:not(.is-flat) {
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0; //z-index: 20!important;
+    }
+
     //background-color: rgba($creator-bg, .85);
     color: $creator-content;
     user-select: none;
