@@ -119,8 +119,7 @@
 
 <script>
 import KalendarXButton from '@/lib-components/kalendar-x-button';
-import BaseSelect from '@/lib-components/base/BaseSelect';
-import BaseTimeSelect from '@/lib-components/base/BaseTimeSelect';
+import BaseSelect from '@/lib-components/base/BaseSelect'
 
 import {
   getFormattedWeekDayTime,
@@ -165,8 +164,7 @@ export default {
   name: "kalendar-popup-card-slot",
   components: {
     KalendarXButton,
-    BaseSelect,
-    BaseTimeSelect
+    BaseSelect
   },
   props: ['popup_information'],
   data () {

@@ -1,6 +1,5 @@
-import { k as isWeekend, l as isToday, n as cloneObject, h as __vue_normalize__, j as __vue_create_injector__ } from './index-02b4b942.js';
+import { k as isWeekend, l as isToday, n as cloneObject, h as __vue_normalize__, j as __vue_create_injector__ } from './index-e5ac3211.js';
 import 'vue';
-import 'vue2-timepicker/src/vue-timepicker.vue';
 import { m as myWorker } from './index-d71cc8ae.js';
 
 //
@@ -8,7 +7,7 @@ var script = {
   name: "kalendar-daymonth",
   components: {
     KalendarEvent: function KalendarEvent() {
-      return import('./kalendar-event-d0245837.js');
+      return import('./kalendar-event-586a05b2.js');
     }
   },
   props: ["day", "passedTime"],
