@@ -3,7 +3,6 @@
     :class="{
     'is-weekend': isWeekend,
     'is-today': isToday,
-    /*creating: creator.creating || creator.status === 'popup-initiated'*/
     }"
     class="calendar-day">
     <li
@@ -22,7 +21,7 @@
 </template>
 
 <script>
-import { isToday, isWeekend, cloneObject, getLocaleTime } from "./utils";
+import { isToday, isWeekend, cloneObject } from "./utils";
 import myWorker from "@/lib-components/workers";
 
 export default {

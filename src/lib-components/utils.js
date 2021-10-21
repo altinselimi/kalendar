@@ -238,7 +238,7 @@ const beginningOfPeriod = (d, periodUom, startDow) => {
     case "month":
       return new Date(d.getFullYear(), d.getMonth())
     case "week":
-      return this.beginningOfWeek(d, startDow)
+      return beginningOfWeek(d, startDow)
     default:
       return d
   }

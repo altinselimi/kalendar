@@ -30,22 +30,19 @@
 
 <script>
 import {
-  getHourlessDate,
   incrementPeriod,
-  beginningOfMonth,
   addDays,
   beginningOfWeek,
   endOfWeekInMonth,
   dayDiff,
   beginningOfPeriod, getLocaleTime
 } from './utils'
-import KalendarDay from "./kalendar-daymonth";
 
 export default {
   name: "kalendar-monthview",
 
   components: {
-      KalendarDay
+    KalendarDay: () => import('./kalendar-daymonth.vue'),
   },
 
   props: {

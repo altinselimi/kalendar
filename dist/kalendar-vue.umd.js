@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var Vue=_interopDefault(require('vue')),VueTimepicker=_interopDefault(require('vue2-timepicker/src/vue-timepicker.vue'));function ownKeys(object, enumerableOnly) {
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var Vue=_interopDefault(require('vue')),VueTimepicker=_interopDefault(require('vue2-timepicker/src/vue-timepicker.vue')),selectable=_interopDefault(require('vue-selectable'));function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
 
   if (Object.getOwnPropertySymbols) {
@@ -71,8 +71,20 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -120,6 +132,10 @@ function _arrayLikeToArray(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
   return arr2;
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
@@ -192,7 +208,7 @@ var getLocaleTime = function getLocaleTime(dateString) {
 };
 
 var addTimezoneInfo = function addTimezoneInfo(ISOdate) {
-  if (new Date(ISOdate).toISOString() !== ISOdate) return;
+  if (new Date(ISOdate).toISOString() !== ISOdate && ISOdate.indexOf('000Z') !== -1) return;
   return "".concat(ISOdate.slice(0, 19)).concat(creators_offset);
 };
 
@@ -255,6 +271,43 @@ var getTimeRemaining = function getTimeRemaining(endTime) {
     minutes: minutes,
     seconds: seconds
   };
+};
+
+var beginningOfWeek = function beginningOfWeek(d, startDow) {
+  return addDays(d, (startDow - d.getDay() - 7) % -7);
+};
+
+var endOfWeekInMonth = function endOfWeekInMonth(d, startDow) {
+  return addDays(beginningOfWeek(d, startDow), 7);
+};
+
+var incrementPeriod = function incrementPeriod(d, uom, count) {
+  return new Date(d.getFullYear() + (uom === "year" ? count : 0), d.getMonth() + (uom === "month" ? count : 0), d.getDate() + (uom === "week" ? count * 7 : 0));
+}; // Number of whole days between two dates. If present, time of day is ignored.
+// Treats dates as UTC to avoid DST changes within the perioud leading to incorrect
+// answers.
+
+
+var dayDiff = function dayDiff(d1, d2) {
+  var endDate = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()),
+      startDate = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate());
+  return (endDate - startDate) / 86400000;
+};
+
+var beginningOfPeriod = function beginningOfPeriod(d, periodUom, startDow) {
+  switch (periodUom) {
+    case "year":
+      return new Date(d.getFullYear(), 0);
+
+    case "month":
+      return new Date(d.getFullYear(), d.getMonth());
+
+    case "week":
+      return beginningOfWeek(d, startDow);
+
+    default:
+      return d;
+  }
 };//
 var script = {
   name: "kalendar-created-card-slot",
@@ -637,6 +690,10 @@ var __vue_component__$2 = /*#__PURE__*/normalizeComponent({
         var values = ['text', 'class'];
         return values.indexOf(value) !== -1;
       }
+    },
+    error: {
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -695,7 +752,10 @@ var __vue_render__$3 = function __vue_render__() {
       }
     }
   }, [_vm._v("\n    " + _vm._s(_vm.label) + "\n  ")]) : _vm._e(), _vm._v(" "), _c('div', {
-    staticClass: "b-pth-base-select"
+    staticClass: "b-pth-base-select",
+    class: {
+      '--error': _vm.error
+    }
   }, [_c('div', {
     staticClass: "b-pth-base-select__container",
     on: {
@@ -779,8 +839,8 @@ var __vue_staticRenderFns__$3 = [];
 
 var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-6e96159a_0", {
-    source: ".b-pth-base-select[data-v-6e96159a]{width:100%;height:3.4rem;max-width:50rem;position:relative;display:flex;background-color:#fff;border-bottom:1px solid #dadada;transition:border-color .2s ease;cursor:pointer}.b-pth-base-select *[data-v-6e96159a]{user-select:none}.b-pth-base-select__container[data-v-6e96159a]{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.5rem 1.5rem}.b-pth-base-select__name[data-v-6e96159a]{font-size:1.4rem;line-height:1.8rem;color:#777;cursor:pointer;white-space:nowrap;max-width:95%;overflow:hidden;text-overflow:ellipsis}.b-pth-base-select__name input[data-v-6e96159a]{border:transparent solid 1px}.b-pth-base-select__arrow[data-v-6e96159a]{width:.8rem}.b-pth-base-select__icon[data-v-6e96159a]{margin:0;display:block!important}.b-pth-base-select__icon_up[data-v-6e96159a]{transform:rotate(-180deg);transition:all .2s cubic-bezier(1,.5,.8,1);fill:#000}.b-pth-base-select__dropdown[data-v-6e96159a]{transition:all .2s cubic-bezier(1,.5,.8,1);border-top:none;overflow:hidden;background:#fff;position:absolute;top:100%;left:0;right:0;z-index:999;margin:.2rem .1rem;padding:0;box-shadow:0 4px 4px rgba(0,0,0,.25);border-radius:5px}.b-pth-base-select__options[data-v-6e96159a]{margin:0;padding:0;min-height:6rem}.b-pth-base-select__options._mt[data-v-6e96159a]{margin:1rem 0 0}.b-pth-base-select__options-item[data-v-6e96159a]{padding:1.2rem 24px;line-height:1.6rem;font-size:1.4rem;list-style:none;color:#272727;transition:all .2s cubic-bezier(1,.5,.8,1)}.b-pth-base-select__options-item._fixed[data-v-6e96159a]{top:0;right:0;left:0}.b-pth-base-select__options-item._fixed input[data-v-6e96159a]{width:100%}.b-pth-base-select__options-item[data-v-6e96159a]:last-child{border-bottom:none}.b-pth-base-select__options-item.selected[data-v-6e96159a],.b-pth-base-select__options-item[data-v-6e96159a]:hover{background-color:rgba(0,173,182,.05)}.vue-scrollbar__scrollbar-vertical[data-v-6e96159a]{width:.4rem;height:92%;top:.4rem;bottom:.4rem;right:.4rem}.vue-scrollbar__scrollbar-vertical .scrollbar[data-v-6e96159a]{width:.4rem;border-radius:.4rem}",
+  inject("data-v-3ce90245_0", {
+    source: ".b-pth-base-select[data-v-3ce90245]{width:100%;height:3.4rem;max-width:50rem;position:relative;display:flex;background-color:#fff;border-bottom:1px solid #dadada;transition:border-color .2s ease;cursor:pointer}.b-pth-base-select.--error[data-v-3ce90245]{border-bottom:1px solid #f50d0a}.b-pth-base-select *[data-v-3ce90245]{user-select:none}.b-pth-base-select__container[data-v-3ce90245]{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.5rem 1.5rem .5rem 0}.b-pth-base-select__name[data-v-3ce90245]{font-size:1.4rem;line-height:1.8rem;color:#777;cursor:pointer;white-space:nowrap;max-width:95%;overflow:hidden;text-overflow:ellipsis}.--error .b-pth-base-select__name[data-v-3ce90245]{color:#f50d0a}.b-pth-base-select__name input[data-v-3ce90245]{border:transparent solid 1px}.b-pth-base-select__arrow[data-v-3ce90245]{width:.8rem;max-width:5%}.b-pth-base-select__icon[data-v-3ce90245]{margin:0;display:block!important}.b-pth-base-select__icon_up[data-v-3ce90245]{transform:rotate(-180deg);transition:all .2s cubic-bezier(1,.5,.8,1);fill:#000}.b-pth-base-select__dropdown[data-v-3ce90245]{transition:all .2s cubic-bezier(1,.5,.8,1);border-top:none;overflow:hidden;background:#fff;position:absolute;top:100%;left:-2rem;right:-1rem;z-index:999;margin:.2rem .1rem;padding:0;box-shadow:0 4px 4px rgba(0,0,0,.25);border-radius:5px}.b-pth-base-select__options[data-v-3ce90245]{margin:0;padding:0;min-height:6rem}.b-pth-base-select__options._mt[data-v-3ce90245]{margin:1rem 0 0}.b-pth-base-select__options-item[data-v-3ce90245]{padding:1.2rem 2.4rem;line-height:1.6rem;font-size:1.4rem;list-style:none;color:#272727;transition:all .2s cubic-bezier(1,.5,.8,1)}.b-pth-base-select__options-item._fixed[data-v-3ce90245]{top:0;right:0;left:0}.b-pth-base-select__options-item._fixed input[data-v-3ce90245]{width:100%}.b-pth-base-select__options-item[data-v-3ce90245]:last-child{border-bottom:none}.b-pth-base-select__options-item.selected[data-v-3ce90245],.b-pth-base-select__options-item[data-v-3ce90245]:hover{background-color:rgba(0,173,182,.05)}.vue-scrollbar__scrollbar-vertical[data-v-3ce90245]{width:.4rem;height:92%;top:.4rem;bottom:.4rem;right:.4rem}.vue-scrollbar__scrollbar-vertical .scrollbar[data-v-3ce90245]{width:.4rem;border-radius:.4rem}",
     map: undefined,
     media: undefined
   });
@@ -788,7 +848,7 @@ var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$3 = "data-v-6e96159a";
+var __vue_scope_id__$3 = "data-v-3ce90245";
 /* module identifier */
 
 var __vue_module_identifier__$3 = undefined;
@@ -900,7 +960,14 @@ var __vue_is_functional_template__$4 = false;
 var __vue_component__$4 = /*#__PURE__*/normalizeComponent({
   render: __vue_render__$4,
   staticRenderFns: __vue_staticRenderFns__$4
-}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, createInjector, undefined, undefined);var EVENT = {
+}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, createInjector, undefined, undefined);var hourUtils = {
+  getAllHours: function getAllHours() {
+    return ["00:00:00", "00:10:00", "00:20:00", "00:30:00", "00:40:00", "00:50:00", "01:00:00", "01:10:00", "01:20:00", "01:30:00", "01:40:00", "01:50:00", "02:00:00", "02:10:00", "02:20:00", "02:30:00", "02:40:00", "02:50:00", "03:00:00", "03:10:00", "03:20:00", "03:30:00", "03:40:00", "03:50:00", "04:00:00", "04:10:00", "04:20:00", "04:30:00", "04:40:00", "04:50:00", "05:00:00", "05:10:00", "05:20:00", "05:30:00", "05:40:00", "05:50:00", "06:00:00", "06:10:00", "06:20:00", "06:30:00", "06:40:00", "06:50:00", "07:00:00", "07:10:00", "07:20:00", "07:30:00", "07:40:00", "07:50:00", "08:00:00", "08:10:00", "08:20:00", "08:30:00", "08:40:00", "08:50:00", "09:00:00", "09:10:00", "09:20:00", "09:30:00", "09:40:00", "09:50:00", "10:00:00", "10:10:00", "10:20:00", "10:30:00", "10:40:00", "10:50:00", "11:00:00", "11:10:00", "11:20:00", "11:30:00", "11:40:00", "11:50:00", "12:00:00", "12:10:00", "12:20:00", "12:30:00", "12:40:00", "12:50:00", "13:00:00", "13:10:00", "13:20:00", "13:30:00", "13:40:00", "13:50:00", "14:00:00", "14:10:00", "14:20:00", "14:30:00", "14:40:00", "14:50:00", "15:00:00", "15:10:00", "15:20:00", "15:30:00", "15:40:00", "15:50:00", "16:00:00", "16:10:00", "16:20:00", "16:30:00", "16:40:00", "16:50:00", "17:00:00", "17:10:00", "17:20:00", "17:30:00", "17:40:00", "17:50:00", "18:00:00", "18:10:00", "18:20:00", "18:30:00", "18:40:00", "18:50:00", "19:00:00", "19:10:00", "19:20:00", "19:30:00", "19:40:00", "19:50:00", "20:00:00", "20:10:00", "20:20:00", "20:30:00", "20:40:00", "20:50:00", "21:00:00", "21:10:00", "21:20:00", "21:30:00", "21:40:00", "21:50:00", "22:00:00", "22:10:00", "22:20:00", "22:30:00", "22:40:00", "22:50:00", "23:00:00", "23:10:00", "23:20:00", "23:30:00", "23:40:00", "23:50:00", "24:00:00"];
+  },
+  getFullHours: function getFullHours() {
+    return ["00:00:00", "01:00:00", "02:00:00", "03:00:00", "04:00:00", "05:00:00", "06:00:00", "07:00:00", "08:00:00", "09:00:00", "10:00:00", "11:00:00", "12:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00", "20:00:00", "21:00:00", "22:00:00", "23:00:00"];
+  }
+};var EVENT = {
   title: 'Новое занятие',
   description: null,
   userId: null,
@@ -970,7 +1037,18 @@ var script$5 = {
       addedMaterials: [],
       isShowMaterialSelect: false,
       start_time_h: 0,
-      end_time_h: 0
+      end_time_h: 0,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     };
   },
   computed: {
@@ -984,11 +1062,31 @@ var script$5 = {
       return this.end_time_h - this.start_time_h < 0;
     }
   },
+  created: function created() {
+    var _cloneObject = cloneObject(this.popup_information),
+        start_time = _cloneObject.start_time,
+        end_time = _cloneObject.end_time,
+        data = _cloneObject.data,
+        day_events = _cloneObject.day_events;
+
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.day_events = day_events;
+  },
   mounted: function mounted() {
     this.filterStudents();
     this.filterMaterials();
+    this.filterTimes();
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes: function filterTimes() {
+      this.filterTime('start');
+      this.filterTime('end');
+    },
     addEvent: function addEvent() {
       var payload = {
         data: {
@@ -1038,13 +1136,6 @@ var script$5 = {
       var dayMonth = getFormattedMonth(isoDate);
       return "".concat(dayName, ", ").concat(dayMonth);
     },
-    changeTime: function changeTime(eventData, timeName) {
-      var date = new Date(this.popup_information[timeName]);
-      var newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm));
-      this[timeName] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
-
-      this["".concat(timeName, "_h")] = +eventData.data.h;
-    },
     showMaterialSelect: function showMaterialSelect() {
       this.isShowMaterialSelect = true;
     },
@@ -1073,6 +1164,81 @@ var script$5 = {
     removeMaterial: function removeMaterial(index) {
       this.addedMaterials.splice(index, 1);
       this.filterMaterials();
+    },
+    changeTime: function changeTime(value, timeName) {
+      var dataTime = value.split(':');
+      var date = new Date(this["".concat(timeName, "_time")]);
+      var newDate = new Date(date.setHours(dataTime[0], dataTime[1]));
+      this["".concat(timeName, "_time")] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
+
+      this["".concat(timeName, "_time_h")] = +dataTime[0] * 100;
+      this.filterTimes();
+
+      if (this.start_time_h > this.end_time_h) {
+        // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0];
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':', '');
+        this.changeTime(this.endTimeSelect.selected.value, 'end');
+      }
+    },
+    filterTime: function filterTime(prop) {
+      var _this3 = this;
+
+      var maxStartTime = this.hourRange[0] * 100;
+      var maxEndTime = this.hourRange[1] * 100;
+      Object.keys(this.day_events).forEach(function (key) {
+        var eventStartTime = +_this3.getNumHour(_this3.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+
+        var eventEndTime = +_this3.getNumHour(_this3.day_events[key][0].end.value); //
+
+        if (eventStartTime <= _this3.start_time_h && eventEndTime <= _this3.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime;
+          }
+        }
+
+        if (eventStartTime >= _this3.end_time_h && eventEndTime >= _this3.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime;
+          }
+        }
+      });
+      var all_hours = hourUtils.getAllHours().filter(function (h) {
+        var numHour = +h.slice(0, 2); // берем время в виде 10
+
+        var numHour10 = +h.slice(0, 5).replace(':', ''); // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < _this3.hourRange[0] || numHour > _this3.hourRange[1]) {
+          // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false;
+        }
+
+        if (prop === 'start' && numHour10 === _this3.getNumHour(_this3.end_time)) {
+          return false;
+        }
+
+        if (prop === 'end' && numHour10 <= _this3.getNumHour(_this3.start_time)) {
+          return false;
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime; // выбираем только кратные 30мин
+      });
+      this["".concat(prop, "TimeSelect")].filteredList = all_hours.map(function (h) {
+        return {
+          name: h.slice(0, 5),
+          value: h.slice(0, 5)
+        };
+      });
+    },
+    setTime: function setTime(prop) {
+      var time = this["".concat(prop, "_time")].slice(11, 16);
+      return {
+        name: time,
+        value: time
+      };
+    },
+    getNumHour: function getNumHour(time) {
+      return +time.slice(11, 16).replace(':', ''); // 2021-10-22T18:00:00+03:00 => 1800
     }
   }
 };/* script */
@@ -1223,28 +1389,42 @@ var __vue_render__$5 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n      " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n    ")]), _vm._v(" "), _c('base-time-select', {
+  }, [_vm._v("\n      " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n    ")]), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.start_time,
-      "hour-range": _vm.hourRange
+      "defaultText": "Начало",
+      "options": _vm.startTimeSelect.filteredList
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'start_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.startTimeSelect.selected.value, 'start');
       }
+    },
+    model: {
+      value: _vm.startTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.startTimeSelect, "selected", $$v);
+      },
+      expression: "startTimeSelect.selected"
     }
   }), _vm._v(" "), _c('span', {
     staticClass: "b-delimiter"
-  }), _vm._v(" "), _c('base-time-select', {
+  }), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.end_time,
-      "hour-range": _vm.hourRange,
+      "defaultText": "Конец",
+      "options": _vm.endTimeSelect.filteredList,
       "error": _vm.errorSelectedTime
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'end_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.endTimeSelect.selected.value, 'end');
       }
+    },
+    model: {
+      value: _vm.endTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.endTimeSelect, "selected", $$v);
+      },
+      expression: "endTimeSelect.selected"
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "b-materials"
@@ -1339,7 +1519,7 @@ var __vue_staticRenderFns__$5 = [function () {
 
 var __vue_inject_styles__$5 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-07d7150d_0", {
+  inject("data-v-d2d361fe_0", {
     source: ".created-card{display:flex;flex-direction:column;padding:20px 20px 10px 30px;position:relative}.created-card__x{position:absolute;top:0;right:0}.created-card__header{display:flex;align-items:center;margin:0 0 20px 0}.created-card__header-icon{display:inline-block;width:20px;height:20px;margin:0 10px 0 0}.created-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-lesson{width:100%;color:#777;display:flex;justify-content:center;align-items:center;margin:10px}.b-open-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:20px 0}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 10px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}",
     map: undefined,
     media: undefined
@@ -1392,14 +1572,12 @@ var script$6 = {
   name: "kalendar-popup-edit-form",
   components: {
     KalendarXButton: __vue_component__$1,
-    BaseSelect: __vue_component__$3,
-    BaseTimeSelect: __vue_component__$4
+    BaseSelect: __vue_component__$3
   },
   props: ['popup_information'],
   data: function data() {
     return {
       studentSelect: {
-        value: {},
         list: Object.keys(STUDENTS$1).map(function (m) {
           return {
             value: m,
@@ -1410,7 +1588,6 @@ var script$6 = {
         selected: {}
       },
       materialSelect: {
-        value: {},
         list: Object.keys(MATERIALS$1).map(function (m) {
           return {
             value: m,
@@ -1428,23 +1605,23 @@ var script$6 = {
       isShowMaterialSelect: false,
       start_time_h: 0,
       end_time_h: 0,
-      isEdit: false
+      isEdit: false,
+      startTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      endTimeSelect: {
+        list: [],
+        filteredList: [],
+        selected: {}
+      },
+      day_events: []
     };
-  },
-  created: function created() {
-    var _cloneObject = cloneObject(this.popup_information),
-        start_time = _cloneObject.start_time,
-        end_time = _cloneObject.end_time,
-        data = _cloneObject.data;
-
-    this.start_time = start_time;
-    this.end_time = end_time;
-    this.addedStudents = data.students;
-    this.addedMaterials = data.materials;
   },
   computed: {
     hourRange: function hourRange() {
-      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at];
+      return [this.$kalendar.options.day_starts_at, this.$kalendar.options.day_ends_at - 1];
     },
     enabledSave: function enabledSave() {
       return this.addedStudents.length > 0 && !this.errorSelectedTime;
@@ -1455,18 +1632,40 @@ var script$6 = {
     beforeTime: function beforeTime() {
       var rt = getTimeRemaining(this.start_time);
 
-      if (rt.days === 0 && rt.minutes > 0) {
-        return rt.minutes;
+      if (rt.days === 0 && rt.minutes >= 0 && rt.hours < 8 && rt.hours >= 0) {
+        return [rt.hours, rt.minutes];
       }
 
-      return 0;
+      return [];
     }
+  },
+  created: function created() {
+    var _cloneObject = cloneObject(this.popup_information),
+        start_time = _cloneObject.start_time,
+        end_time = _cloneObject.end_time,
+        data = _cloneObject.data,
+        day_events = _cloneObject.day_events;
+
+    this.start_time = start_time;
+    this.start_time_h = this.getNumHour(this.start_time);
+    this.end_time = end_time;
+    this.end_time_h = this.getNumHour(this.end_time);
+    this.addedStudents = data.students;
+    this.addedMaterials = data.materials;
+    this.day_events = day_events;
   },
   mounted: function mounted() {
     this.filterStudents();
     this.filterMaterials();
+    this.filterTimes();
+    this.startTimeSelect.selected = this.setTime('start');
+    this.endTimeSelect.selected = this.setTime('end');
   },
   methods: {
+    filterTimes: function filterTimes() {
+      this.filterTime('start');
+      this.filterTime('end');
+    },
     editEvent: function editEvent() {
       this.start_time = addTimezoneInfo(this.start_time);
       this.end_time = addTimezoneInfo(this.end_time);
@@ -1516,12 +1715,21 @@ var script$6 = {
       var dayMonth = getFormattedMonth(isoDate);
       return "".concat(dayName, ", ").concat(dayMonth);
     },
-    changeTime: function changeTime(eventData, timeName) {
-      var date = new Date(this[timeName]);
-      var newDate = new Date(date.setHours(eventData.data.HH, eventData.data.mm));
-      this[timeName] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
+    changeTime: function changeTime(value, timeName) {
+      var dataTime = value.split(':');
+      var date = new Date(this["".concat(timeName, "_time")]);
+      var newDate = new Date(date.setHours(dataTime[0], dataTime[1]));
+      this["".concat(timeName, "_time")] = getLocaleTime(newDate.toISOString()); // this.startTime or this.endTime
 
-      this["".concat(timeName, "_h")] = +eventData.data.H;
+      this["".concat(timeName, "_time_h")] = +dataTime[0] * 100;
+      this.filterTimes();
+
+      if (this.start_time_h > this.end_time_h) {
+        // если при переключении выбрали время начала больше конца
+        this.endTimeSelect.selected = this.endTimeSelect.filteredList[0];
+        this.end_time_h = +this.endTimeSelect.selected.value.replace(':', '');
+        this.changeTime(this.endTimeSelect.selected.value, 'end');
+      }
     },
     showMaterialSelect: function showMaterialSelect() {
       this.isShowMaterialSelect = true;
@@ -1564,6 +1772,65 @@ var script$6 = {
     formatDate: function formatDate(date) {
       var isoDate = new Date(date);
       return getFormattedTime(isoDate);
+    },
+    filterTime: function filterTime(prop) {
+      var _this3 = this;
+
+      var maxStartTime = this.hourRange[0] * 100;
+      var maxEndTime = this.hourRange[1] * 100;
+      Object.keys(this.day_events).forEach(function (key) {
+        var eventStartTime = +_this3.getNumHour(_this3.day_events[key][0].start.value); // // 2021-10-22T18:00:00+03:00 => 1800
+
+        var eventEndTime = +_this3.getNumHour(_this3.day_events[key][0].end.value); //
+
+        if (eventStartTime <= _this3.start_time_h && eventEndTime <= _this3.start_time_h) {
+          if (eventEndTime > maxStartTime) {
+            maxStartTime = eventEndTime;
+          }
+        }
+
+        if (eventStartTime >= _this3.end_time_h && eventEndTime >= _this3.end_time_h) {
+          if (eventStartTime < maxEndTime) {
+            maxEndTime = eventStartTime;
+          }
+        }
+      });
+      var all_hours = hourUtils.getAllHours().filter(function (h) {
+        var numHour = +h.slice(0, 2); // берем время в виде 10
+
+        var numHour10 = +h.slice(0, 5).replace(':', ''); // берем время в виде 10:30 и переводим в число 1030
+
+        if (numHour < _this3.hourRange[0] || numHour > _this3.hourRange[1]) {
+          // убираем часы не попадающие в режим работы day_starts_at и day_ends_at календаря
+          return false;
+        }
+
+        if (prop === 'start' && numHour10 === _this3.getNumHour(_this3.end_time)) {
+          return false;
+        }
+
+        if (prop === 'end' && numHour10 <= _this3.getNumHour(_this3.start_time)) {
+          return false;
+        }
+
+        return (h.indexOf(':00:') !== -1 || h.indexOf(':30:') !== -1) && numHour10 >= maxStartTime && numHour10 <= maxEndTime; // выбираем только кратные 30мин
+      });
+      this["".concat(prop, "TimeSelect")].filteredList = all_hours.map(function (h) {
+        return {
+          name: h.slice(0, 5),
+          value: h.slice(0, 5)
+        };
+      });
+    },
+    setTime: function setTime(prop) {
+      var time = this["".concat(prop, "_time")].slice(11, 16);
+      return {
+        name: time,
+        value: time
+      };
+    },
+    getNumHour: function getNumHour(time) {
+      return +time.slice(11, 16).replace(':', ''); // 2021-10-22T18:00:00+03:00 => 1800
     }
   }
 };/* script */
@@ -1745,7 +2012,6 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "defaultText": "Выбрать студента...",
       "options": _vm.studentSelect.filteredList,
-      "value": _vm.studentSelect.value,
       "search": true
     },
     on: {
@@ -1764,28 +2030,42 @@ var __vue_render__$6 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n          " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n        ")]), _vm._v(" "), _c('base-time-select', {
+  }, [_vm._v("\n          " + _vm._s(_vm.formatDay(_vm.start_time)) + "\n        ")]), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.start_time,
-      "hour-range": _vm.hourRange
+      "defaultText": "Начало",
+      "options": _vm.startTimeSelect.filteredList
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'start_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.startTimeSelect.selected.value, 'start');
       }
+    },
+    model: {
+      value: _vm.startTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.startTimeSelect, "selected", $$v);
+      },
+      expression: "startTimeSelect.selected"
     }
   }), _vm._v(" "), _c('span', {
     staticClass: "b-delimiter"
-  }), _vm._v(" "), _c('base-time-select', {
+  }), _vm._v(" "), _c('base-select', {
     attrs: {
-      "time": _vm.end_time,
-      "hour-range": _vm.hourRange,
+      "defaultText": "Конец",
+      "options": _vm.endTimeSelect.filteredList,
       "error": _vm.errorSelectedTime
     },
     on: {
-      "changeTime": function changeTime(event) {
-        return _vm.changeTime(event, 'end_time');
+      "input": function input() {
+        return _vm.changeTime(_vm.endTimeSelect.selected.value, 'end');
       }
+    },
+    model: {
+      value: _vm.endTimeSelect.selected,
+      callback: function callback($$v) {
+        _vm.$set(_vm.endTimeSelect, "selected", $$v);
+      },
+      expression: "endTimeSelect.selected"
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "b-materials"
@@ -1811,7 +2091,6 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "defaultText": "Выбрать материал к уроку...",
       "options": _vm.materialSelect.filteredList,
-      "value": _vm.materialSelect.value,
       "search": true
     },
     on: {
@@ -1871,7 +2150,7 @@ var __vue_render__$6 = function __vue_render__() {
     staticClass: "b-date-time"
   }, [_c('span', {
     staticClass: "b-date-time__date"
-  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.beforeTime > 0 ? _c('div', {
+  }, [_vm._v("\n            " + _vm._s(_vm.formatDay(_vm.start_time)) + ",\n            " + _vm._s(_vm.formatDate(_vm.start_time)) + "\n            -\n\t\t\t      " + _vm._s(_vm.formatDate(_vm.end_time)) + "\n          ")])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.beforeTime[0] > 0 || _vm.beforeTime[1] > 0 ? _c('div', {
     staticClass: "b-before-time"
   }, [_c('svg', {
     attrs: {
@@ -1889,7 +2168,7 @@ var __vue_render__$6 = function __vue_render__() {
       "stroke-linecap": "round",
       "stroke-linejoin": "round"
     }
-  })]), _vm._v("\n          " + _vm._s(_vm.beforeTime) + " мин\n        ")]) : _vm._e(), _vm._v(" "), _c('ul', {
+  })]), _vm._v(" "), _vm.beforeTime[0] > 0 ? [_vm._v("\n            " + _vm._s(_vm.beforeTime[0]) + " час.\n          ")] : _vm._e(), _vm._v(" "), _vm.beforeTime[1] > 0 ? [_vm._v("\n            " + _vm._s(_vm.beforeTime[1]) + " мин.\n          ")] : _vm._e()], 2) : _vm._e(), _vm._v(" "), _c('ul', {
     staticClass: "b-materials__list"
   }, _vm._l(_vm.addedMaterials, function (student) {
     return _c('li', {
@@ -1924,7 +2203,7 @@ var __vue_staticRenderFns__$6 = [function () {
 
 var __vue_inject_styles__$6 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-cb4c1c9a_0", {
+  inject("data-v-8eb136f0_0", {
     source: ".b-edit-card{display:flex;flex-direction:column;padding:4px 10px 10px 15px;position:relative}.b-edit-card__x{position:relative;right:-10px}.b-edit-card__header{display:flex;justify-content:flex-end;align-items:center;margin:0 0 20px 0}.b-edit-card__header-icon{display:flex;justify-content:center;align-items:center;width:20px;height:20px;margin:0 10px}.b-edit-card__header-icon>span{cursor:pointer}.b-edit-card__header-text{font-size:16px;font-weight:600;color:#0967d1;text-transform:uppercase}.b-added-edit-students{display:flex;flex-wrap:wrap;margin:10px 0 0 0!important}.b-added-edit-students__item{border-right:none!important;margin:0 20px 0 0;display:flex;align-items:center;font-size:16px;color:#0967d1}.b-added-edit-students__item>span{width:20px;height:20px;display:inline-block;margin:0 10px 0 0;background:#0967d1;border-radius:3px}.b-added-students{display:flex;flex-wrap:wrap;margin:10px 0 0 10px!important}.b-added-students__item{border-right:none!important;margin:0 20px 0 0}.b-added-students__item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-open-edit-lesson{width:100%;color:#777;display:flex;justify-content:flex-start;align-items:center;margin:0 0 0 25px}.b-open-edit-lesson>button{color:#2089ff;cursor:pointer;border:none;background:0 0}.b-buttons{width:100%;display:flex;justify-content:center;margin:10px 0}.b-date-time{display:flex;align-items:center;flex-wrap:nowrap;padding:10px 0 20px 30px}.b-date-time__date{display:inline-block;margin:0 30px 0 0}.b-date-time__date:first-letter{text-transform:uppercase}.b-delimiter{width:50px;display:flex;justify-content:center;align-items:center}.b-delimiter:before{content:\"\";display:inline-block;border-bottom:1px solid #dadada;width:10px}.b-materials__add-button{color:#2089ff;display:flex;align-items:center;background:0 0;border:none;cursor:pointer}.b-materials__add-button>svg{margin:0 9px 0 0}.b-materials__list{display:flex;flex-direction:column;margin:10px 0 0 30px!important}.b-materials__list-item{border-right:none!important;margin:0 20px 0 0}.b-materials__list-item-x{width:8px;height:8px;display:inline-block;margin:0 7px 0 0;cursor:pointer}.b-before-time{margin:18px 0 10px;display:flex;align-items:center;font-size:14px;color:#333}.b-before-time>svg{margin:0 8px 0 0}",
     map: undefined,
     media: undefined
@@ -1949,6 +2228,9 @@ var __vue_component__$6 = /*#__PURE__*/normalizeComponent({
   staticRenderFns: __vue_staticRenderFns__$6
 }, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, createInjector, undefined, undefined);var script$7 = {
   components: {
+    KalendarMonthview: function KalendarMonthview() {
+      return Promise.resolve().then(function(){return kalendarMonthview});
+    },
     KalendarWeekView: function KalendarWeekView() {
       return Promise.resolve().then(function(){return kalendarWeekview});
     },
@@ -2058,7 +2340,7 @@ var __vue_component__$6 = /*#__PURE__*/normalizeComponent({
           return !isNaN(Date.parse(val));
         },
         view_type: function view_type(val) {
-          return ['week', 'day'].includes(val);
+          return ['week', 'day', 'month'].includes(val);
         },
         cell_height: function cell_height(val) {
           return !isNaN(val);
@@ -2379,7 +2661,11 @@ var __vue_render__$7 = function __vue_render__() {
     attrs: {
       "points": "9 18 15 12 9 6"
     }
-  })])])]) : _vm._e()])]), _vm._v(" "), _vm._t("workTimeEdit")], 2), _vm._v(" "), _c('div', {
+  })])])]) : _vm._e()])]), _vm._v(" "), _vm._t("workTimeEdit")], 2), _vm._v(" "), _vm.kalendar_options.view_type === 'month' ? _c('kalendar-monthview', {
+    attrs: {
+      "current_day": _vm.current_day
+    }
+  }) : _c('div', {
     staticClass: "b-scroll-container",
     style: {
       height: _vm.kalendar_options.height
@@ -2491,8 +2777,8 @@ var __vue_staticRenderFns__$7 = [];
 
 var __vue_inject_styles__$7 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-24780dbc_0", {
-    source: "@import url(https://fonts.googleapis.com/css?family=Rubik:wght@400,600&display=swap);*{box-sizing:border-box;font-family:Rubik,Helvetica,Arial,sans-serif}*{box-sizing:border-box;user-select:none}:after,:before{box-sizing:border-box;user-select:none}html{font-size:10px!important}@media only screen and (max-width:1100px){html{font-size:8px!important}}@media only screen and (max-width:768px){html{font-size:10px!important}}.kalendar-wrapper{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\";--main-color:#ec4d3d;--weekend-color:#f7f7f7;--current-day-color:#7AFFD7;--table-cell-border-color:#e5e5e5;--odd-cell-border-color:#e5e5e5;--hour-row-color:inherit;--dark:#212121;--lightg:#9e9e9e;--card-bgcolor:#04A675;--card-color:white;--max-hours:10;--previous-events:#c6dafc;--previous-text-color:#727d8f;--green:#0abc83;--red:#ec4d3d}.kalendar-wrapper.gstyle{--hour-row-color:#212121;--main-color:#4285f4;--weekend-color:transparent;--table-cell-border-color:#dadada;--odd-cell-border-color:transparent;font-family:\"Google Sans\",Roboto,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Arial,sans-serif}.kalendar-wrapper.gstyle .week-navigator{display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:none;padding:20px;color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .week-navigator button{color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .created-event,.kalendar-wrapper.gstyle .creating-event{background-color:var(--card-bgcolor);color:var(--card-color);text-shadow:none;border-left:none;border-radius:10px;opacity:1;border-bottom:solid 1px rgba(0,0,0,.03);font-size:14px;padding:0 5px;display:flex;justify-content:space-between;align-items:center}.kalendar-wrapper.gstyle .created-event>*,.kalendar-wrapper.gstyle .creating-event>*{text-shadow:none}.kalendar-wrapper.gstyle .creating-event{color:var(--main-color);background-color:#7affd7;font-size:12px;padding:0 20px;border-radius:10px;align-items:flex-start}.kalendar-wrapper.gstyle .creating-event .time{color:var(--main-color);display:flex;align-items:center}.kalendar-wrapper.gstyle .is-past .created-event,.kalendar-wrapper.gstyle .is-past .creating-event{background-color:var(--previous-events);color:var(--previous-text-color)}.kalendar-wrapper.gstyle .created-event{width:100%}.kalendar-wrapper.gstyle .created-event .time{right:2px}.kalendar-wrapper.gstyle .created-event:hover{cursor:pointer;background-color:var(--main-color)}.kalendar-wrapper.gstyle .created-event:hover *{color:#fff}.kalendar-wrapper.gstyle .sticky-top .days{margin-left:0;padding-left:55px}.kalendar-wrapper.gstyle .all-day{display:none}.kalendar-wrapper.gstyle ul.building-blocks.day-1 li.is-an-hour::before{content:\"\";position:absolute;bottom:-1px;left:-10px;width:10px;height:1px;background-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hours,.kalendar-wrapper.gstyle ul.building-blocks li{border-right:solid 1px var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hour-indicator-line>span.line{height:2px;background-color:#db4437}.kalendar-wrapper.gstyle .hour-indicator-line>span.line:before{content:\"\";width:12px;height:12px;display:block;background-color:#db4437;position:absolute;top:-1px;left:0;border-radius:100%}.kalendar-wrapper.gstyle .days{position:relative}.kalendar-wrapper.gstyle .days:before{content:\"\";position:absolute;height:1px;width:55px;left:0;bottom:0}.kalendar-wrapper.gstyle .day-indicator{display:flex;flex-direction:column;align-items:center;color:var(--dark);font-size:13px;padding-left:0;background:#fff}.kalendar-wrapper.gstyle .day-indicator>div{display:flex;flex-direction:column;align-items:center}.kalendar-wrapper.gstyle .day-indicator.is-before{color:#757575}.kalendar-wrapper.gstyle .day-indicator .number-date{margin-left:0;margin-right:0;order:2;font-size:18px;font-weight:600;width:32px;height:32px;border-radius:100%;align-items:center;justify-content:center;display:flex;margin-top:4px}.kalendar-wrapper.gstyle .day-indicator.today{border-bottom-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .day-indicator.today:after{display:none}.kalendar-wrapper.gstyle .day-indicator.today .number-date{background-color:var(--main-color);color:#fff}.kalendar-wrapper.gstyle .day-indicator .letters-date{margin-left:0;margin-right:0;font-weight:500;text-transform:uppercase;font-size:11px}.kalendar-wrapper.gstyle .day-indicator:first-child{position:relative}.kalendar-wrapper.gstyle .day-indicator:first-child::before{content:\"\";position:absolute;left:-1px;top:0;width:1px;height:100%}.kalendar-wrapper.gstyle .creating-event{border-radius:10px;box-shadow:0 2px 2px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.gstyle .popup-wrapper{width:400px;min-height:116px;box-shadow:0 4px 4px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.non-desktop .building-blocks{pointer-events:none}.kalendar-wrapper.day-view .day-indicator{align-items:flex-start;text-align:center;padding-left:10px}.created-event,.creating-event{padding:4px 6px;cursor:default;word-break:break-word;height:100%;width:100%;font-size:14px}.created-event h4,.creating-event h4{font-weight:400}.creating-event{background-color:#34aadc;opacity:.9}.creating-event>*{text-shadow:0 0 7px rgba(0,0,0,.25)}.created-event{background-color:#bfecff;opacity:.74;border-left:solid 3px #34aadc;color:#1f6570}.week-navigator{display:flex;align-items:center;background:linear-gradient(#fdfdfd,#f9f9f9);border-bottom:solid 1px #ec4d3d;padding:10px 20px}.week-navigator .nav-wrapper{display:flex;align-items:center;justify-content:space-between;font-size:22px}.week-navigator .nav-wrapper span{white-space:nowrap;line-height:1.6;color:#333}.week-navigator button{background:0 0;border:none;display:inline-flex;margin:0 10px;color:#ec4d3d;align-items:center;font-size:14px;cursor:pointer;padding:0}.kalendar-wrapper{background-color:#fff;min-width:300px}.no-scroll{overflow-y:hidden;max-height:100%}.hour-indicator-line{position:absolute;z-index:2;width:100%;height:10px;display:flex;align-items:center;pointer-events:none;user-select:none}.hour-indicator-line>span.line{background-color:var(--main-color);height:1px;display:block;flex:1}.hour-indicator-line>span.time-value{font-size:14px;width:48px;color:var(--main-color);font-weight:600;background-color:#fff}.hour-indicator-tooltip{position:absolute;z-index:0;background-color:var(--main-color);width:10px;height:10px;display:block;border-radius:100%;pointer-events:none;user-select:none}ul.kalendar-day li.kalendar-cell:last-child{display:none}.week-navigator-button{outline:0}.week-navigator-button:active svg,.week-navigator-button:hover svg{stroke:var(--main-color)}.gstyle .week-navigator-button{width:32px;height:32px;display:flex;justify-content:center;align-items:center;border:2px solid var(--main-color);border-radius:100%;transition:all .2s}.gstyle .week-navigator-button svg{position:relative;left:1px;stroke:var(--main-color)}.gstyle .week-navigator-button:hover{border:2px solid #fff;background:var(--main-color)}.gstyle .week-navigator-button:hover svg{stroke:#fff}.kalendar-header{display:flex;justify-content:space-between;align-items:center}.kalendar-header>div{display:flex;justify-content:space-between;align-items:center}.main-button{padding:11px 42px;background:#2089ff;box-shadow:5px 5px 15px rgba(0,0,0,.15);border-radius:10px;margin:0 5px;cursor:pointer;border:none;color:#fff}.main-button:active{box-shadow:inset 5px 5px 15px rgba(0,0,0,.15)}.main-button.--gray{background:var(--green)}.main-button.--red{background:var(--red)}.button-today{margin:0 20px 0 0}",
+  inject("data-v-e7abf1f8_0", {
+    source: "@import url(https://fonts.googleapis.com/css?family=Rubik:wght@400,600&display=swap);*{box-sizing:border-box;font-family:Rubik,Helvetica,Arial,sans-serif}*{box-sizing:border-box}:after,:before{box-sizing:border-box}html{font-size:10px!important}@media only screen and (max-width:1100px){html{font-size:8px!important}}@media only screen and (max-width:768px){html{font-size:10px!important}}.kalendar-wrapper{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\";--main-color:#ec4d3d;--weekend-color:#f7f7f7;--current-day-color:#7AFFD7;--table-cell-border-color:#e5e5e5;--odd-cell-border-color:#e5e5e5;--hour-row-color:inherit;--dark:#212121;--lightg:#9e9e9e;--card-bgcolor:#04A675;--card-color:white;--max-hours:10;--previous-events:#c6dafc;--previous-text-color:#727d8f;--green:#0abc83;--red:#ec4d3d}.kalendar-wrapper.gstyle{--hour-row-color:#212121;--main-color:#4285f4;--weekend-color:transparent;--table-cell-border-color:#dadada;--odd-cell-border-color:transparent;font-family:\"Google Sans\",Roboto,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Arial,sans-serif}.kalendar-wrapper.gstyle .week-navigator{display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:none;padding:20px;color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .week-navigator button{color:rgba(0,0,0,.54)}.kalendar-wrapper.gstyle .created-event,.kalendar-wrapper.gstyle .creating-event{background-color:var(--card-bgcolor);color:var(--card-color);text-shadow:none;border-left:none;border-radius:10px;opacity:1;border-bottom:solid 1px rgba(0,0,0,.03);font-size:14px;padding:0 5px;display:flex;justify-content:space-between;align-items:center}.kalendar-wrapper.gstyle .created-event>*,.kalendar-wrapper.gstyle .creating-event>*{text-shadow:none}.kalendar-wrapper.gstyle .creating-event{color:var(--main-color);background-color:#7affd7;font-size:12px;padding:0 20px;border-radius:10px;align-items:flex-start}.kalendar-wrapper.gstyle .creating-event .time{color:var(--main-color);display:flex;align-items:center}.kalendar-wrapper.gstyle .is-past .created-event,.kalendar-wrapper.gstyle .is-past .creating-event{background-color:var(--previous-events);color:var(--previous-text-color)}.kalendar-wrapper.gstyle .created-event{width:100%}.kalendar-wrapper.gstyle .created-event .time{right:2px}.kalendar-wrapper.gstyle .created-event:hover{cursor:pointer;background-color:var(--main-color)}.kalendar-wrapper.gstyle .created-event:hover *{color:#fff}.kalendar-wrapper.gstyle .sticky-top .days{margin-left:0;padding-left:55px}.kalendar-wrapper.gstyle .all-day{display:none}.kalendar-wrapper.gstyle ul.building-blocks.day-1 li.is-an-hour::before{content:\"\";position:absolute;bottom:-1px;left:-10px;width:10px;height:1px;background-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hours,.kalendar-wrapper.gstyle ul.building-blocks li{border-right:solid 1px var(--table-cell-border-color)}.kalendar-wrapper.gstyle .hour-indicator-line>span.line{height:2px;background-color:#db4437}.kalendar-wrapper.gstyle .hour-indicator-line>span.line:before{content:\"\";width:12px;height:12px;display:block;background-color:#db4437;position:absolute;top:-1px;left:0;border-radius:100%}.kalendar-wrapper.gstyle .days{position:relative}.kalendar-wrapper.gstyle .days:before{content:\"\";position:absolute;height:1px;width:55px;left:0;bottom:0}.kalendar-wrapper.gstyle .day-indicator{display:flex;flex-direction:column;align-items:center;color:var(--dark);font-size:13px;padding-left:0;background:#fff}.kalendar-wrapper.gstyle .day-indicator>div{display:flex;flex-direction:column;align-items:center}.kalendar-wrapper.gstyle .day-indicator.is-before{color:#757575}.kalendar-wrapper.gstyle .day-indicator .number-date{margin-left:0;margin-right:0;order:2;font-size:18px;font-weight:600;width:32px;height:32px;border-radius:100%;align-items:center;justify-content:center;display:flex;margin-top:4px}.kalendar-wrapper.gstyle .day-indicator.today{border-bottom-color:var(--table-cell-border-color)}.kalendar-wrapper.gstyle .day-indicator.today:after{display:none}.kalendar-wrapper.gstyle .day-indicator.today .number-date{background-color:var(--main-color);color:#fff}.kalendar-wrapper.gstyle .day-indicator .letters-date{margin-left:0;margin-right:0;font-weight:500;text-transform:uppercase;font-size:11px}.kalendar-wrapper.gstyle .day-indicator:first-child{position:relative}.kalendar-wrapper.gstyle .day-indicator:first-child::before{content:\"\";position:absolute;left:-1px;top:0;width:1px;height:100%}.kalendar-wrapper.gstyle .creating-event{border-radius:10px;box-shadow:0 2px 2px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.gstyle .popup-wrapper{width:400px;min-height:116px;box-shadow:0 4px 4px rgba(0,0,0,.25);transition:opacity .1s linear}.kalendar-wrapper.non-desktop .building-blocks{pointer-events:none}.kalendar-wrapper.day-view .day-indicator{align-items:flex-start;text-align:center;padding-left:10px}.created-event,.creating-event{padding:4px 6px;cursor:default;word-break:break-word;height:100%;width:100%;font-size:14px}.created-event h4,.creating-event h4{font-weight:400}.creating-event{background-color:#34aadc;opacity:.9}.creating-event>*{text-shadow:0 0 7px rgba(0,0,0,.25)}.created-event{background-color:#bfecff;opacity:.74;border-left:solid 3px #34aadc;color:#1f6570}.week-navigator{display:flex;align-items:center;background:linear-gradient(#fdfdfd,#f9f9f9);border-bottom:solid 1px #ec4d3d;padding:10px 20px}.week-navigator .nav-wrapper{display:flex;align-items:center;justify-content:space-between;font-size:22px}.week-navigator .nav-wrapper span{white-space:nowrap;line-height:1.6;color:#333}.week-navigator button{background:0 0;border:none;display:inline-flex;margin:0 10px;color:#ec4d3d;align-items:center;font-size:14px;cursor:pointer;padding:0}.kalendar-wrapper{background-color:#fff;min-width:300px}.no-scroll{overflow-y:hidden;max-height:100%}.hour-indicator-line{position:absolute;z-index:10;width:106%;height:10px;display:flex;align-items:center;pointer-events:none;user-select:none;margin:0 0 0 -10px}.hour-indicator-line>span.line{background-color:var(--main-color);height:1px;display:block;flex:1}.hour-indicator-line>span.time-value{font-size:14px;width:48px;color:var(--main-color);font-weight:600;background-color:#fff}.hour-indicator-tooltip{position:absolute;z-index:0;background-color:var(--main-color);width:10px;height:10px;display:block;border-radius:100%;pointer-events:none;user-select:none}ul.kalendar-day li.kalendar-cell:last-child{display:none}.week-navigator-button{outline:0}.week-navigator-button:active svg,.week-navigator-button:hover svg{stroke:var(--main-color)}.gstyle .week-navigator-button{width:32px;height:32px;display:flex;justify-content:center;align-items:center;border:2px solid var(--main-color);border-radius:100%;transition:all .2s}.gstyle .week-navigator-button svg{position:relative;left:1px;stroke:var(--main-color)}.gstyle .week-navigator-button:hover{border:2px solid #fff;background:var(--main-color)}.gstyle .week-navigator-button:hover svg{stroke:#fff}.kalendar-header{display:flex;justify-content:space-between;align-items:center}.kalendar-header>div{display:flex;justify-content:space-between;align-items:center}.main-button{padding:11px 42px;background:#2089ff;box-shadow:5px 5px 15px rgba(0,0,0,.15);border-radius:10px;margin:0 5px;cursor:pointer;border:none;color:#fff}.main-button:active{box-shadow:inset 5px 5px 15px rgba(0,0,0,.15)}.main-button.--gray{background:var(--green)}.main-button.--red{background:var(--red)}.button-today{margin:0 20px 0 0}",
     map: undefined,
     media: undefined
   });
@@ -2546,7 +2832,154 @@ if (typeof window !== "undefined") {
 if (GlobalVue) {
   GlobalVue.use(plugin);
 } // Default export is library as a whole, registered via Vue.use()
-function PromiseWorker (worker) {
+var script$8 = {
+  name: "kalendar-monthview",
+  components: {
+    KalendarDay: function KalendarDay() {
+      return Promise.resolve().then(function(){return kalendarDaymonth});
+    }
+  },
+  props: {
+    current_day: {
+      required: true,
+      type: String,
+      validator: function validator(d) {
+        return !isNaN(Date.parse(d));
+      }
+    }
+  },
+  data: function data() {
+    return {
+      dayTitles: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
+    };
+  },
+  inject: ["kalendar_options", "kalendar_events"],
+  computed: {
+    today: function today() {
+      return new Date(this.current_day);
+    },
+    //TODO: add a default date
+    periodStart: function periodStart() {
+      return beginningOfPeriod(this.today, 'month', 0);
+    },
+    periodEnd: function periodEnd() {
+      return addDays(incrementPeriod(this.periodStart, 'month', 1), 0);
+    },
+    displayFirstDate: function displayFirstDate() {
+      return beginningOfWeek(this.periodStart, 2);
+    },
+    displayLastDate: function displayLastDate() {
+      return endOfWeekInMonth(this.periodEnd, 2);
+    },
+    weeksOfPeriod: function weeksOfPeriod() {
+      var _this = this;
+
+      var numWeeks = Math.floor((dayDiff(this.displayFirstDate, this.displayLastDate) + 1) / 7);
+      return _toConsumableArray(Array(numWeeks)).map(function (_, i) {
+        return addDays(_this.displayFirstDate, i * 7);
+      });
+    },
+    colsSpace: function colsSpace() {
+      return this.kalendar_options.style === "flat_design" ? "5px" : "0px";
+    },
+    passedTime: function passedTime() {
+      var _this$kalendar_option = this.kalendar_options,
+          day_starts_at = _this$kalendar_option.day_starts_at,
+          day_ends_at = _this$kalendar_option.day_ends_at,
+          now = _this$kalendar_option.now;
+      var time = getLocaleTime(now);
+      var day_starts = "".concat(time.split("T")[0], "T").concat((day_starts_at + "").padStart(2, '0'), ":00:00.000Z");
+      var day_ends = "".concat(time.split("T")[0], "T").concat((day_ends_at + "").padStart(2, '0'), ":00:00.000Z");
+      var time_obj = new Date(time);
+      if (new Date(day_ends) < time_obj || time_obj < new Date(day_starts)) return null;
+      var distance = (time_obj - new Date(day_starts)) / 1000 / 60;
+      return {
+        distance: distance,
+        time: time
+      };
+    }
+  },
+  methods: {
+    daysOfWeek: function daysOfWeek(weekStart) {
+      return _toConsumableArray(Array(7)).map(function (_, i) {
+        return addDays(weekStart, i).toISOString();
+      });
+    }
+  }
+};/* script */
+var __vue_script__$8 = script$8;
+/* template */
+
+var __vue_render__$8 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('div', {
+    staticClass: "calendar-wrap",
+    style: "--space-between-cols: " + _vm.colsSpace
+  }, [_c('div', {
+    staticClass: "sticky-top"
+  }, [_c('ul', {
+    staticClass: "days"
+  }, _vm._l(_vm.dayTitles, function (value, index) {
+    return _c('li', {
+      key: index,
+      staticClass: "day-indicator"
+    }, [_c('div', [_c('span', {
+      staticClass: "letters-date"
+    }, [_vm._v(_vm._s(value))])])]);
+  }), 0), _vm._v(" "), _vm._l(_vm.weeksOfPeriod, function (weekStart, weekIndex) {
+    return _c('div', {
+      key: weekIndex + "-week",
+      staticClass: "weeks"
+    }, _vm._l(_vm.daysOfWeek(weekStart), function (day, dayIndex) {
+      return _c('kalendar-day', {
+        key: dayIndex,
+        ref: dayIndex,
+        refInFor: true,
+        staticClass: "building-blocks",
+        class: "day-" + (dayIndex + 1),
+        attrs: {
+          "day": day,
+          "passed-time": _vm.passedTime.distance
+        }
+      });
+    }), 1);
+  })], 2)]);
+};
+
+var __vue_staticRenderFns__$8 = [];
+/* style */
+
+var __vue_inject_styles__$8 = function __vue_inject_styles__(inject) {
+  if (!inject) return;
+  inject("data-v-00f3ff6c_0", {
+    source: ".sticky-top[data-v-00f3ff6c]{position:sticky;top:0;z-index:20;background-color:#fff}.sticky-top .days[data-v-00f3ff6c]{margin:0;display:flex;margin-left:55px}.sticky-top .days li[data-v-00f3ff6c]{display:inline-flex;flex:1;font-size:1.1rem;color:#666;font-weight:300;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5;padding-bottom:5px;position:relative}.sticky-top .days li span[data-v-00f3ff6c]{margin-right:3px}.sticky-top .days li span[data-v-00f3ff6c]:first-child{font-size:20px;font-weight:500}.sticky-top .days .today[data-v-00f3ff6c]{border-bottom-color:var(--main-color);color:var(--main-color)!important}.sticky-top .days .today[data-v-00f3ff6c]::after{content:\"\";position:absolute;height:2px;bottom:0;left:0;width:100%;background-color:var(--main-color)}.sticky-top .all-day[data-v-00f3ff6c]{display:flex;margin-bottom:0;margin-top:0;border-bottom:solid 2px #e5e5e5}.sticky-top .all-day span[data-v-00f3ff6c]{display:flex;align-items:center;padding:0 5px;width:55px;font-weight:500;font-size:.8rem;color:#b8bbca;text-transform:lowercase}.sticky-top .all-day li[data-v-00f3ff6c]{flex:1;margin-right:var(--space-between-cols)}.sticky-top .all-day li.all-today[data-v-00f3ff6c]{background-color:#fef4f4}.weeks[data-v-00f3ff6c]{display:flex;padding-left:54px}.weeks>ul[data-v-00f3ff6c]{flex-grow:1}",
+    map: undefined,
+    media: undefined
+  });
+};
+/* scoped */
+
+
+var __vue_scope_id__$8 = "data-v-00f3ff6c";
+/* module identifier */
+
+var __vue_module_identifier__$8 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$8 = false;
+/* style inject SSR */
+
+/* style inject shadow dom */
+
+var __vue_component__$8 = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$8,
+  staticRenderFns: __vue_staticRenderFns__$8
+}, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, false, createInjector, undefined, undefined);var kalendarMonthview=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$8});function PromiseWorker (worker) {
   var messageIds = 0;
   var callbacks = {};
   worker.addEventListener("message", function (e) {
@@ -2636,7 +3069,7 @@ function createBase64WorkerFactory(base64, sourcemap = null, enableUnicode = fal
         return new Worker(url, options);
     };
 }/* eslint-disable */
-var WorkerFactory = createBase64WorkerFactory('Lyogcm9sbHVwLXBsdWdpbi13ZWItd29ya2VyLWxvYWRlciAqLwpmdW5jdGlvbiBvd25LZXlzKG9iamVjdCwgZW51bWVyYWJsZU9ubHkpIHsKICB2YXIga2V5cyA9IE9iamVjdC5rZXlzKG9iamVjdCk7CgogIGlmIChPYmplY3QuZ2V0T3duUHJvcGVydHlTeW1ib2xzKSB7CiAgICB2YXIgc3ltYm9scyA9IE9iamVjdC5nZXRPd25Qcm9wZXJ0eVN5bWJvbHMob2JqZWN0KTsKCiAgICBpZiAoZW51bWVyYWJsZU9ubHkpIHsKICAgICAgc3ltYm9scyA9IHN5bWJvbHMuZmlsdGVyKGZ1bmN0aW9uIChzeW0pIHsKICAgICAgICByZXR1cm4gT2JqZWN0LmdldE93blByb3BlcnR5RGVzY3JpcHRvcihvYmplY3QsIHN5bSkuZW51bWVyYWJsZTsKICAgICAgfSk7CiAgICB9CgogICAga2V5cy5wdXNoLmFwcGx5KGtleXMsIHN5bWJvbHMpOwogIH0KCiAgcmV0dXJuIGtleXM7Cn0KCmZ1bmN0aW9uIF9vYmplY3RTcHJlYWQyKHRhcmdldCkgewogIGZvciAodmFyIGkgPSAxOyBpIDwgYXJndW1lbnRzLmxlbmd0aDsgaSsrKSB7CiAgICB2YXIgc291cmNlID0gYXJndW1lbnRzW2ldICE9IG51bGwgPyBhcmd1bWVudHNbaV0gOiB7fTsKCiAgICBpZiAoaSAlIDIpIHsKICAgICAgb3duS2V5cyhPYmplY3Qoc291cmNlKSwgdHJ1ZSkuZm9yRWFjaChmdW5jdGlvbiAoa2V5KSB7CiAgICAgICAgX2RlZmluZVByb3BlcnR5KHRhcmdldCwga2V5LCBzb3VyY2Vba2V5XSk7CiAgICAgIH0pOwogICAgfSBlbHNlIGlmIChPYmplY3QuZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9ycykgewogICAgICBPYmplY3QuZGVmaW5lUHJvcGVydGllcyh0YXJnZXQsIE9iamVjdC5nZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3JzKHNvdXJjZSkpOwogICAgfSBlbHNlIHsKICAgICAgb3duS2V5cyhPYmplY3Qoc291cmNlKSkuZm9yRWFjaChmdW5jdGlvbiAoa2V5KSB7CiAgICAgICAgT2JqZWN0LmRlZmluZVByb3BlcnR5KHRhcmdldCwga2V5LCBPYmplY3QuZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9yKHNvdXJjZSwga2V5KSk7CiAgICAgIH0pOwogICAgfQogIH0KCiAgcmV0dXJuIHRhcmdldDsKfQoKZnVuY3Rpb24gX3R5cGVvZihvYmopIHsKICAiQGJhYmVsL2hlbHBlcnMgLSB0eXBlb2YiOwoKICBpZiAodHlwZW9mIFN5bWJvbCA9PT0gImZ1bmN0aW9uIiAmJiB0eXBlb2YgU3ltYm9sLml0ZXJhdG9yID09PSAic3ltYm9sIikgewogICAgX3R5cGVvZiA9IGZ1bmN0aW9uIChvYmopIHsKICAgICAgcmV0dXJuIHR5cGVvZiBvYmo7CiAgICB9OwogIH0gZWxzZSB7CiAgICBfdHlwZW9mID0gZnVuY3Rpb24gKG9iaikgewogICAgICByZXR1cm4gb2JqICYmIHR5cGVvZiBTeW1ib2wgPT09ICJmdW5jdGlvbiIgJiYgb2JqLmNvbnN0cnVjdG9yID09PSBTeW1ib2wgJiYgb2JqICE9PSBTeW1ib2wucHJvdG90eXBlID8gInN5bWJvbCIgOiB0eXBlb2Ygb2JqOwogICAgfTsKICB9CgogIHJldHVybiBfdHlwZW9mKG9iaik7Cn0KCmZ1bmN0aW9uIF9kZWZpbmVQcm9wZXJ0eShvYmosIGtleSwgdmFsdWUpIHsKICBpZiAoa2V5IGluIG9iaikgewogICAgT2JqZWN0LmRlZmluZVByb3BlcnR5KG9iaiwga2V5LCB7CiAgICAgIHZhbHVlOiB2YWx1ZSwKICAgICAgZW51bWVyYWJsZTogdHJ1ZSwKICAgICAgY29uZmlndXJhYmxlOiB0cnVlLAogICAgICB3cml0YWJsZTogdHJ1ZQogICAgfSk7CiAgfSBlbHNlIHsKICAgIG9ialtrZXldID0gdmFsdWU7CiAgfQoKICByZXR1cm4gb2JqOwp9CgpmdW5jdGlvbiBfc2xpY2VkVG9BcnJheShhcnIsIGkpIHsKICByZXR1cm4gX2FycmF5V2l0aEhvbGVzKGFycikgfHwgX2l0ZXJhYmxlVG9BcnJheUxpbWl0KGFyciwgaSkgfHwgX3Vuc3VwcG9ydGVkSXRlcmFibGVUb0FycmF5KGFyciwgaSkgfHwgX25vbkl0ZXJhYmxlUmVzdCgpOwp9CgpmdW5jdGlvbiBfYXJyYXlXaXRoSG9sZXMoYXJyKSB7CiAgaWYgKEFycmF5LmlzQXJyYXkoYXJyKSkgcmV0dXJuIGFycjsKfQoKZnVuY3Rpb24gX2l0ZXJhYmxlVG9BcnJheUxpbWl0KGFyciwgaSkgewogIHZhciBfaSA9IGFyciA9PSBudWxsID8gbnVsbCA6IHR5cGVvZiBTeW1ib2wgIT09ICJ1bmRlZmluZWQiICYmIGFycltTeW1ib2wuaXRlcmF0b3JdIHx8IGFyclsiQEBpdGVyYXRvciJdOwoKICBpZiAoX2kgPT0gbnVsbCkgcmV0dXJuOwogIHZhciBfYXJyID0gW107CiAgdmFyIF9uID0gdHJ1ZTsKICB2YXIgX2QgPSBmYWxzZTsKCiAgdmFyIF9zLCBfZTsKCiAgdHJ5IHsKICAgIGZvciAoX2kgPSBfaS5jYWxsKGFycik7ICEoX24gPSAoX3MgPSBfaS5uZXh0KCkpLmRvbmUpOyBfbiA9IHRydWUpIHsKICAgICAgX2Fyci5wdXNoKF9zLnZhbHVlKTsKCiAgICAgIGlmIChpICYmIF9hcnIubGVuZ3RoID09PSBpKSBicmVhazsKICAgIH0KICB9IGNhdGNoIChlcnIpIHsKICAgIF9kID0gdHJ1ZTsKICAgIF9lID0gZXJyOwogIH0gZmluYWxseSB7CiAgICB0cnkgewogICAgICBpZiAoIV9uICYmIF9pWyJyZXR1cm4iXSAhPSBudWxsKSBfaVsicmV0dXJuIl0oKTsKICAgIH0gZmluYWxseSB7CiAgICAgIGlmIChfZCkgdGhyb3cgX2U7CiAgICB9CiAgfQoKICByZXR1cm4gX2FycjsKfQoKZnVuY3Rpb24gX3Vuc3VwcG9ydGVkSXRlcmFibGVUb0FycmF5KG8sIG1pbkxlbikgewogIGlmICghbykgcmV0dXJuOwogIGlmICh0eXBlb2YgbyA9PT0gInN0cmluZyIpIHJldHVybiBfYXJyYXlMaWtlVG9BcnJheShvLCBtaW5MZW4pOwogIHZhciBuID0gT2JqZWN0LnByb3RvdHlwZS50b1N0cmluZy5jYWxsKG8pLnNsaWNlKDgsIC0xKTsKICBpZiAobiA9PT0gIk9iamVjdCIgJiYgby5jb25zdHJ1Y3RvcikgbiA9IG8uY29uc3RydWN0b3IubmFtZTsKICBpZiAobiA9PT0gIk1hcCIgfHwgbiA9PT0gIlNldCIpIHJldHVybiBBcnJheS5mcm9tKG8pOwogIGlmIChuID09PSAiQXJndW1lbnRzIiB8fCAvXig/OlVpfEkpbnQoPzo4fDE2fDMyKSg/OkNsYW1wZWQpP0FycmF5JC8udGVzdChuKSkgcmV0dXJuIF9hcnJheUxpa2VUb0FycmF5KG8sIG1pbkxlbik7Cn0KCmZ1bmN0aW9uIF9hcnJheUxpa2VUb0FycmF5KGFyciwgbGVuKSB7CiAgaWYgKGxlbiA9PSBudWxsIHx8IGxlbiA+IGFyci5sZW5ndGgpIGxlbiA9IGFyci5sZW5ndGg7CgogIGZvciAodmFyIGkgPSAwLCBhcnIyID0gbmV3IEFycmF5KGxlbik7IGkgPCBsZW47IGkrKykgYXJyMltpXSA9IGFycltpXTsKCiAgcmV0dXJuIGFycjI7Cn0KCmZ1bmN0aW9uIF9ub25JdGVyYWJsZVJlc3QoKSB7CiAgdGhyb3cgbmV3IFR5cGVFcnJvcigiSW52YWxpZCBhdHRlbXB0IHRvIGRlc3RydWN0dXJlIG5vbi1pdGVyYWJsZSBpbnN0YW5jZS5cbkluIG9yZGVyIHRvIGJlIGl0ZXJhYmxlLCBub24tYXJyYXkgb2JqZWN0cyBtdXN0IGhhdmUgYSBbU3ltYm9sLml0ZXJhdG9yXSgpIG1ldGhvZC4iKTsKfQoKLy90b2RvOiByZW1vdmUgdGhpcyBhbmQgZm9yayBwcm9taXNlLXdvcmtlciB0byBwcm92aWRlIEVTTQoKZnVuY3Rpb24gaXNQcm9taXNlKG9iaikgewogIC8vIHZpYSBodHRwczovL3VucGtnLmNvbS9pcy1wcm9taXNlQDIuMS4wL2luZGV4LmpzCiAgcmV0dXJuICEhb2JqICYmIChfdHlwZW9mKG9iaikgPT09ICJvYmplY3QiIHx8IHR5cGVvZiBvYmogPT09ICJmdW5jdGlvbiIpICYmIHR5cGVvZiBvYmoudGhlbiA9PT0gImZ1bmN0aW9uIjsKfQoKZnVuY3Rpb24gcmVnaXN0ZXJQcm9taXNlV29ya2VyIChjYWxsYmFjaykgewogIGZ1bmN0aW9uIHBvc3RPdXRnb2luZ01lc3NhZ2UoZSwgbWVzc2FnZUlkLCBlcnJvciwgcmVzdWx0KSB7CiAgICBmdW5jdGlvbiBwb3N0TWVzc2FnZShtc2cpIHsKICAgICAgLyogaXN0YW5idWwgaWdub3JlIGlmICovCiAgICAgIGlmICh0eXBlb2Ygc2VsZi5wb3N0TWVzc2FnZSAhPT0gImZ1bmN0aW9uIikgewogICAgICAgIC8vIHNlcnZpY2Ugd29ya2VyCiAgICAgICAgZS5wb3J0c1swXS5wb3N0TWVzc2FnZShtc2cpOwogICAgICB9IGVsc2UgewogICAgICAgIC8vIHdlYiB3b3JrZXIKICAgICAgICBzZWxmLnBvc3RNZXNzYWdlKG1zZyk7CiAgICAgIH0KICAgIH0KCiAgICBpZiAoZXJyb3IpIHsKCiAgICAgIHBvc3RNZXNzYWdlKFttZXNzYWdlSWQsIHsKICAgICAgICBtZXNzYWdlOiBlcnJvci5tZXNzYWdlCiAgICAgIH1dKTsKICAgIH0gZWxzZSB7CiAgICAgIHBvc3RNZXNzYWdlKFttZXNzYWdlSWQsIG51bGwsIHJlc3VsdF0pOwogICAgfQogIH0KCiAgZnVuY3Rpb24gdHJ5Q2F0Y2hGdW5jKGNhbGxiYWNrLCBtZXNzYWdlKSB7CiAgICB0cnkgewogICAgICByZXR1cm4gewogICAgICAgIHJlczogY2FsbGJhY2sobWVzc2FnZSkKICAgICAgfTsKICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgcmV0dXJuIHsKICAgICAgICBlcnI6IGUKICAgICAgfTsKICAgIH0KICB9CgogIGZ1bmN0aW9uIGhhbmRsZUluY29taW5nTWVzc2FnZShlLCBjYWxsYmFjaywgbWVzc2FnZUlkLCBtZXNzYWdlKSB7CiAgICB2YXIgcmVzdWx0ID0gdHJ5Q2F0Y2hGdW5jKGNhbGxiYWNrLCBtZXNzYWdlKTsKCiAgICBpZiAocmVzdWx0LmVycikgewogICAgICBwb3N0T3V0Z29pbmdNZXNzYWdlKGUsIG1lc3NhZ2VJZCwgcmVzdWx0LmVycik7CiAgICB9IGVsc2UgaWYgKCFpc1Byb21pc2UocmVzdWx0LnJlcykpIHsKICAgICAgcG9zdE91dGdvaW5nTWVzc2FnZShlLCBtZXNzYWdlSWQsIG51bGwsIHJlc3VsdC5yZXMpOwogICAgfSBlbHNlIHsKICAgICAgcmVzdWx0LnJlcy50aGVuKGZ1bmN0aW9uIChmaW5hbFJlc3VsdCkgewogICAgICAgIHBvc3RPdXRnb2luZ01lc3NhZ2UoZSwgbWVzc2FnZUlkLCBudWxsLCBmaW5hbFJlc3VsdCk7CiAgICAgIH0sIGZ1bmN0aW9uIChmaW5hbEVycm9yKSB7CiAgICAgICAgcG9zdE91dGdvaW5nTWVzc2FnZShlLCBtZXNzYWdlSWQsIGZpbmFsRXJyb3IpOwogICAgICB9KTsKICAgIH0KICB9CgogIGZ1bmN0aW9uIG9uSW5jb21pbmdNZXNzYWdlKGUpIHsKICAgIHZhciBwYXlsb2FkID0gZS5kYXRhOwoKICAgIGlmICghQXJyYXkuaXNBcnJheShwYXlsb2FkKSB8fCBwYXlsb2FkLmxlbmd0aCAhPT0gMikgewogICAgICAvLyBtZXNzYWdlIGRvZW5zJ3QgbWF0Y2ggY29tbXVuaWNhdGlvbiBmb3JtYXQ7IGlnbm9yZQogICAgICByZXR1cm47CiAgICB9CgogICAgdmFyIG1lc3NhZ2VJZCA9IHBheWxvYWRbMF07CiAgICB2YXIgbWVzc2FnZSA9IHBheWxvYWRbMV07CgogICAgaWYgKHR5cGVvZiBjYWxsYmFjayAhPT0gImZ1bmN0aW9uIikgewogICAgICBwb3N0T3V0Z29pbmdNZXNzYWdlKGUsIG1lc3NhZ2VJZCwgbmV3IEVycm9yKCJQbGVhc2UgcGFzcyBhIGZ1bmN0aW9uIGludG8gcmVnaXN0ZXIoKS4iKSk7CiAgICB9IGVsc2UgewogICAgICBoYW5kbGVJbmNvbWluZ01lc3NhZ2UoZSwgY2FsbGJhY2ssIG1lc3NhZ2VJZCwgbWVzc2FnZSk7CiAgICB9CiAgfQoKICBzZWxmLmFkZEV2ZW50TGlzdGVuZXIoIm1lc3NhZ2UiLCBvbkluY29taW5nTWVzc2FnZSk7Cn0KCnZhciBjcmVhdG9yc19vZmZzZXQgPSBuZXcgRGF0ZSgpLmdldFRpbWV6b25lT2Zmc2V0KCkgLyA2MDsKCmlmIChjcmVhdG9yc19vZmZzZXQgKiAtMSA+PSAwKSB7CiAgY3JlYXRvcnNfb2Zmc2V0ICo9IC0xOwogIGNyZWF0b3JzX29mZnNldCA9ICIiLmNvbmNhdCgoY3JlYXRvcnNfb2Zmc2V0ICsgIiIpLnBhZFN0YXJ0KDIsICIwIiksICI6MDAiKTsKICBjcmVhdG9yc19vZmZzZXQgPSAiKyIuY29uY2F0KGNyZWF0b3JzX29mZnNldCk7Cn0gZWxzZSB7CiAgY3JlYXRvcnNfb2Zmc2V0ID0gIiIuY29uY2F0KChjcmVhdG9yc19vZmZzZXQgKyAiIikucGFkU3RhcnQoMiwgIjAiKSwgIjowMCIpOwogIGNyZWF0b3JzX29mZnNldCA9ICItIi5jb25jYXQoY3JlYXRvcnNfb2Zmc2V0KTsKfQoKdmFyIGdldEhvdXJsZXNzRGF0ZSA9IGZ1bmN0aW9uIGdldEhvdXJsZXNzRGF0ZShkYXRlX3N0cmluZykgewogIHZhciB0b2RheSA9IGRhdGVfc3RyaW5nID8gbmV3IERhdGUoZGF0ZV9zdHJpbmcpIDogbmV3IERhdGUoKTsKICB2YXIgeWVhciA9IHRvZGF5LmdldEZ1bGxZZWFyKCkgKyAiIiwKICAgICAgbW9udGggPSAodG9kYXkuZ2V0TW9udGgoKSArIDEgKyAiIikucGFkU3RhcnQoMiwgIjAiKSwKICAgICAgZGF5ID0gKHRvZGF5LmdldERhdGUoKSArICIiKS5wYWRTdGFydCgyLCAiMCIpOwogIHJldHVybiAiIi5jb25jYXQoeWVhciwgIi0iKS5jb25jYXQobW9udGgsICItIikuY29uY2F0KGRheSwgIlQwMDowMDowMC4wMDBaIik7Cn07Cgp2YXIgZ2V0WWVhck1vbnRoRGF5ID0gZnVuY3Rpb24gZ2V0WWVhck1vbnRoRGF5KGRhdGVfc3RyaW5nKSB7CiAgcmV0dXJuIGdldEhvdXJsZXNzRGF0ZShkYXRlX3N0cmluZykuc2xpY2UoMCwgMTApOwp9OwoKdmFyIGFkZERheXMgPSBmdW5jdGlvbiBhZGREYXlzKGRhdGUsIGRheXMpIHsKICB2YXIgZGF0ZU9iaiA9IG5ldyBEYXRlKGRhdGUpOwogIGRhdGVPYmouc2V0VVRDSG91cnMoMCwgMCwgMCwgMCk7CiAgZGF0ZU9iai5zZXREYXRlKGRhdGVPYmouZ2V0RGF0ZSgpICsgZGF5cyk7CiAgcmV0dXJuIGRhdGVPYmo7Cn07Cgp2YXIgZ2VuZXJhdGVVVUlEID0gZnVuY3Rpb24gZ2VuZXJhdGVVVUlEKCkgewogIHJldHVybiAoWzFlN10gKyAtMWUzICsgLTRlMyArIC04ZTMgKyAtMWUxMSkucmVwbGFjZSgvWzAxOF0vZywgZnVuY3Rpb24gKGMpIHsKICAgIHJldHVybiAoYyBeIGNyeXB0by5nZXRSYW5kb21WYWx1ZXMobmV3IFVpbnQ4QXJyYXkoMSkpWzBdICYgMTUgPj4gYyAvIDQpLnRvU3RyaW5nKDE2KTsKICB9KTsKfTsKCnZhciBnZXRMb2NhbGVUaW1lID0gZnVuY3Rpb24gZ2V0TG9jYWxlVGltZShkYXRlU3RyaW5nKSB7CiAgdmFyIF9EYXRlJHRvTG9jYWxlU3RyaW5nJCA9IG5ldyBEYXRlKGRhdGVTdHJpbmcpLnRvTG9jYWxlU3RyaW5nKCJlbi1HQiIpLnNwbGl0KCIsICIpLAogICAgICBfRGF0ZSR0b0xvY2FsZVN0cmluZyQyID0gX3NsaWNlZFRvQXJyYXkoX0RhdGUkdG9Mb2NhbGVTdHJpbmckLCAyKSwKICAgICAgZGF0ZSA9IF9EYXRlJHRvTG9jYWxlU3RyaW5nJDJbMF0sCiAgICAgIGhvdXIgPSBfRGF0ZSR0b0xvY2FsZVN0cmluZyQyWzFdOwoKICBkYXRlID0gZGF0ZS5zcGxpdCgiLyIpLnJldmVyc2UoKS5qb2luKCItIik7CiAgcmV0dXJuICIiLmNvbmNhdChkYXRlLCAiVCIpLmNvbmNhdChob3VyLCAiLjAwMFoiKTsKfTsKCnZhciBob3VyVXRpbHMgPSB7CiAgZ2V0QWxsSG91cnM6IGZ1bmN0aW9uIGdldEFsbEhvdXJzKCkgewogICAgcmV0dXJuIFsiMDA6MDA6MDAiLCAiMDA6MTA6MDAiLCAiMDA6MjA6MDAiLCAiMDA6MzA6MDAiLCAiMDA6NDA6MDAiLCAiMDA6NTA6MDAiLCAiMDE6MDA6MDAiLCAiMDE6MTA6MDAiLCAiMDE6MjA6MDAiLCAiMDE6MzA6MDAiLCAiMDE6NDA6MDAiLCAiMDE6NTA6MDAiLCAiMDI6MDA6MDAiLCAiMDI6MTA6MDAiLCAiMDI6MjA6MDAiLCAiMDI6MzA6MDAiLCAiMDI6NDA6MDAiLCAiMDI6NTA6MDAiLCAiMDM6MDA6MDAiLCAiMDM6MTA6MDAiLCAiMDM6MjA6MDAiLCAiMDM6MzA6MDAiLCAiMDM6NDA6MDAiLCAiMDM6NTA6MDAiLCAiMDQ6MDA6MDAiLCAiMDQ6MTA6MDAiLCAiMDQ6MjA6MDAiLCAiMDQ6MzA6MDAiLCAiMDQ6NDA6MDAiLCAiMDQ6NTA6MDAiLCAiMDU6MDA6MDAiLCAiMDU6MTA6MDAiLCAiMDU6MjA6MDAiLCAiMDU6MzA6MDAiLCAiMDU6NDA6MDAiLCAiMDU6NTA6MDAiLCAiMDY6MDA6MDAiLCAiMDY6MTA6MDAiLCAiMDY6MjA6MDAiLCAiMDY6MzA6MDAiLCAiMDY6NDA6MDAiLCAiMDY6NTA6MDAiLCAiMDc6MDA6MDAiLCAiMDc6MTA6MDAiLCAiMDc6MjA6MDAiLCAiMDc6MzA6MDAiLCAiMDc6NDA6MDAiLCAiMDc6NTA6MDAiLCAiMDg6MDA6MDAiLCAiMDg6MTA6MDAiLCAiMDg6MjA6MDAiLCAiMDg6MzA6MDAiLCAiMDg6NDA6MDAiLCAiMDg6NTA6MDAiLCAiMDk6MDA6MDAiLCAiMDk6MTA6MDAiLCAiMDk6MjA6MDAiLCAiMDk6MzA6MDAiLCAiMDk6NDA6MDAiLCAiMDk6NTA6MDAiLCAiMTA6MDA6MDAiLCAiMTA6MTA6MDAiLCAiMTA6MjA6MDAiLCAiMTA6MzA6MDAiLCAiMTA6NDA6MDAiLCAiMTA6NTA6MDAiLCAiMTE6MDA6MDAiLCAiMTE6MTA6MDAiLCAiMTE6MjA6MDAiLCAiMTE6MzA6MDAiLCAiMTE6NDA6MDAiLCAiMTE6NTA6MDAiLCAiMTI6MDA6MDAiLCAiMTI6MTA6MDAiLCAiMTI6MjA6MDAiLCAiMTI6MzA6MDAiLCAiMTI6NDA6MDAiLCAiMTI6NTA6MDAiLCAiMTM6MDA6MDAiLCAiMTM6MTA6MDAiLCAiMTM6MjA6MDAiLCAiMTM6MzA6MDAiLCAiMTM6NDA6MDAiLCAiMTM6NTA6MDAiLCAiMTQ6MDA6MDAiLCAiMTQ6MTA6MDAiLCAiMTQ6MjA6MDAiLCAiMTQ6MzA6MDAiLCAiMTQ6NDA6MDAiLCAiMTQ6NTA6MDAiLCAiMTU6MDA6MDAiLCAiMTU6MTA6MDAiLCAiMTU6MjA6MDAiLCAiMTU6MzA6MDAiLCAiMTU6NDA6MDAiLCAiMTU6NTA6MDAiLCAiMTY6MDA6MDAiLCAiMTY6MTA6MDAiLCAiMTY6MjA6MDAiLCAiMTY6MzA6MDAiLCAiMTY6NDA6MDAiLCAiMTY6NTA6MDAiLCAiMTc6MDA6MDAiLCAiMTc6MTA6MDAiLCAiMTc6MjA6MDAiLCAiMTc6MzA6MDAiLCAiMTc6NDA6MDAiLCAiMTc6NTA6MDAiLCAiMTg6MDA6MDAiLCAiMTg6MTA6MDAiLCAiMTg6MjA6MDAiLCAiMTg6MzA6MDAiLCAiMTg6NDA6MDAiLCAiMTg6NTA6MDAiLCAiMTk6MDA6MDAiLCAiMTk6MTA6MDAiLCAiMTk6MjA6MDAiLCAiMTk6MzA6MDAiLCAiMTk6NDA6MDAiLCAiMTk6NTA6MDAiLCAiMjA6MDA6MDAiLCAiMjA6MTA6MDAiLCAiMjA6MjA6MDAiLCAiMjA6MzA6MDAiLCAiMjA6NDA6MDAiLCAiMjA6NTA6MDAiLCAiMjE6MDA6MDAiLCAiMjE6MTA6MDAiLCAiMjE6MjA6MDAiLCAiMjE6MzA6MDAiLCAiMjE6NDA6MDAiLCAiMjE6NTA6MDAiLCAiMjI6MDA6MDAiLCAiMjI6MTA6MDAiLCAiMjI6MjA6MDAiLCAiMjI6MzA6MDAiLCAiMjI6NDA6MDAiLCAiMjI6NTA6MDAiLCAiMjM6MDA6MDAiLCAiMjM6MTA6MDAiLCAiMjM6MjA6MDAiLCAiMjM6MzA6MDAiLCAiMjM6NDA6MDAiLCAiMjM6NTA6MDAiLCAiMjQ6MDA6MDAiXTsKICB9LAogIGdldEZ1bGxIb3VyczogZnVuY3Rpb24gZ2V0RnVsbEhvdXJzKCkgewogICAgcmV0dXJuIFsiMDA6MDA6MDAiLCAiMDE6MDA6MDAiLCAiMDI6MDA6MDAiLCAiMDM6MDA6MDAiLCAiMDQ6MDA6MDAiLCAiMDU6MDA6MDAiLCAiMDY6MDA6MDAiLCAiMDc6MDA6MDAiLCAiMDg6MDA6MDAiLCAiMDk6MDA6MDAiLCAiMTA6MDA6MDAiLCAiMTE6MDA6MDAiLCAiMTI6MDA6MDAiLCAiMTM6MDA6MDAiLCAiMTQ6MDA6MDAiLCAiMTU6MDA6MDAiLCAiMTY6MDA6MDAiLCAiMTc6MDA6MDAiLCAiMTg6MDA6MDAiLCAiMTk6MDA6MDAiLCAiMjA6MDA6MDAiLCAiMjE6MDA6MDAiLCAiMjI6MDA6MDAiLCAiMjM6MDA6MDAiXTsKICB9Cn07CgpyZWdpc3RlclByb21pc2VXb3JrZXIoZnVuY3Rpb24gKG1lc3NhZ2UpIHsKICB2YXIgdHlwZSA9IG1lc3NhZ2UudHlwZSwKICAgICAgZGF0YSA9IG1lc3NhZ2UuZGF0YTsKCiAgaWYgKHR5cGUgPT09ICJtZXNzYWdlIikgewogICAgcmV0dXJuICJXb3JrZXIgcmVwbGllczogIi5jb25jYXQobmV3IERhdGUoKS50b0lTT1N0cmluZygpKTsKICB9CgogIHN3aXRjaCAodHlwZSkgewogICAgY2FzZSAiZ2V0RGF5cyI6CiAgICAgIHJldHVybiBnZXREYXlzKGRhdGEuZGF5LCBkYXRhLm9wdGlvbnMpOwoKICAgIGNhc2UgImdldEhvdXJzIjoKICAgICAgcmV0dXJuIGdldEhvdXJzKGRhdGEuaG91ck9wdGlvbnMpOwoKICAgIGNhc2UgImdldERheUNlbGxzIjoKICAgICAgcmV0dXJuIGdldERheUNlbGxzKGRhdGEuZGF5LCBkYXRhLmhvdXJPcHRpb25zKTsKCiAgICBjYXNlICJjb25zdHJ1Y3REYXlFdmVudHMiOgogICAgICByZXR1cm4gY29uc3RydWN0RGF5RXZlbnRzKGRhdGEuZGF5LCBkYXRhLmV2ZW50cyk7CgogICAgY2FzZSAiY29uc3RydWN0TmV3RXZlbnQiOgogICAgICByZXR1cm4gY29uc3RydWN0TmV3RXZlbnQoZGF0YS5ldmVudCk7CiAgfQp9KTsKCmZ1bmN0aW9uIGdldERheXMoZGF5U3RyaW5nLCBfcmVmKSB7CiAgdmFyIGhpZGVfZGF0ZXMgPSBfcmVmLmhpZGVfZGF0ZXMsCiAgICAgIGhpZGVfZGF5cyA9IF9yZWYuaGlkZV9kYXlzLAogICAgICB2aWV3X3R5cGUgPSBfcmVmLnZpZXdfdHlwZTsKICB2YXIgZGF0ZSA9IG5ldyBEYXRlKCIiLmNvbmNhdChkYXlTdHJpbmcsICJUMDA6MDA6MDAuMDAwWiIpKTsKICB2YXIgZGF5X29mX3dlZWsgPSBkYXRlLmdldFVUQ0RheSgpIC0gMTsKICB2YXIgZGF5cyA9IFtdOwoKICBpZiAodmlld190eXBlID09PSAiZGF5IikgewogICAgZGF5cyA9IFt7CiAgICAgIHZhbHVlOiBkYXRlLnRvSVNPU3RyaW5nKCksCiAgICAgIGluZGV4OiAwCiAgICB9XTsKICB9IGVsc2UgewogICAgZm9yICh2YXIgaWR4ID0gMDsgaWR4IDwgNzsgaWR4KyspIHsKICAgICAgZGF5cy5wdXNoKHsKICAgICAgICB2YWx1ZTogYWRkRGF5cyhkYXRlLCBpZHggLSBkYXlfb2Zfd2VlaykudG9JU09TdHJpbmcoKSwKICAgICAgICBpbmRleDogaWR4CiAgICAgIH0pOwogICAgfQogIH0KCiAgaWYgKGhpZGVfZGF0ZXMgJiYgaGlkZV9kYXRlcy5sZW5ndGggPiAwKSB7CiAgICBkYXlzID0gZGF5cy5maWx0ZXIoZnVuY3Rpb24gKF9yZWYyKSB7CiAgICAgIHZhciB2YWx1ZSA9IF9yZWYyLnZhbHVlOwogICAgICByZXR1cm4gaGlkZV9kYXRlcy5pbmRleE9mKHZhbHVlLnNsaWNlKDAsIDEwKSkgPCAwOwogICAgfSk7CiAgfQoKICBpZiAoaGlkZV9kYXlzICYmIGhpZGVfZGF5cy5sZW5ndGggPiAwKSB7CiAgICBkYXlzID0gZGF5cy5maWx0ZXIoZnVuY3Rpb24gKF9yZWYzKSB7CiAgICAgIHZhciBpbmRleCA9IF9yZWYzLmluZGV4OwogICAgICByZXR1cm4gaGlkZV9kYXlzLmluZGV4T2YoaW5kZXgpIDwgMDsKICAgIH0pOwogIH0KCiAgcmV0dXJuIGRheXM7Cn0KCmZ1bmN0aW9uIGdldEhvdXJzKGhvdXJfb3B0aW9ucykgewogIHZhciBkYXRlID0gbmV3IERhdGUoKTsKICBkYXRlLnNldFVUQ0hvdXJzKDAsIDAsIDAsIDApOwogIHZhciBpc29fZGF0ZSA9IGdldFllYXJNb250aERheShkYXRlKTsKICB2YXIgZGF5X2hvdXJzID0gaG91clV0aWxzLmdldEZ1bGxIb3VycygpOwoKICBpZiAoaG91cl9vcHRpb25zKSB7CiAgICB2YXIgc3RhcnRfaG91ciA9IGhvdXJfb3B0aW9ucy5zdGFydF9ob3VyLAogICAgICAgIGVuZF9ob3VyID0gaG91cl9vcHRpb25zLmVuZF9ob3VyOwogICAgZGF5X2hvdXJzID0gZGF5X2hvdXJzLnNsaWNlKHN0YXJ0X2hvdXIsIGVuZF9ob3VyKTsKICB9CgogIHZhciBob3VycyA9IFtdOwoKICBmb3IgKHZhciBpZHggPSAwOyBpZHggPCBkYXlfaG91cnMubGVuZ3RoOyBpZHgrKykgewogICAgdmFyIHZhbHVlID0gIiIuY29uY2F0KGlzb19kYXRlLCAiVCIpLmNvbmNhdChkYXlfaG91cnNbaWR4XSwgIi4wMDBaIik7CiAgICBob3Vycy5wdXNoKHsKICAgICAgdmFsdWU6IHZhbHVlLAogICAgICBpbmRleDogaWR4LAogICAgICB2aXNpYmxlOiB0cnVlCiAgICB9KTsKICB9CgogIHJldHVybiBob3VyczsKfQoKdmFyIGdldERheUNlbGxzID0gZnVuY3Rpb24gZ2V0RGF5Q2VsbHMoZGF5U3RyaW5nLCBkYXlfb3B0aW9ucykgewogIGlmIChuZXcgRGF0ZShkYXlTdHJpbmcpLnRvSVNPU3RyaW5nKCkgIT09IGRheVN0cmluZykgewogICAgdGhyb3cgbmV3IEVycm9yKCJVbnN1cHBvcnRlZCBkYXlTdHJpbmcgcGFyYW1ldGVyIHByb3ZpZGVkIik7CiAgfQoKICB2YXIgY2VsbHMgPSBbXTsKICB2YXIgZGF0ZV9wYXJ0ID0gZGF5U3RyaW5nLnNsaWNlKDAsIDEwKTsKICB2YXIgYWxsX2hvdXJzID0gaG91clV0aWxzLmdldEFsbEhvdXJzKCk7CgogIGlmIChkYXlfb3B0aW9ucykgewogICAgdmFyIHN0YXJ0X2hvdXIgPSBkYXlfb3B0aW9ucy5zdGFydF9ob3VyLAogICAgICAgIGVuZF9ob3VyID0gZGF5X29wdGlvbnMuZW5kX2hvdXI7CiAgICB2YXIgc3RhcnRfaW5kZXggPSBzdGFydF9ob3VyICogNjsKICAgIHZhciBlbmRfaW5kZXggPSBlbmRfaG91ciAqIDYgKyAxOwogICAgYWxsX2hvdXJzID0gYWxsX2hvdXJzLnNsaWNlKHN0YXJ0X2luZGV4LCBlbmRfaW5kZXgpOwogIH0KCiAgZm9yICh2YXIgaG91cklkeCA9IDA7IGhvdXJJZHggPCBhbGxfaG91cnMubGVuZ3RoOyBob3VySWR4KyspIHsKICAgIHZhciBob3VyID0gYWxsX2hvdXJzW2hvdXJJZHhdOwogICAgdmFyIHZhbHVlID0gIiIuY29uY2F0KGRhdGVfcGFydCwgIlQiKS5jb25jYXQoaG91ciwgIi4wMDBaIik7CiAgICBjZWxscy5wdXNoKHsKICAgICAgdmFsdWU6IHZhbHVlLAogICAgICBpbmRleDogaG91cklkeCwKICAgICAgdmlzaWJsZTogdHJ1ZQogICAgfSk7CiAgfQoKICByZXR1cm4gY2VsbHM7Cn07Cgp2YXIgY29uc3RydWN0RGF5RXZlbnRzID0gZnVuY3Rpb24gY29uc3RydWN0RGF5RXZlbnRzKGRheSwgZXhpc3RpbmdfZXZlbnRzKSB7CiAgdmFyIGV2ZW50c19mb3JfdGhpc19kYXkgPSBleGlzdGluZ19ldmVudHMubWFwKGZ1bmN0aW9uIChldmVudCkgewogICAgdmFyIGZyb20gPSBldmVudC5mcm9tLAogICAgICAgIHRvID0gZXZlbnQudG87CiAgICBmcm9tID0gZ2V0TG9jYWxlVGltZShmcm9tKTsKICAgIHRvID0gZ2V0TG9jYWxlVGltZSh0byk7CiAgICByZXR1cm4gX29iamVjdFNwcmVhZDIoX29iamVjdFNwcmVhZDIoe30sIGV2ZW50KSwge30sIHsKICAgICAgZnJvbTogZnJvbSwKICAgICAgdG86IHRvCiAgICB9KTsKICB9KS5maWx0ZXIoZnVuY3Rpb24gKF9yZWY0KSB7CiAgICB2YXIgZnJvbSA9IF9yZWY0LmZyb207CiAgICByZXR1cm4gZnJvbS5zbGljZSgwLCAxMCkgPT09IGRheS5zbGljZSgwLCAxMCk7CiAgfSk7CiAgaWYgKGV2ZW50c19mb3JfdGhpc19kYXkubGVuZ3RoID09PSAwKSByZXR1cm4ge307CiAgdmFyIGZpbHRlcmVkX2V2ZW50cyA9IHt9OwogIGV2ZW50c19mb3JfdGhpc19kYXkuZm9yRWFjaChmdW5jdGlvbiAoZXZlbnQpIHsKICAgIHZhciBjb25zdHJ1Y3RlZEV2ZW50ID0gY29uc3RydWN0TmV3RXZlbnQoZXZlbnQpOwogICAgdmFyIGtleSA9IGNvbnN0cnVjdGVkRXZlbnQua2V5OwoKICAgIGlmIChmaWx0ZXJlZF9ldmVudHMuaGFzT3duUHJvcGVydHkoa2V5KSkgewogICAgICBmaWx0ZXJlZF9ldmVudHNba2V5XS5wdXNoKGNvbnN0cnVjdGVkRXZlbnQpOwogICAgfSBlbHNlIHsKICAgICAgZmlsdGVyZWRfZXZlbnRzW2tleV0gPSBbY29uc3RydWN0ZWRFdmVudF07CiAgICB9CiAgfSk7CiAgcmV0dXJuIGZpbHRlcmVkX2V2ZW50czsKfTsKCnZhciBjb25zdHJ1Y3ROZXdFdmVudCA9IGZ1bmN0aW9uIGNvbnN0cnVjdE5ld0V2ZW50KGV2ZW50KSB7CiAgdmFyIGZyb20gPSBldmVudC5mcm9tLAogICAgICB0byA9IGV2ZW50LnRvOwogIGZyb20gPSBuZXcgRGF0ZShmcm9tKTsKICB0byA9IG5ldyBEYXRlKHRvKTsKICBmcm9tLnNldFVUQ1NlY29uZHMoMCwgMCk7CiAgdG8uc2V0VVRDU2Vjb25kcygwLCAwKTsKICB2YXIgZnJvbV92YWx1ZSA9IGZyb20udG9JU09TdHJpbmcoKTsKICB2YXIgbWFza2VkX2Zyb20gPSBuZXcgRGF0ZShmcm9tLmdldFRpbWUoKSk7CiAgdmFyIG1hc2tlZF90byA9IG5ldyBEYXRlKHRvLmdldFRpbWUoKSk7CiAgdmFyIGZyb21EYXRhID0gewogICAgdmFsdWU6IGZyb21fdmFsdWUsCiAgICBtYXNrZWRfdmFsdWU6IG1hc2tlZF9mcm9tLnRvSVNPU3RyaW5nKCksCiAgICByb3VuZGVkOiBmYWxzZSwKICAgIHJvdW5kX29mZnNldDogbnVsbAogIH07CiAgdmFyIHRvX3ZhbHVlID0gdG8udG9JU09TdHJpbmcoKTsKICB2YXIgdG9EYXRhID0gewogICAgdmFsdWU6IHRvX3ZhbHVlLAogICAgbWFza2VkX3ZhbHVlOiBtYXNrZWRfdG8udG9JU09TdHJpbmcoKSwKICAgIHJvdW5kZWQ6IGZhbHNlLAogICAgcm91bmRfb2Zmc2V0OiBudWxsCiAgfTsKCiAgdmFyIG11bHRpcGxlT2YxMCA9IGZ1bmN0aW9uIG11bHRpcGxlT2YxMChkYXRlU3RyKSB7CiAgICByZXR1cm4gbmV3IERhdGUoZGF0ZVN0cikuZ2V0TWludXRlcygpICUgMTA7CiAgfTsKCiAgaWYgKG11bHRpcGxlT2YxMChmcm9tRGF0YS52YWx1ZSkgIT09IDApIHsKICAgIGZyb21EYXRhLnJvdW5kZWQgPSB0cnVlOwogICAgZnJvbURhdGEucm91bmRfb2Zmc2V0ID0gbXVsdGlwbGVPZjEwKGZyb21EYXRhLnZhbHVlKTsKICAgIHZhciBtaW51dGVzID0gbmV3IERhdGUoZnJvbURhdGEudmFsdWUpLmdldE1pbnV0ZXMoKTsKICAgIHZhciBtYXNrZWRNaW51dGVzID0gTWF0aC5mbG9vcihtaW51dGVzIC8gMTApICogMTA7CiAgICBtYXNrZWRfZnJvbS5zZXRNaW51dGVzKG1hc2tlZE1pbnV0ZXMpOwogICAgZnJvbURhdGEubWFza2VkX3ZhbHVlID0gbWFza2VkX2Zyb20udG9JU09TdHJpbmcoKTsKICB9CgogIHZhciBldmVudEtleSA9IG1hc2tlZF9mcm9tLnRvSVNPU3RyaW5nKCk7IC8vIDEgbWludXRlIGVxdWFscyAxIHBpeGVsIGluIG91ciB2aWV3LiBUaGF0IG1lYW5zIHdlIG5lZWQgdG8gZmluZCB0aGUgbGVuZ3RoCiAgLy8gb2YgdGhlIGV2ZW50IGJ5IGZpbmRpbmcgb3V0IHRoZSBkaWZmZXJlbmNlIGluIG1pbnV0ZXMKCiAgdmFyIGRpZmZJbk1zID0gdG8gLSBmcm9tOwogIHZhciBkaWZmSW5IcnMgPSBNYXRoLmZsb29yKGRpZmZJbk1zICUgODY0MDAwMDAgLyAzNjAwMDAwKTsKICB2YXIgZGlmZk1pbnMgPSBNYXRoLnJvdW5kKGRpZmZJbk1zICUgODY0MDAwMDAgJSAzNjAwMDAwIC8gNjAwMDApOwogIHZhciBjb25zdHJ1Y3RlZEV2ZW50ID0gewogICAgc3RhcnQ6IGZyb21EYXRhLAogICAgZW5kOiB0b0RhdGEsCiAgICBkYXRhOiBldmVudC5kYXRhLAogICAgaWQ6IGV2ZW50LmlkIHx8IGdlbmVyYXRlVVVJRCgpLAogICAgZGlzdGFuY2U6IGRpZmZNaW5zICsgZGlmZkluSHJzICogNjAsCiAgICBzdGF0dXM6ICJjb21wbGV0ZWQiLAogICAga2V5OiBldmVudEtleQogIH07IC8vIGNvbnNvbGUubG9nKCJDb25zdHJ1Y3RlZCBldmVudDoiLCBjb25zdHJ1Y3RlZEV2ZW50KTsKCiAgcmV0dXJuIGNvbnN0cnVjdGVkRXZlbnQ7Cn07Cgo=', null, false);
+var WorkerFactory = createBase64WorkerFactory('Lyogcm9sbHVwLXBsdWdpbi13ZWItd29ya2VyLWxvYWRlciAqLwpmdW5jdGlvbiBvd25LZXlzKG9iamVjdCwgZW51bWVyYWJsZU9ubHkpIHsKICB2YXIga2V5cyA9IE9iamVjdC5rZXlzKG9iamVjdCk7CgogIGlmIChPYmplY3QuZ2V0T3duUHJvcGVydHlTeW1ib2xzKSB7CiAgICB2YXIgc3ltYm9scyA9IE9iamVjdC5nZXRPd25Qcm9wZXJ0eVN5bWJvbHMob2JqZWN0KTsKCiAgICBpZiAoZW51bWVyYWJsZU9ubHkpIHsKICAgICAgc3ltYm9scyA9IHN5bWJvbHMuZmlsdGVyKGZ1bmN0aW9uIChzeW0pIHsKICAgICAgICByZXR1cm4gT2JqZWN0LmdldE93blByb3BlcnR5RGVzY3JpcHRvcihvYmplY3QsIHN5bSkuZW51bWVyYWJsZTsKICAgICAgfSk7CiAgICB9CgogICAga2V5cy5wdXNoLmFwcGx5KGtleXMsIHN5bWJvbHMpOwogIH0KCiAgcmV0dXJuIGtleXM7Cn0KCmZ1bmN0aW9uIF9vYmplY3RTcHJlYWQyKHRhcmdldCkgewogIGZvciAodmFyIGkgPSAxOyBpIDwgYXJndW1lbnRzLmxlbmd0aDsgaSsrKSB7CiAgICB2YXIgc291cmNlID0gYXJndW1lbnRzW2ldICE9IG51bGwgPyBhcmd1bWVudHNbaV0gOiB7fTsKCiAgICBpZiAoaSAlIDIpIHsKICAgICAgb3duS2V5cyhPYmplY3Qoc291cmNlKSwgdHJ1ZSkuZm9yRWFjaChmdW5jdGlvbiAoa2V5KSB7CiAgICAgICAgX2RlZmluZVByb3BlcnR5KHRhcmdldCwga2V5LCBzb3VyY2Vba2V5XSk7CiAgICAgIH0pOwogICAgfSBlbHNlIGlmIChPYmplY3QuZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9ycykgewogICAgICBPYmplY3QuZGVmaW5lUHJvcGVydGllcyh0YXJnZXQsIE9iamVjdC5nZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3JzKHNvdXJjZSkpOwogICAgfSBlbHNlIHsKICAgICAgb3duS2V5cyhPYmplY3Qoc291cmNlKSkuZm9yRWFjaChmdW5jdGlvbiAoa2V5KSB7CiAgICAgICAgT2JqZWN0LmRlZmluZVByb3BlcnR5KHRhcmdldCwga2V5LCBPYmplY3QuZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9yKHNvdXJjZSwga2V5KSk7CiAgICAgIH0pOwogICAgfQogIH0KCiAgcmV0dXJuIHRhcmdldDsKfQoKZnVuY3Rpb24gX3R5cGVvZihvYmopIHsKICAiQGJhYmVsL2hlbHBlcnMgLSB0eXBlb2YiOwoKICBpZiAodHlwZW9mIFN5bWJvbCA9PT0gImZ1bmN0aW9uIiAmJiB0eXBlb2YgU3ltYm9sLml0ZXJhdG9yID09PSAic3ltYm9sIikgewogICAgX3R5cGVvZiA9IGZ1bmN0aW9uIChvYmopIHsKICAgICAgcmV0dXJuIHR5cGVvZiBvYmo7CiAgICB9OwogIH0gZWxzZSB7CiAgICBfdHlwZW9mID0gZnVuY3Rpb24gKG9iaikgewogICAgICByZXR1cm4gb2JqICYmIHR5cGVvZiBTeW1ib2wgPT09ICJmdW5jdGlvbiIgJiYgb2JqLmNvbnN0cnVjdG9yID09PSBTeW1ib2wgJiYgb2JqICE9PSBTeW1ib2wucHJvdG90eXBlID8gInN5bWJvbCIgOiB0eXBlb2Ygb2JqOwogICAgfTsKICB9CgogIHJldHVybiBfdHlwZW9mKG9iaik7Cn0KCmZ1bmN0aW9uIF9kZWZpbmVQcm9wZXJ0eShvYmosIGtleSwgdmFsdWUpIHsKICBpZiAoa2V5IGluIG9iaikgewogICAgT2JqZWN0LmRlZmluZVByb3BlcnR5KG9iaiwga2V5LCB7CiAgICAgIHZhbHVlOiB2YWx1ZSwKICAgICAgZW51bWVyYWJsZTogdHJ1ZSwKICAgICAgY29uZmlndXJhYmxlOiB0cnVlLAogICAgICB3cml0YWJsZTogdHJ1ZQogICAgfSk7CiAgfSBlbHNlIHsKICAgIG9ialtrZXldID0gdmFsdWU7CiAgfQoKICByZXR1cm4gb2JqOwp9CgpmdW5jdGlvbiBfc2xpY2VkVG9BcnJheShhcnIsIGkpIHsKICByZXR1cm4gX2FycmF5V2l0aEhvbGVzKGFycikgfHwgX2l0ZXJhYmxlVG9BcnJheUxpbWl0KGFyciwgaSkgfHwgX3Vuc3VwcG9ydGVkSXRlcmFibGVUb0FycmF5KGFyciwgaSkgfHwgX25vbkl0ZXJhYmxlUmVzdCgpOwp9CgpmdW5jdGlvbiBfYXJyYXlXaXRoSG9sZXMoYXJyKSB7CiAgaWYgKEFycmF5LmlzQXJyYXkoYXJyKSkgcmV0dXJuIGFycjsKfQoKZnVuY3Rpb24gX2l0ZXJhYmxlVG9BcnJheUxpbWl0KGFyciwgaSkgewogIHZhciBfaSA9IGFyciA9PSBudWxsID8gbnVsbCA6IHR5cGVvZiBTeW1ib2wgIT09ICJ1bmRlZmluZWQiICYmIGFycltTeW1ib2wuaXRlcmF0b3JdIHx8IGFyclsiQEBpdGVyYXRvciJdOwoKICBpZiAoX2kgPT0gbnVsbCkgcmV0dXJuOwogIHZhciBfYXJyID0gW107CiAgdmFyIF9uID0gdHJ1ZTsKICB2YXIgX2QgPSBmYWxzZTsKCiAgdmFyIF9zLCBfZTsKCiAgdHJ5IHsKICAgIGZvciAoX2kgPSBfaS5jYWxsKGFycik7ICEoX24gPSAoX3MgPSBfaS5uZXh0KCkpLmRvbmUpOyBfbiA9IHRydWUpIHsKICAgICAgX2Fyci5wdXNoKF9zLnZhbHVlKTsKCiAgICAgIGlmIChpICYmIF9hcnIubGVuZ3RoID09PSBpKSBicmVhazsKICAgIH0KICB9IGNhdGNoIChlcnIpIHsKICAgIF9kID0gdHJ1ZTsKICAgIF9lID0gZXJyOwogIH0gZmluYWxseSB7CiAgICB0cnkgewogICAgICBpZiAoIV9uICYmIF9pWyJyZXR1cm4iXSAhPSBudWxsKSBfaVsicmV0dXJuIl0oKTsKICAgIH0gZmluYWxseSB7CiAgICAgIGlmIChfZCkgdGhyb3cgX2U7CiAgICB9CiAgfQoKICByZXR1cm4gX2FycjsKfQoKZnVuY3Rpb24gX3Vuc3VwcG9ydGVkSXRlcmFibGVUb0FycmF5KG8sIG1pbkxlbikgewogIGlmICghbykgcmV0dXJuOwogIGlmICh0eXBlb2YgbyA9PT0gInN0cmluZyIpIHJldHVybiBfYXJyYXlMaWtlVG9BcnJheShvLCBtaW5MZW4pOwogIHZhciBuID0gT2JqZWN0LnByb3RvdHlwZS50b1N0cmluZy5jYWxsKG8pLnNsaWNlKDgsIC0xKTsKICBpZiAobiA9PT0gIk9iamVjdCIgJiYgby5jb25zdHJ1Y3RvcikgbiA9IG8uY29uc3RydWN0b3IubmFtZTsKICBpZiAobiA9PT0gIk1hcCIgfHwgbiA9PT0gIlNldCIpIHJldHVybiBBcnJheS5mcm9tKG8pOwogIGlmIChuID09PSAiQXJndW1lbnRzIiB8fCAvXig/OlVpfEkpbnQoPzo4fDE2fDMyKSg/OkNsYW1wZWQpP0FycmF5JC8udGVzdChuKSkgcmV0dXJuIF9hcnJheUxpa2VUb0FycmF5KG8sIG1pbkxlbik7Cn0KCmZ1bmN0aW9uIF9hcnJheUxpa2VUb0FycmF5KGFyciwgbGVuKSB7CiAgaWYgKGxlbiA9PSBudWxsIHx8IGxlbiA+IGFyci5sZW5ndGgpIGxlbiA9IGFyci5sZW5ndGg7CgogIGZvciAodmFyIGkgPSAwLCBhcnIyID0gbmV3IEFycmF5KGxlbik7IGkgPCBsZW47IGkrKykgYXJyMltpXSA9IGFycltpXTsKCiAgcmV0dXJuIGFycjI7Cn0KCmZ1bmN0aW9uIF9ub25JdGVyYWJsZVJlc3QoKSB7CiAgdGhyb3cgbmV3IFR5cGVFcnJvcigiSW52YWxpZCBhdHRlbXB0IHRvIGRlc3RydWN0dXJlIG5vbi1pdGVyYWJsZSBpbnN0YW5jZS5cbkluIG9yZGVyIHRvIGJlIGl0ZXJhYmxlLCBub24tYXJyYXkgb2JqZWN0cyBtdXN0IGhhdmUgYSBbU3ltYm9sLml0ZXJhdG9yXSgpIG1ldGhvZC4iKTsKfQoKLy90b2RvOiByZW1vdmUgdGhpcyBhbmQgZm9yayBwcm9taXNlLXdvcmtlciB0byBwcm92aWRlIEVTTQoKZnVuY3Rpb24gaXNQcm9taXNlKG9iaikgewogIC8vIHZpYSBodHRwczovL3VucGtnLmNvbS9pcy1wcm9taXNlQDIuMS4wL2luZGV4LmpzCiAgcmV0dXJuICEhb2JqICYmIChfdHlwZW9mKG9iaikgPT09ICJvYmplY3QiIHx8IHR5cGVvZiBvYmogPT09ICJmdW5jdGlvbiIpICYmIHR5cGVvZiBvYmoudGhlbiA9PT0gImZ1bmN0aW9uIjsKfQoKZnVuY3Rpb24gcmVnaXN0ZXJQcm9taXNlV29ya2VyIChjYWxsYmFjaykgewogIGZ1bmN0aW9uIHBvc3RPdXRnb2luZ01lc3NhZ2UoZSwgbWVzc2FnZUlkLCBlcnJvciwgcmVzdWx0KSB7CiAgICBmdW5jdGlvbiBwb3N0TWVzc2FnZShtc2cpIHsKICAgICAgLyogaXN0YW5idWwgaWdub3JlIGlmICovCiAgICAgIGlmICh0eXBlb2Ygc2VsZi5wb3N0TWVzc2FnZSAhPT0gImZ1bmN0aW9uIikgewogICAgICAgIC8vIHNlcnZpY2Ugd29ya2VyCiAgICAgICAgZS5wb3J0c1swXS5wb3N0TWVzc2FnZShtc2cpOwogICAgICB9IGVsc2UgewogICAgICAgIC8vIHdlYiB3b3JrZXIKICAgICAgICBzZWxmLnBvc3RNZXNzYWdlKG1zZyk7CiAgICAgIH0KICAgIH0KCiAgICBpZiAoZXJyb3IpIHsKCiAgICAgIHBvc3RNZXNzYWdlKFttZXNzYWdlSWQsIHsKICAgICAgICBtZXNzYWdlOiBlcnJvci5tZXNzYWdlCiAgICAgIH1dKTsKICAgIH0gZWxzZSB7CiAgICAgIHBvc3RNZXNzYWdlKFttZXNzYWdlSWQsIG51bGwsIHJlc3VsdF0pOwogICAgfQogIH0KCiAgZnVuY3Rpb24gdHJ5Q2F0Y2hGdW5jKGNhbGxiYWNrLCBtZXNzYWdlKSB7CiAgICB0cnkgewogICAgICByZXR1cm4gewogICAgICAgIHJlczogY2FsbGJhY2sobWVzc2FnZSkKICAgICAgfTsKICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgcmV0dXJuIHsKICAgICAgICBlcnI6IGUKICAgICAgfTsKICAgIH0KICB9CgogIGZ1bmN0aW9uIGhhbmRsZUluY29taW5nTWVzc2FnZShlLCBjYWxsYmFjaywgbWVzc2FnZUlkLCBtZXNzYWdlKSB7CiAgICB2YXIgcmVzdWx0ID0gdHJ5Q2F0Y2hGdW5jKGNhbGxiYWNrLCBtZXNzYWdlKTsKCiAgICBpZiAocmVzdWx0LmVycikgewogICAgICBwb3N0T3V0Z29pbmdNZXNzYWdlKGUsIG1lc3NhZ2VJZCwgcmVzdWx0LmVycik7CiAgICB9IGVsc2UgaWYgKCFpc1Byb21pc2UocmVzdWx0LnJlcykpIHsKICAgICAgcG9zdE91dGdvaW5nTWVzc2FnZShlLCBtZXNzYWdlSWQsIG51bGwsIHJlc3VsdC5yZXMpOwogICAgfSBlbHNlIHsKICAgICAgcmVzdWx0LnJlcy50aGVuKGZ1bmN0aW9uIChmaW5hbFJlc3VsdCkgewogICAgICAgIHBvc3RPdXRnb2luZ01lc3NhZ2UoZSwgbWVzc2FnZUlkLCBudWxsLCBmaW5hbFJlc3VsdCk7CiAgICAgIH0sIGZ1bmN0aW9uIChmaW5hbEVycm9yKSB7CiAgICAgICAgcG9zdE91dGdvaW5nTWVzc2FnZShlLCBtZXNzYWdlSWQsIGZpbmFsRXJyb3IpOwogICAgICB9KTsKICAgIH0KICB9CgogIGZ1bmN0aW9uIG9uSW5jb21pbmdNZXNzYWdlKGUpIHsKICAgIHZhciBwYXlsb2FkID0gZS5kYXRhOwoKICAgIGlmICghQXJyYXkuaXNBcnJheShwYXlsb2FkKSB8fCBwYXlsb2FkLmxlbmd0aCAhPT0gMikgewogICAgICAvLyBtZXNzYWdlIGRvZW5zJ3QgbWF0Y2ggY29tbXVuaWNhdGlvbiBmb3JtYXQ7IGlnbm9yZQogICAgICByZXR1cm47CiAgICB9CgogICAgdmFyIG1lc3NhZ2VJZCA9IHBheWxvYWRbMF07CiAgICB2YXIgbWVzc2FnZSA9IHBheWxvYWRbMV07CgogICAgaWYgKHR5cGVvZiBjYWxsYmFjayAhPT0gImZ1bmN0aW9uIikgewogICAgICBwb3N0T3V0Z29pbmdNZXNzYWdlKGUsIG1lc3NhZ2VJZCwgbmV3IEVycm9yKCJQbGVhc2UgcGFzcyBhIGZ1bmN0aW9uIGludG8gcmVnaXN0ZXIoKS4iKSk7CiAgICB9IGVsc2UgewogICAgICBoYW5kbGVJbmNvbWluZ01lc3NhZ2UoZSwgY2FsbGJhY2ssIG1lc3NhZ2VJZCwgbWVzc2FnZSk7CiAgICB9CiAgfQoKICBzZWxmLmFkZEV2ZW50TGlzdGVuZXIoIm1lc3NhZ2UiLCBvbkluY29taW5nTWVzc2FnZSk7Cn0KCnZhciBjcmVhdG9yc19vZmZzZXQgPSBuZXcgRGF0ZSgpLmdldFRpbWV6b25lT2Zmc2V0KCkgLyA2MDsKCmlmIChjcmVhdG9yc19vZmZzZXQgKiAtMSA+PSAwKSB7CiAgY3JlYXRvcnNfb2Zmc2V0ICo9IC0xOwogIGNyZWF0b3JzX29mZnNldCA9ICIiLmNvbmNhdCgoY3JlYXRvcnNfb2Zmc2V0ICsgIiIpLnBhZFN0YXJ0KDIsICIwIiksICI6MDAiKTsKICBjcmVhdG9yc19vZmZzZXQgPSAiKyIuY29uY2F0KGNyZWF0b3JzX29mZnNldCk7Cn0gZWxzZSB7CiAgY3JlYXRvcnNfb2Zmc2V0ID0gIiIuY29uY2F0KChjcmVhdG9yc19vZmZzZXQgKyAiIikucGFkU3RhcnQoMiwgIjAiKSwgIjowMCIpOwogIGNyZWF0b3JzX29mZnNldCA9ICItIi5jb25jYXQoY3JlYXRvcnNfb2Zmc2V0KTsKfQoKdmFyIGdldEhvdXJsZXNzRGF0ZSA9IGZ1bmN0aW9uIGdldEhvdXJsZXNzRGF0ZShkYXRlX3N0cmluZykgewogIHZhciB0b2RheSA9IGRhdGVfc3RyaW5nID8gbmV3IERhdGUoZGF0ZV9zdHJpbmcpIDogbmV3IERhdGUoKTsKICB2YXIgeWVhciA9IHRvZGF5LmdldEZ1bGxZZWFyKCkgKyAiIiwKICAgICAgbW9udGggPSAodG9kYXkuZ2V0TW9udGgoKSArIDEgKyAiIikucGFkU3RhcnQoMiwgIjAiKSwKICAgICAgZGF5ID0gKHRvZGF5LmdldERhdGUoKSArICIiKS5wYWRTdGFydCgyLCAiMCIpOwogIHJldHVybiAiIi5jb25jYXQoeWVhciwgIi0iKS5jb25jYXQobW9udGgsICItIikuY29uY2F0KGRheSwgIlQwMDowMDowMC4wMDBaIik7Cn07Cgp2YXIgZ2V0WWVhck1vbnRoRGF5ID0gZnVuY3Rpb24gZ2V0WWVhck1vbnRoRGF5KGRhdGVfc3RyaW5nKSB7CiAgcmV0dXJuIGdldEhvdXJsZXNzRGF0ZShkYXRlX3N0cmluZykuc2xpY2UoMCwgMTApOwp9OwoKdmFyIGFkZERheXMgPSBmdW5jdGlvbiBhZGREYXlzKGRhdGUsIGRheXMpIHsKICB2YXIgZGF0ZU9iaiA9IG5ldyBEYXRlKGRhdGUpOwogIGRhdGVPYmouc2V0VVRDSG91cnMoMCwgMCwgMCwgMCk7CiAgZGF0ZU9iai5zZXREYXRlKGRhdGVPYmouZ2V0RGF0ZSgpICsgZGF5cyk7CiAgcmV0dXJuIGRhdGVPYmo7Cn07Cgp2YXIgZ2VuZXJhdGVVVUlEID0gZnVuY3Rpb24gZ2VuZXJhdGVVVUlEKCkgewogIHJldHVybiAoWzFlN10gKyAtMWUzICsgLTRlMyArIC04ZTMgKyAtMWUxMSkucmVwbGFjZSgvWzAxOF0vZywgZnVuY3Rpb24gKGMpIHsKICAgIHJldHVybiAoYyBeIGNyeXB0by5nZXRSYW5kb21WYWx1ZXMobmV3IFVpbnQ4QXJyYXkoMSkpWzBdICYgMTUgPj4gYyAvIDQpLnRvU3RyaW5nKDE2KTsKICB9KTsKfTsKCnZhciBnZXRMb2NhbGVUaW1lID0gZnVuY3Rpb24gZ2V0TG9jYWxlVGltZShkYXRlU3RyaW5nKSB7CiAgdmFyIF9EYXRlJHRvTG9jYWxlU3RyaW5nJCA9IG5ldyBEYXRlKGRhdGVTdHJpbmcpLnRvTG9jYWxlU3RyaW5nKCJlbi1HQiIpLnNwbGl0KCIsICIpLAogICAgICBfRGF0ZSR0b0xvY2FsZVN0cmluZyQyID0gX3NsaWNlZFRvQXJyYXkoX0RhdGUkdG9Mb2NhbGVTdHJpbmckLCAyKSwKICAgICAgZGF0ZSA9IF9EYXRlJHRvTG9jYWxlU3RyaW5nJDJbMF0sCiAgICAgIGhvdXIgPSBfRGF0ZSR0b0xvY2FsZVN0cmluZyQyWzFdOwoKICBkYXRlID0gZGF0ZS5zcGxpdCgiLyIpLnJldmVyc2UoKS5qb2luKCItIik7CiAgcmV0dXJuICIiLmNvbmNhdChkYXRlLCAiVCIpLmNvbmNhdChob3VyLCAiLjAwMFoiKTsKfTsKCnZhciBiZWdpbm5pbmdPZk1vbnRoID0gZnVuY3Rpb24gYmVnaW5uaW5nT2ZNb250aChkKSB7CiAgcmV0dXJuIG5ldyBEYXRlKGQuZ2V0RnVsbFllYXIoKSwgZC5nZXRNb250aCgpKTsKfTsKCnZhciBkYXlzSW5Nb250aCA9IGZ1bmN0aW9uIGRheXNJbk1vbnRoKCkgewogIHZhciBkID0gbmV3IERhdGUoKTsKICByZXR1cm4gMzMgLSBuZXcgRGF0ZShkLmdldEZ1bGxZZWFyKCksIGQuZ2V0TW9udGgoKSwgMzMpLmdldERhdGUoKTsKfTsKCnZhciBob3VyVXRpbHMgPSB7CiAgZ2V0QWxsSG91cnM6IGZ1bmN0aW9uIGdldEFsbEhvdXJzKCkgewogICAgcmV0dXJuIFsiMDA6MDA6MDAiLCAiMDA6MTA6MDAiLCAiMDA6MjA6MDAiLCAiMDA6MzA6MDAiLCAiMDA6NDA6MDAiLCAiMDA6NTA6MDAiLCAiMDE6MDA6MDAiLCAiMDE6MTA6MDAiLCAiMDE6MjA6MDAiLCAiMDE6MzA6MDAiLCAiMDE6NDA6MDAiLCAiMDE6NTA6MDAiLCAiMDI6MDA6MDAiLCAiMDI6MTA6MDAiLCAiMDI6MjA6MDAiLCAiMDI6MzA6MDAiLCAiMDI6NDA6MDAiLCAiMDI6NTA6MDAiLCAiMDM6MDA6MDAiLCAiMDM6MTA6MDAiLCAiMDM6MjA6MDAiLCAiMDM6MzA6MDAiLCAiMDM6NDA6MDAiLCAiMDM6NTA6MDAiLCAiMDQ6MDA6MDAiLCAiMDQ6MTA6MDAiLCAiMDQ6MjA6MDAiLCAiMDQ6MzA6MDAiLCAiMDQ6NDA6MDAiLCAiMDQ6NTA6MDAiLCAiMDU6MDA6MDAiLCAiMDU6MTA6MDAiLCAiMDU6MjA6MDAiLCAiMDU6MzA6MDAiLCAiMDU6NDA6MDAiLCAiMDU6NTA6MDAiLCAiMDY6MDA6MDAiLCAiMDY6MTA6MDAiLCAiMDY6MjA6MDAiLCAiMDY6MzA6MDAiLCAiMDY6NDA6MDAiLCAiMDY6NTA6MDAiLCAiMDc6MDA6MDAiLCAiMDc6MTA6MDAiLCAiMDc6MjA6MDAiLCAiMDc6MzA6MDAiLCAiMDc6NDA6MDAiLCAiMDc6NTA6MDAiLCAiMDg6MDA6MDAiLCAiMDg6MTA6MDAiLCAiMDg6MjA6MDAiLCAiMDg6MzA6MDAiLCAiMDg6NDA6MDAiLCAiMDg6NTA6MDAiLCAiMDk6MDA6MDAiLCAiMDk6MTA6MDAiLCAiMDk6MjA6MDAiLCAiMDk6MzA6MDAiLCAiMDk6NDA6MDAiLCAiMDk6NTA6MDAiLCAiMTA6MDA6MDAiLCAiMTA6MTA6MDAiLCAiMTA6MjA6MDAiLCAiMTA6MzA6MDAiLCAiMTA6NDA6MDAiLCAiMTA6NTA6MDAiLCAiMTE6MDA6MDAiLCAiMTE6MTA6MDAiLCAiMTE6MjA6MDAiLCAiMTE6MzA6MDAiLCAiMTE6NDA6MDAiLCAiMTE6NTA6MDAiLCAiMTI6MDA6MDAiLCAiMTI6MTA6MDAiLCAiMTI6MjA6MDAiLCAiMTI6MzA6MDAiLCAiMTI6NDA6MDAiLCAiMTI6NTA6MDAiLCAiMTM6MDA6MDAiLCAiMTM6MTA6MDAiLCAiMTM6MjA6MDAiLCAiMTM6MzA6MDAiLCAiMTM6NDA6MDAiLCAiMTM6NTA6MDAiLCAiMTQ6MDA6MDAiLCAiMTQ6MTA6MDAiLCAiMTQ6MjA6MDAiLCAiMTQ6MzA6MDAiLCAiMTQ6NDA6MDAiLCAiMTQ6NTA6MDAiLCAiMTU6MDA6MDAiLCAiMTU6MTA6MDAiLCAiMTU6MjA6MDAiLCAiMTU6MzA6MDAiLCAiMTU6NDA6MDAiLCAiMTU6NTA6MDAiLCAiMTY6MDA6MDAiLCAiMTY6MTA6MDAiLCAiMTY6MjA6MDAiLCAiMTY6MzA6MDAiLCAiMTY6NDA6MDAiLCAiMTY6NTA6MDAiLCAiMTc6MDA6MDAiLCAiMTc6MTA6MDAiLCAiMTc6MjA6MDAiLCAiMTc6MzA6MDAiLCAiMTc6NDA6MDAiLCAiMTc6NTA6MDAiLCAiMTg6MDA6MDAiLCAiMTg6MTA6MDAiLCAiMTg6MjA6MDAiLCAiMTg6MzA6MDAiLCAiMTg6NDA6MDAiLCAiMTg6NTA6MDAiLCAiMTk6MDA6MDAiLCAiMTk6MTA6MDAiLCAiMTk6MjA6MDAiLCAiMTk6MzA6MDAiLCAiMTk6NDA6MDAiLCAiMTk6NTA6MDAiLCAiMjA6MDA6MDAiLCAiMjA6MTA6MDAiLCAiMjA6MjA6MDAiLCAiMjA6MzA6MDAiLCAiMjA6NDA6MDAiLCAiMjA6NTA6MDAiLCAiMjE6MDA6MDAiLCAiMjE6MTA6MDAiLCAiMjE6MjA6MDAiLCAiMjE6MzA6MDAiLCAiMjE6NDA6MDAiLCAiMjE6NTA6MDAiLCAiMjI6MDA6MDAiLCAiMjI6MTA6MDAiLCAiMjI6MjA6MDAiLCAiMjI6MzA6MDAiLCAiMjI6NDA6MDAiLCAiMjI6NTA6MDAiLCAiMjM6MDA6MDAiLCAiMjM6MTA6MDAiLCAiMjM6MjA6MDAiLCAiMjM6MzA6MDAiLCAiMjM6NDA6MDAiLCAiMjM6NTA6MDAiLCAiMjQ6MDA6MDAiXTsKICB9LAogIGdldEZ1bGxIb3VyczogZnVuY3Rpb24gZ2V0RnVsbEhvdXJzKCkgewogICAgcmV0dXJuIFsiMDA6MDA6MDAiLCAiMDE6MDA6MDAiLCAiMDI6MDA6MDAiLCAiMDM6MDA6MDAiLCAiMDQ6MDA6MDAiLCAiMDU6MDA6MDAiLCAiMDY6MDA6MDAiLCAiMDc6MDA6MDAiLCAiMDg6MDA6MDAiLCAiMDk6MDA6MDAiLCAiMTA6MDA6MDAiLCAiMTE6MDA6MDAiLCAiMTI6MDA6MDAiLCAiMTM6MDA6MDAiLCAiMTQ6MDA6MDAiLCAiMTU6MDA6MDAiLCAiMTY6MDA6MDAiLCAiMTc6MDA6MDAiLCAiMTg6MDA6MDAiLCAiMTk6MDA6MDAiLCAiMjA6MDA6MDAiLCAiMjE6MDA6MDAiLCAiMjI6MDA6MDAiLCAiMjM6MDA6MDAiXTsKICB9Cn07CgpyZWdpc3RlclByb21pc2VXb3JrZXIoZnVuY3Rpb24gKG1lc3NhZ2UpIHsKICB2YXIgdHlwZSA9IG1lc3NhZ2UudHlwZSwKICAgICAgZGF0YSA9IG1lc3NhZ2UuZGF0YTsKCiAgaWYgKHR5cGUgPT09ICJtZXNzYWdlIikgewogICAgcmV0dXJuICJXb3JrZXIgcmVwbGllczogIi5jb25jYXQobmV3IERhdGUoKS50b0lTT1N0cmluZygpKTsKICB9CgogIHN3aXRjaCAodHlwZSkgewogICAgY2FzZSAiZ2V0RGF5cyI6CiAgICAgIHJldHVybiBnZXREYXlzKGRhdGEuZGF5LCBkYXRhLm9wdGlvbnMpOwoKICAgIGNhc2UgImdldEhvdXJzIjoKICAgICAgcmV0dXJuIGdldEhvdXJzKGRhdGEuaG91ck9wdGlvbnMpOwoKICAgIGNhc2UgImdldERheUNlbGxzIjoKICAgICAgcmV0dXJuIGdldERheUNlbGxzKGRhdGEuZGF5LCBkYXRhLmhvdXJPcHRpb25zKTsKCiAgICBjYXNlICJjb25zdHJ1Y3REYXlFdmVudHMiOgogICAgICByZXR1cm4gY29uc3RydWN0RGF5RXZlbnRzKGRhdGEuZGF5LCBkYXRhLmV2ZW50cyk7CgogICAgY2FzZSAiY29uc3RydWN0TmV3RXZlbnQiOgogICAgICByZXR1cm4gY29uc3RydWN0TmV3RXZlbnQoZGF0YS5ldmVudCk7CiAgfQp9KTsKCmZ1bmN0aW9uIGdldERheXMoZGF5U3RyaW5nLCBfcmVmKSB7CiAgdmFyIGhpZGVfZGF0ZXMgPSBfcmVmLmhpZGVfZGF0ZXMsCiAgICAgIGhpZGVfZGF5cyA9IF9yZWYuaGlkZV9kYXlzLAogICAgICB2aWV3X3R5cGUgPSBfcmVmLnZpZXdfdHlwZTsKICB2YXIgZGF0ZSA9IG5ldyBEYXRlKCIiLmNvbmNhdChkYXlTdHJpbmcsICJUMDA6MDA6MDAuMDAwWiIpKTsKICB2YXIgZGF5X29mX3dlZWsgPSBkYXRlLmdldFVUQ0RheSgpIC0gMTsKICB2YXIgZGF5cyA9IFtdOwoKICBzd2l0Y2ggKHZpZXdfdHlwZSkgewogICAgY2FzZSAnZGF5JzoKICAgICAgZGF5cyA9IFt7CiAgICAgICAgdmFsdWU6IGRhdGUudG9JU09TdHJpbmcoKSwKICAgICAgICBpbmRleDogMAogICAgICB9XTsKICAgICAgYnJlYWs7CgogICAgY2FzZSAnbW9udGgnOgogICAgICBmb3IgKHZhciBpZHggPSAwOyBpZHggPCBkYXlzSW5Nb250aCgpOyBpZHgrKykgewogICAgICAgIGRheXMucHVzaCh7CiAgICAgICAgICB2YWx1ZTogYWRkRGF5cyhiZWdpbm5pbmdPZk1vbnRoKGRhdGUpLCBpZHgpLnRvSVNPU3RyaW5nKCksCiAgICAgICAgICBpbmRleDogaWR4CiAgICAgICAgfSk7CiAgICAgIH0KCiAgICAgIGJyZWFrOwoKICAgIGRlZmF1bHQ6CiAgICAgIGZvciAodmFyIF9pZHggPSAwOyBfaWR4IDwgNzsgX2lkeCsrKSB7CiAgICAgICAgZGF5cy5wdXNoKHsKICAgICAgICAgIHZhbHVlOiBhZGREYXlzKGRhdGUsIF9pZHggLSBkYXlfb2Zfd2VlaykudG9JU09TdHJpbmcoKSwKICAgICAgICAgIGluZGV4OiBfaWR4CiAgICAgICAgfSk7CiAgICAgIH0KCiAgICAgIGJyZWFrOwogIH0KCiAgaWYgKGhpZGVfZGF0ZXMgJiYgaGlkZV9kYXRlcy5sZW5ndGggPiAwKSB7CiAgICBkYXlzID0gZGF5cy5maWx0ZXIoZnVuY3Rpb24gKF9yZWYyKSB7CiAgICAgIHZhciB2YWx1ZSA9IF9yZWYyLnZhbHVlOwogICAgICByZXR1cm4gaGlkZV9kYXRlcy5pbmRleE9mKHZhbHVlLnNsaWNlKDAsIDEwKSkgPCAwOwogICAgfSk7CiAgfQoKICBpZiAoaGlkZV9kYXlzICYmIGhpZGVfZGF5cy5sZW5ndGggPiAwKSB7CiAgICBkYXlzID0gZGF5cy5maWx0ZXIoZnVuY3Rpb24gKF9yZWYzKSB7CiAgICAgIHZhciBpbmRleCA9IF9yZWYzLmluZGV4OwogICAgICByZXR1cm4gaGlkZV9kYXlzLmluZGV4T2YoaW5kZXgpIDwgMDsKICAgIH0pOwogIH0KCiAgcmV0dXJuIGRheXM7Cn0KCmZ1bmN0aW9uIGdldEhvdXJzKGhvdXJfb3B0aW9ucykgewogIHZhciBkYXRlID0gbmV3IERhdGUoKTsKICBkYXRlLnNldFVUQ0hvdXJzKDAsIDAsIDAsIDApOwogIHZhciBpc29fZGF0ZSA9IGdldFllYXJNb250aERheShkYXRlKTsKICB2YXIgZGF5X2hvdXJzID0gaG91clV0aWxzLmdldEZ1bGxIb3VycygpOwoKICBpZiAoaG91cl9vcHRpb25zKSB7CiAgICB2YXIgc3RhcnRfaG91ciA9IGhvdXJfb3B0aW9ucy5zdGFydF9ob3VyLAogICAgICAgIGVuZF9ob3VyID0gaG91cl9vcHRpb25zLmVuZF9ob3VyOwogICAgZGF5X2hvdXJzID0gZGF5X2hvdXJzLnNsaWNlKHN0YXJ0X2hvdXIsIGVuZF9ob3VyKTsKICB9CgogIHZhciBob3VycyA9IFtdOwoKICBmb3IgKHZhciBpZHggPSAwOyBpZHggPCBkYXlfaG91cnMubGVuZ3RoOyBpZHgrKykgewogICAgdmFyIHZhbHVlID0gIiIuY29uY2F0KGlzb19kYXRlLCAiVCIpLmNvbmNhdChkYXlfaG91cnNbaWR4XSwgIi4wMDBaIik7CiAgICBob3Vycy5wdXNoKHsKICAgICAgdmFsdWU6IHZhbHVlLAogICAgICBpbmRleDogaWR4LAogICAgICB2aXNpYmxlOiB0cnVlCiAgICB9KTsKICB9CgogIHJldHVybiBob3VyczsKfQoKdmFyIGdldERheUNlbGxzID0gZnVuY3Rpb24gZ2V0RGF5Q2VsbHMoZGF5U3RyaW5nLCBkYXlfb3B0aW9ucykgewogIGlmIChuZXcgRGF0ZShkYXlTdHJpbmcpLnRvSVNPU3RyaW5nKCkgIT09IGRheVN0cmluZykgewogICAgdGhyb3cgbmV3IEVycm9yKCJVbnN1cHBvcnRlZCBkYXlTdHJpbmcgcGFyYW1ldGVyIHByb3ZpZGVkIik7CiAgfQoKICB2YXIgY2VsbHMgPSBbXTsKICB2YXIgZGF0ZV9wYXJ0ID0gZGF5U3RyaW5nLnNsaWNlKDAsIDEwKTsKICB2YXIgYWxsX2hvdXJzID0gaG91clV0aWxzLmdldEFsbEhvdXJzKCkuZmlsdGVyKGZ1bmN0aW9uIChoKSB7CiAgICByZXR1cm4gaC5pbmRleE9mKCc6MDA6JykgIT09IC0xIHx8IGguaW5kZXhPZignOjMwOicpICE9PSAtMTsgLy8g0LLRi9Cx0LjRgNCw0LXQvCDRgtC+0LvRjNC60L4g0L/QvtC70YPRh9Cw0YHQvtCy0YvQtSDQuNC90YLQtdGA0LLQsNC70YsKICB9KTsKCiAgaWYgKGRheV9vcHRpb25zKSB7CiAgICB2YXIgc3RhcnRfaG91ciA9IGRheV9vcHRpb25zLnN0YXJ0X2hvdXIsCiAgICAgICAgZW5kX2hvdXIgPSBkYXlfb3B0aW9ucy5lbmRfaG91cjsKICAgIHZhciBzdGFydF9pbmRleCA9IHN0YXJ0X2hvdXIgKiAyOwogICAgdmFyIGVuZF9pbmRleCA9IGVuZF9ob3VyICogMiArIDE7CiAgICBhbGxfaG91cnMgPSBhbGxfaG91cnMuc2xpY2Uoc3RhcnRfaW5kZXgsIGVuZF9pbmRleCk7CiAgfQoKICBmb3IgKHZhciBob3VySWR4ID0gMDsgaG91cklkeCA8IGFsbF9ob3Vycy5sZW5ndGg7IGhvdXJJZHgrKykgewogICAgdmFyIGhvdXIgPSBhbGxfaG91cnNbaG91cklkeF07CiAgICB2YXIgdmFsdWUgPSAiIi5jb25jYXQoZGF0ZV9wYXJ0LCAiVCIpLmNvbmNhdChob3VyLCAiLjAwMFoiKTsKICAgIGNlbGxzLnB1c2goewogICAgICB2YWx1ZTogdmFsdWUsCiAgICAgIGluZGV4OiBob3VySWR4LAogICAgICB2aXNpYmxlOiB0cnVlCiAgICB9KTsKICB9CgogIHJldHVybiBjZWxsczsKfTsKCnZhciBjb25zdHJ1Y3REYXlFdmVudHMgPSBmdW5jdGlvbiBjb25zdHJ1Y3REYXlFdmVudHMoZGF5LCBleGlzdGluZ19ldmVudHMpIHsKICB2YXIgZXZlbnRzX2Zvcl90aGlzX2RheSA9IGV4aXN0aW5nX2V2ZW50cy5tYXAoZnVuY3Rpb24gKGV2ZW50KSB7CiAgICB2YXIgZnJvbSA9IGV2ZW50LmZyb20sCiAgICAgICAgdG8gPSBldmVudC50bzsKICAgIGZyb20gPSBnZXRMb2NhbGVUaW1lKGZyb20pOwogICAgdG8gPSBnZXRMb2NhbGVUaW1lKHRvKTsKICAgIHJldHVybiBfb2JqZWN0U3ByZWFkMihfb2JqZWN0U3ByZWFkMih7fSwgZXZlbnQpLCB7fSwgewogICAgICBmcm9tOiBmcm9tLAogICAgICB0bzogdG8KICAgIH0pOwogIH0pLmZpbHRlcihmdW5jdGlvbiAoX3JlZjQpIHsKICAgIHZhciBmcm9tID0gX3JlZjQuZnJvbTsKICAgIHJldHVybiBmcm9tLnNsaWNlKDAsIDEwKSA9PT0gZGF5LnNsaWNlKDAsIDEwKTsKICB9KTsKICBpZiAoZXZlbnRzX2Zvcl90aGlzX2RheS5sZW5ndGggPT09IDApIHJldHVybiB7fTsKICB2YXIgZmlsdGVyZWRfZXZlbnRzID0ge307CiAgZXZlbnRzX2Zvcl90aGlzX2RheS5mb3JFYWNoKGZ1bmN0aW9uIChldmVudCkgewogICAgdmFyIGNvbnN0cnVjdGVkRXZlbnQgPSBjb25zdHJ1Y3ROZXdFdmVudChldmVudCk7CiAgICB2YXIga2V5ID0gY29uc3RydWN0ZWRFdmVudC5rZXk7CgogICAgaWYgKGZpbHRlcmVkX2V2ZW50cy5oYXNPd25Qcm9wZXJ0eShrZXkpKSB7CiAgICAgIGZpbHRlcmVkX2V2ZW50c1trZXldLnB1c2goY29uc3RydWN0ZWRFdmVudCk7CiAgICB9IGVsc2UgewogICAgICBmaWx0ZXJlZF9ldmVudHNba2V5XSA9IFtjb25zdHJ1Y3RlZEV2ZW50XTsKICAgIH0KICB9KTsKICByZXR1cm4gZmlsdGVyZWRfZXZlbnRzOwp9OwoKdmFyIGNvbnN0cnVjdE5ld0V2ZW50ID0gZnVuY3Rpb24gY29uc3RydWN0TmV3RXZlbnQoZXZlbnQpIHsKICB2YXIgZnJvbSA9IGV2ZW50LmZyb20sCiAgICAgIHRvID0gZXZlbnQudG87CiAgZnJvbSA9IG5ldyBEYXRlKGZyb20pOwogIHRvID0gbmV3IERhdGUodG8pOwogIGZyb20uc2V0VVRDU2Vjb25kcygwLCAwKTsKICB0by5zZXRVVENTZWNvbmRzKDAsIDApOwogIHZhciBmcm9tX3ZhbHVlID0gZnJvbS50b0lTT1N0cmluZygpOwogIHZhciBtYXNrZWRfZnJvbSA9IG5ldyBEYXRlKGZyb20uZ2V0VGltZSgpKTsKICB2YXIgbWFza2VkX3RvID0gbmV3IERhdGUodG8uZ2V0VGltZSgpKTsKICB2YXIgZnJvbURhdGEgPSB7CiAgICB2YWx1ZTogZnJvbV92YWx1ZSwKICAgIG1hc2tlZF92YWx1ZTogbWFza2VkX2Zyb20udG9JU09TdHJpbmcoKSwKICAgIHJvdW5kZWQ6IGZhbHNlLAogICAgcm91bmRfb2Zmc2V0OiBudWxsCiAgfTsKICB2YXIgdG9fdmFsdWUgPSB0by50b0lTT1N0cmluZygpOwogIHZhciB0b0RhdGEgPSB7CiAgICB2YWx1ZTogdG9fdmFsdWUsCiAgICBtYXNrZWRfdmFsdWU6IG1hc2tlZF90by50b0lTT1N0cmluZygpLAogICAgcm91bmRlZDogZmFsc2UsCiAgICByb3VuZF9vZmZzZXQ6IG51bGwKICB9OwoKICB2YXIgbXVsdGlwbGVPZjEwID0gZnVuY3Rpb24gbXVsdGlwbGVPZjEwKGRhdGVTdHIpIHsKICAgIHJldHVybiBuZXcgRGF0ZShkYXRlU3RyKS5nZXRNaW51dGVzKCkgJSAzMDsKICB9OwoKICBpZiAobXVsdGlwbGVPZjEwKGZyb21EYXRhLnZhbHVlKSAhPT0gMCkgewogICAgZnJvbURhdGEucm91bmRlZCA9IHRydWU7CiAgICBmcm9tRGF0YS5yb3VuZF9vZmZzZXQgPSBtdWx0aXBsZU9mMTAoZnJvbURhdGEudmFsdWUpOwogICAgdmFyIG1pbnV0ZXMgPSBuZXcgRGF0ZShmcm9tRGF0YS52YWx1ZSkuZ2V0TWludXRlcygpOwogICAgdmFyIG1hc2tlZE1pbnV0ZXMgPSBNYXRoLmZsb29yKG1pbnV0ZXMgLyAzMCkgKiAzMDsKICAgIG1hc2tlZF9mcm9tLnNldE1pbnV0ZXMobWFza2VkTWludXRlcyk7CiAgICBmcm9tRGF0YS5tYXNrZWRfdmFsdWUgPSBtYXNrZWRfZnJvbS50b0lTT1N0cmluZygpOwogIH0KCiAgdmFyIGV2ZW50S2V5ID0gbWFza2VkX2Zyb20udG9JU09TdHJpbmcoKTsgLy8gMSBtaW51dGUgZXF1YWxzIDEgcGl4ZWwgaW4gb3VyIHZpZXcuIFRoYXQgbWVhbnMgd2UgbmVlZCB0byBmaW5kIHRoZSBsZW5ndGgKICAvLyBvZiB0aGUgZXZlbnQgYnkgZmluZGluZyBvdXQgdGhlIGRpZmZlcmVuY2UgaW4gbWludXRlcwoKICB2YXIgZGlmZkluTXMgPSB0byAtIGZyb207CiAgdmFyIGRpZmZJbkhycyA9IE1hdGguZmxvb3IoZGlmZkluTXMgJSA4NjQwMDAwMCAvIDM2MDAwMDApOwogIHZhciBkaWZmTWlucyA9IE1hdGgucm91bmQoZGlmZkluTXMgJSA4NjQwMDAwMCAlIDM2MDAwMDAgLyA2MDAwMCk7CiAgdmFyIGNvbnN0cnVjdGVkRXZlbnQgPSB7CiAgICBzdGFydDogZnJvbURhdGEsCiAgICBlbmQ6IHRvRGF0YSwKICAgIGRhdGE6IGV2ZW50LmRhdGEsCiAgICBpZDogZXZlbnQuaWQgfHwgZ2VuZXJhdGVVVUlEKCksCiAgICBkaXN0YW5jZTogZGlmZk1pbnMgKyBkaWZmSW5IcnMgKiA2MCwKICAgIHN0YXR1czogImNvbXBsZXRlZCIsCiAgICBrZXk6IGV2ZW50S2V5CiAgfTsgLy8gY29uc29sZS5sb2coIkNvbnN0cnVjdGVkIGV2ZW50OiIsIGNvbnN0cnVjdGVkRXZlbnQpOwoKICByZXR1cm4gY29uc3RydWN0ZWRFdmVudDsKfTsKCg==', null, false);
 /* eslint-enable */var worker = new WorkerFactory();
 var promiseWorker = PromiseWorker(worker);
 
@@ -2651,7 +3084,7 @@ var send = function send() {
 
 var myWorker = {
   send: send
-};var script$8 = {
+};var script$9 = {
   props: {
     'day': {},
     'passedTime': {},
@@ -2751,7 +3184,7 @@ var myWorker = {
       var _this = this;
 
       myWorker.send("getDayCells", {
-        day: this.day.value,
+        day: !!this.day.value ? this.day.value : this.day,
         hourOptions: {
           start_hour: this.kalendar_options.day_starts_at,
           end_hour: this.kalendar_options.day_ends_at
@@ -3079,10 +3512,10 @@ var myWorker = {
     }
   }
 };/* script */
-var __vue_script__$8 = script$8;
+var __vue_script__$9 = script$9;
 /* template */
 
-var __vue_render__$8 = function __vue_render__() {
+var __vue_render__$9 = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3153,12 +3586,12 @@ var __vue_render__$8 = function __vue_render__() {
   })], 2);
 };
 
-var __vue_staticRenderFns__$8 = [];
+var __vue_staticRenderFns__$9 = [];
 /* style */
 
-var __vue_inject_styles__$8 = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$9 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-7013e3a6_0", {
+  inject("data-v-0cb4272a_0", {
     source: "ul.kalendar-day{position:relative;background-color:#fff}ul.kalendar-day:hover{background:rgba(32,137,255,.1)}ul.kalendar-day.is-weekend{background-color:var(--weekend-color)}ul.kalendar-day.is-today{border-left:1px solid var(--main-color)}ul.kalendar-day .clear{position:absolute;z-index:1;top:-20px;right:0;font-size:10px}ul.kalendar-day.creating{z-index:11}ul.kalendar-day.creating .created-event{pointer-events:none}",
     map: undefined,
     media: undefined
@@ -3167,22 +3600,22 @@ var __vue_inject_styles__$8 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$8 = undefined;
+var __vue_scope_id__$9 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$8 = undefined;
+var __vue_module_identifier__$9 = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$8 = false;
+var __vue_is_functional_template__$9 = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$8 = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$8,
-  staticRenderFns: __vue_staticRenderFns__$8
-}, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, false, createInjector, undefined, undefined);//
-var script$9 = {
+var __vue_component__$9 = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$9,
+  staticRenderFns: __vue_staticRenderFns__$9
+}, __vue_inject_styles__$9, __vue_script__$9, __vue_scope_id__$9, __vue_is_functional_template__$9, __vue_module_identifier__$9, false, createInjector, undefined, undefined);//
+var script$a = {
   props: {
     current_day: {
       required: true,
@@ -3215,7 +3648,7 @@ var script$9 = {
     }
   },
   components: {
-    KalendarDay: __vue_component__$8
+    KalendarDay: __vue_component__$9
   },
   created: function created() {
     var _this = this;
@@ -3244,7 +3677,7 @@ var script$9 = {
       return this.kalendar_options.style === "flat_design" ? "5px" : "0px";
     },
     hourHeight: function hourHeight() {
-      return 6 * this.kalendar_options.cell_height; //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value);
+      return 2 * this.kalendar_options.cell_height; //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value);
       // * this.kalendar_options.hour_parts;
     },
     passedTime: function passedTime() {
@@ -3392,10 +3825,10 @@ var script$9 = {
     }
   }
 };/* script */
-var __vue_script__$9 = script$9;
+var __vue_script__$a = script$a;
 /* template */
 
-var __vue_render__$9 = function __vue_render__() {
+var __vue_render__$a = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3478,12 +3911,12 @@ var __vue_render__$9 = function __vue_render__() {
   })], 2)]) : _vm._e()]);
 };
 
-var __vue_staticRenderFns__$9 = [];
+var __vue_staticRenderFns__$a = [];
 /* style */
 
-var __vue_inject_styles__$9 = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$a = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-f198cab2_0", {
+  inject("data-v-08160daa_0", {
     source: ".calendar-wrap{display:flex;flex-direction:column}.calendar-wrap ul{list-style:none;padding:0}.calendar-wrap ul>li{display:flex}.sticky-top{position:sticky;top:0;z-index:20;background:#fff}.sticky-top .days{margin:0;display:flex;margin-left:55px}.sticky-top .days li{display:inline-flex;align-items:flex-end;padding-top:10px;flex:1;font-size:1.1rem;color:#666;font-weight:300;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5;padding-bottom:5px;position:relative;font-size:18px}.sticky-top .days li span{margin-right:3px}.sticky-top .days li span:first-child{font-size:20px;font-weight:500}.sticky-top .days .today{border-bottom-color:var(--main-color);color:var(--main-color)!important}.sticky-top .days .today::after{content:\"\";position:absolute;height:2px;bottom:0;left:0;width:100%;background-color:var(--main-color)}.sticky-top .all-day{display:flex;margin-bottom:0;margin-top:0;border-bottom:solid 2px #e5e5e5}.sticky-top .all-day span{display:flex;align-items:center;padding:0 5px;width:55px;font-weight:500;font-size:.8rem;color:#b8bbca;text-transform:lowercase}.sticky-top .all-day li{flex:1;margin-right:var(--space-between-cols)}.sticky-top .all-day li.all-today{background-color:#fef4f4}.dummy-row{display:flex;padding-left:55px}.dummy-row ul{display:flex;flex:1;margin:0}.dummy-row li{flex:1;height:15px;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5}.blocks{display:flex;position:relative;height:100%}.blocks ul{margin-top:0}.blocks .building-blocks{flex:1;margin-right:var(--space-between-cols);margin-bottom:0;display:flex;flex-direction:column}.blocks .calendar-blocks{width:100%;display:flex;position:relative;padding:0 50px 0 0}.hours{display:flex;flex-direction:column;color:#b8bbca;font-weight:500;font-size:.85rem;width:55px;height:100%;margin-bottom:0}.hours li{color:var(--hour-row-color);border-bottom:solid 1px transparent;padding-left:8px}.hours li span{margin-top:-8px}.hours li:first-child span{padding-top:5px}",
     map: undefined,
     media: undefined
@@ -3492,21 +3925,21 @@ var __vue_inject_styles__$9 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$9 = undefined;
+var __vue_scope_id__$a = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$9 = undefined;
+var __vue_module_identifier__$a = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$9 = false;
+var __vue_is_functional_template__$a = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$9 = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$9,
-  staticRenderFns: __vue_staticRenderFns__$9
-}, __vue_inject_styles__$9, __vue_script__$9, __vue_scope_id__$9, __vue_is_functional_template__$9, __vue_module_identifier__$9, false, createInjector, undefined, undefined);var kalendarWeekview=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$9});var script$a = {
+var __vue_component__$a = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$a,
+  staticRenderFns: __vue_staticRenderFns__$a
+}, __vue_inject_styles__$a, __vue_script__$a, __vue_scope_id__$a, __vue_is_functional_template__$a, __vue_module_identifier__$a, false, createInjector, undefined, undefined);var kalendarWeekview=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$a});var script$b = {
   props: {
     styling: {
       type: Object
@@ -3538,10 +3971,10 @@ var __vue_component__$9 = /*#__PURE__*/normalizeComponent({
     if (top !== null && top > h) el.scrollTop = top - h;
   }
 };/* script */
-var __vue_script__$a = script$a;
+var __vue_script__$b = script$b;
 /* template */
 
-var __vue_render__$a = function __vue_render__() {
+var __vue_render__$b = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3564,10 +3997,10 @@ var __vue_render__$a = function __vue_render__() {
   }, [_c('div', [_vm._t("default")], 2)]);
 };
 
-var __vue_staticRenderFns__$a = [];
+var __vue_staticRenderFns__$b = [];
 /* style */
 
-var __vue_inject_styles__$a = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$b = function __vue_inject_styles__(inject) {
   if (!inject) return;
   inject("data-v-061df6bf_0", {
     source: ".vue-scrollbar__wrapper{background:0 0}.vue-scrollbar__scrollbar-vertical{width:.2rem;height:92%;top:.4rem;bottom:.4rem;right:.4rem}.vue-scrollbar__scrollbar-vertical .scrollbar{width:.2rem;border-radius:.2rem}.b-scroll-bar{background-color:var(--bg-color)}.b-scroll-bar .scrollbar{background-color:var(--bg-color)}.vuebar-element{height:100%;width:100%}.vb>.vb-dragger{z-index:5;width:10px;right:0}.vb>.vb-dragger>.vb-dragger-styler{-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-transform:rotate3d(0,0,0,0);transform:rotate3d(0,0,0,0);-webkit-transition:background-color .1s ease-out,margin .1s ease-out,height .1s ease-out;transition:background-color .1s ease-out,margin .1s ease-out,height .1s ease-out;background-color:var(--bg-color);opacity:.5;margin:5px 5px 5px 0;border-radius:20px;height:calc(100% - 10px);min-height:2px;display:block}.vb-invisible>.vb-dragger>.vb-dragger-styler{display:none}.vb.vb-scrolling-phantom>.vb-dragger>.vb-dragger-styler{background-color:var(--bg-color);opacity:.3}.vb>.vb-dragger:hover>.vb-dragger-styler{background-color:var(--bg-color);margin:0;height:100%;opacity:.5}.vb.vb-dragging>.vb-dragger>.vb-dragger-styler{background-color:var(--bg-color);margin:0;height:100%;opacity:.5}.vb.vb-dragging-phantom>.vb-dragger>.vb-dragger-styler{background-color:var(--bg-color);opacity:.5}.vb-content::-webkit-scrollbar{display:none;scrollbar-width:none}",
@@ -3578,21 +4011,138 @@ var __vue_inject_styles__$a = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$a = undefined;
+var __vue_scope_id__$b = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$a = undefined;
+var __vue_module_identifier__$b = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$a = false;
+var __vue_is_functional_template__$b = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$a = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$a,
-  staticRenderFns: __vue_staticRenderFns__$a
-}, __vue_inject_styles__$a, __vue_script__$a, __vue_scope_id__$a, __vue_is_functional_template__$a, __vue_module_identifier__$a, false, createInjector, undefined, undefined);var scrollContainer=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$a});var script$b = {
+var __vue_component__$b = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$b,
+  staticRenderFns: __vue_staticRenderFns__$b
+}, __vue_inject_styles__$b, __vue_script__$b, __vue_scope_id__$b, __vue_is_functional_template__$b, __vue_module_identifier__$b, false, createInjector, undefined, undefined);var scrollContainer=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$b});//
+var script$c = {
+  name: "kalendar-daymonth",
+  components: {
+    KalendarEvent: function KalendarEvent() {
+      return Promise.resolve().then(function(){return kalendarEvent});
+    }
+  },
+  props: ["day", "passedTime"],
+  provide: function provide() {
+    // provide these methods to children components
+    // for easier access
+    return {
+      kalendarAddEvent: this.addEvent,
+      kalendarClearPopups: this.clearCreatingLeftovers
+    };
+  },
+  // inject kalendar options from parent component
+  inject: ["kalendar_options"],
+  data: function data() {
+    return {
+      day_events: null
+    };
+  },
+  computed: {
+    isWeekend: function isWeekend$1() {
+      return isWeekend(this.day);
+    },
+    isToday: function isToday$1() {
+      return isToday(this.day);
+    }
+  },
+  created: function created() {
+    // get and render day cells
+    // and then render any event
+    // on top of them
+    this.renderDay();
+  },
+  methods: {
+    renderDay: function renderDay() {
+      return this.getDayEvents(this.$kalendar.getEvents());
+    },
+    getDayEvents: function getDayEvents(events) {
+      var _this = this;
+
+      var clonedEvents = events.map(function (event) {
+        return cloneObject(event);
+      });
+      return myWorker.send("constructDayEvents", {
+        events: clonedEvents,
+        day: this.day
+      }).then(function (constructed_events) {
+        _this.day_events = constructed_events;
+      });
+    }
+  }
+};/* script */
+var __vue_script__$c = script$c;
+/* template */
+
+var __vue_render__$c = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('ul', {
+    staticClass: "calendar-day",
+    class: {
+      'is-weekend': _vm.isWeekend,
+      'is-today': _vm.isToday
+    }
+  }, _vm._l(_vm.day_events, function (event, index) {
+    return _vm.day_events && Object.keys(_vm.day_events).length ? _c('li', {
+      key: index
+    }, [_c('KalendarEvent', {
+      style: "z-index: 10",
+      attrs: {
+        "event": event[0],
+        "total": _vm.day_events.length,
+        "index": index,
+        "overlaps": 0,
+        "flat": true
+      }
+    })], 1) : _vm._e();
+  }), 0);
+};
+
+var __vue_staticRenderFns__$c = [];
+/* style */
+
+var __vue_inject_styles__$c = function __vue_inject_styles__(inject) {
+  if (!inject) return;
+  inject("data-v-3674cae9_0", {
+    source: ".calendar-day[data-v-3674cae9]{border-bottom:solid 1px var(--table-cell-border-color);border-left:solid 1px var(--table-cell-border-color);margin:0;padding:.3rem;height:120px}.calendar-day>li[data-v-3674cae9]{list-style:none;border:none!important;display:block;position:relative}.calendar-day.is-weekend[data-v-3674cae9]{background-color:#f7f7f7}",
+    map: undefined,
+    media: undefined
+  });
+};
+/* scoped */
+
+
+var __vue_scope_id__$c = "data-v-3674cae9";
+/* module identifier */
+
+var __vue_module_identifier__$c = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$c = false;
+/* style inject SSR */
+
+/* style inject shadow dom */
+
+var __vue_component__$c = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$c,
+  staticRenderFns: __vue_staticRenderFns__$c
+}, __vue_inject_styles__$c, __vue_script__$c, __vue_scope_id__$c, __vue_is_functional_template__$c, __vue_module_identifier__$c, false, createInjector, undefined, undefined);var kalendarDaymonth=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$c});var script$d = {
   props: ['creator', 'index', 'cellData', 'constructedEvents', 'constructedWorkHours', 'temporaryEvent', 'kalendar_events', 'isEditing', 'isShowEditPopup'],
   inject: ['kalendar_options'],
   components: {
@@ -3728,10 +4278,10 @@ var __vue_component__$a = /*#__PURE__*/normalizeComponent({
     }
   }
 };/* script */
-var __vue_script__$b = script$b;
+var __vue_script__$d = script$d;
 /* template */
 
-var __vue_render__$b = function __vue_render__() {
+var __vue_render__$d = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3742,7 +4292,7 @@ var __vue_render__$b = function __vue_render__() {
     staticClass: "kalendar-cell",
     class: {
       selected: _vm.selected,
-      'is-an-hour': (_vm.index + 1) % (60 / 10) === 0,
+      'is-an-hour': (_vm.index + 1) % (60 / 30) === 0,
       'has-events': _vm.cell_events && _vm.cell_events.length > 0,
       'being-created': !!_vm.being_created || _vm.hasPopups,
       'work-time': _vm.isConstructed
@@ -3775,6 +4325,7 @@ var __vue_render__$b = function __vue_render__() {
         "total": _vm.cell_events.length,
         "index": eventIndex,
         "overlaps": _vm.overlapValue,
+        "day_events": _vm.constructedEvents,
         "kalendar_events": _vm.kalendar_events,
         "isEditing": _vm.isEditing,
         "isShowEditPopup": _vm.isShowEditPopup
@@ -3783,12 +4334,12 @@ var __vue_render__$b = function __vue_render__() {
   }), 1) : _vm._e();
 };
 
-var __vue_staticRenderFns__$b = [];
+var __vue_staticRenderFns__$d = [];
 /* style */
 
-var __vue_inject_styles__$b = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$d = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-105dadbe_0", {
+  inject("data-v-d02ce4b6_0", {
     source: "li{font-size:13px;position:relative}.created-events{height:100%}ul.building-blocks li{z-index:0;border-bottom:dotted 1px var(--odd-cell-border-color)}ul.building-blocks li.first_of_appointment{z-index:1;opacity:1}ul.building-blocks li.is-an-hour{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events{z-index:unset}ul.building-blocks li.being-created{z-index:11}ul.building-blocks li.work-time{background-color:#7afFD766}",
     map: undefined,
     media: undefined
@@ -3797,22 +4348,22 @@ var __vue_inject_styles__$b = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$b = undefined;
+var __vue_scope_id__$d = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$b = undefined;
+var __vue_module_identifier__$d = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$b = false;
+var __vue_is_functional_template__$d = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$b = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$b,
-  staticRenderFns: __vue_staticRenderFns__$b
-}, __vue_inject_styles__$b, __vue_script__$b, __vue_scope_id__$b, __vue_is_functional_template__$b, __vue_module_identifier__$b, false, createInjector, undefined, undefined);var kalendarCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$b});//
-var script$c = {
+var __vue_component__$d = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$d,
+  staticRenderFns: __vue_staticRenderFns__$d
+}, __vue_inject_styles__$d, __vue_script__$d, __vue_scope_id__$d, __vue_is_functional_template__$d, __vue_module_identifier__$d, false, createInjector, undefined, undefined);var kalendarCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$d});//
+var script$e = {
   props: ['creatingWorkTime', 'index', 'cellData', 'constructedWorkHours', 'temporaryWorkHours'],
   inject: ['kalendar_options'],
   computed: {
@@ -3823,7 +4374,18 @@ var script$c = {
       return this.cellData.value in this.temporaryWorkHours;
     }
   },
+  data: function data() {
+    return {
+      selected: []
+    };
+  },
+  directives: {
+    selectable: selectable
+  },
   methods: {
+    selectedSetter: function selectedSetter(v) {
+      this.selected = v;
+    },
     getTime: getTime,
     mouseDown: function mouseDown() {
       this.$emit('selectWorkHours', this.cellData.value);
@@ -3840,10 +4402,10 @@ var script$c = {
     }
   }
 };/* script */
-var __vue_script__$c = script$c;
+var __vue_script__$e = script$e;
 /* template */
 
-var __vue_render__$c = function __vue_render__() {
+var __vue_render__$e = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3851,10 +4413,18 @@ var __vue_render__$c = function __vue_render__() {
   var _c = _vm._self._c || _h;
 
   return _c('li', {
+    directives: [{
+      name: "selectable",
+      rawName: "v-selectable",
+      value: {
+        selectedSetter: _vm.selectedSetter
+      },
+      expression: "{ selectedSetter: selectedSetter }"
+    }],
     staticClass: "kalendar-cell --work-time",
     class: {
       'selected-work-time': _vm.isConstructed || _vm.isSelectedTemp,
-      'is-an-hour': (_vm.index + 1) % 6 === 0 // у каждого шестого рисуем нижнию рамку для окончания часа
+      'is-an-hour': (_vm.index + 1) % 2 === 0 // у каждого шестого рисуем нижнию рамку для окончания часа
 
     },
     style: "height: " + _vm.kalendar_options.cell_height + "px;",
@@ -3880,13 +4450,13 @@ var __vue_render__$c = function __vue_render__() {
   }, [_c('span', [_vm._v(_vm._s(_vm.getTime(_vm.cellData.value)))])]);
 };
 
-var __vue_staticRenderFns__$c = [];
+var __vue_staticRenderFns__$e = [];
 /* style */
 
-var __vue_inject_styles__$c = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$e = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-4e6cfde0_0", {
-    source: "li[data-v-4e6cfde0]{font-size:13px;position:relative}.created-events[data-v-4e6cfde0]{height:100%}ul.building-blocks li[data-v-4e6cfde0]{z-index:0}ul.building-blocks li.--work-time[data-v-4e6cfde0]{justify-content:flex-end;font-size:9px;color:var(--main-color);user-select:none;font-weight:700}ul.building-blocks li.first_of_appointment[data-v-4e6cfde0]{z-index:1;opacity:1}ul.building-blocks li.is-an-hour[data-v-4e6cfde0]{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events[data-v-4e6cfde0]{z-index:unset}ul.building-blocks li.being-created[data-v-4e6cfde0]{z-index:11}ul.building-blocks li.selected-work-time[data-v-4e6cfde0]{background:#7afFD766}ul.building-blocks li>span[data-v-4e6cfde0]{display:none}ul.building-blocks li[data-v-4e6cfde0]:hover{border-bottom:1px solid var(--main-color)}ul.building-blocks li:hover span[data-v-4e6cfde0]{text-align:right;display:block;padding-bottom:5px}",
+  inject("data-v-f9139950_0", {
+    source: "li[data-v-f9139950]{font-size:13px;position:relative}.created-events[data-v-f9139950]{height:100%}ul.building-blocks li[data-v-f9139950]{z-index:0}ul.building-blocks li.--work-time[data-v-f9139950]{justify-content:flex-end;font-size:9px;color:var(--main-color);user-select:none;font-weight:700}ul.building-blocks li.first_of_appointment[data-v-f9139950]{z-index:1;opacity:1}ul.building-blocks li.is-an-hour[data-v-f9139950]{border-bottom:solid 1px var(--table-cell-border-color)}ul.building-blocks li.has-events[data-v-f9139950]{z-index:unset}ul.building-blocks li.being-created[data-v-f9139950]{z-index:11}ul.building-blocks li.selected-work-time[data-v-f9139950]{background:#7afFD766}ul.building-blocks li>span[data-v-f9139950]{display:none}ul.building-blocks li[data-v-f9139950]:hover{border-bottom:1px solid var(--main-color)}ul.building-blocks li:hover span[data-v-f9139950]{text-align:right;display:block;padding-bottom:5px}",
     map: undefined,
     media: undefined
   });
@@ -3894,22 +4464,23 @@ var __vue_inject_styles__$c = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$c = "data-v-4e6cfde0";
+var __vue_scope_id__$e = "data-v-f9139950";
 /* module identifier */
 
-var __vue_module_identifier__$c = undefined;
+var __vue_module_identifier__$e = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$c = false;
+var __vue_is_functional_template__$e = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$c = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$c,
-  staticRenderFns: __vue_staticRenderFns__$c
-}, __vue_inject_styles__$c, __vue_script__$c, __vue_scope_id__$c, __vue_is_functional_template__$c, __vue_module_identifier__$c, false, createInjector, undefined, undefined);var kalendarWorkingTimeCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$c});var script$d = {
-  props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup'],
+var __vue_component__$e = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$e,
+  staticRenderFns: __vue_staticRenderFns__$e
+}, __vue_inject_styles__$e, __vue_script__$e, __vue_scope_id__$e, __vue_is_functional_template__$e, __vue_module_identifier__$e, false, createInjector, undefined, undefined);var kalendarWorkingTimeCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$e});var script$f = {
+  props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup', 'day_events', 'flat' // for month view
+  ],
   created: function created() {},
   inject: ['kalendar_options'],
   data: function data() {
@@ -3940,7 +4511,8 @@ var __vue_component__$c = /*#__PURE__*/normalizeComponent({
     },
     distance: function distance() {
       if (!this.event) return;
-      var multiplier = this.kalendar_options.cell_height / 10; // 0.5 * multiplier for an offset so next cell is easily selected
+      if (this.flat) return "auto";
+      var multiplier = this.kalendar_options.cell_height / 30; // 0.5 * multiplier for an offset so next cell is easily selected
 
       return "".concat(this.event.distance * multiplier - 0.2 * multiplier, "px");
     },
@@ -3960,7 +4532,8 @@ var __vue_component__$c = /*#__PURE__*/normalizeComponent({
         end_time: addTimezoneInfo(end.value),
         id: id,
         key: key,
-        data: data
+        data: data,
+        day_events: this.day_events
       };
       return payload;
     }
@@ -3977,10 +4550,10 @@ var __vue_component__$c = /*#__PURE__*/normalizeComponent({
     }
   }
 };/* script */
-var __vue_script__$d = script$d;
+var __vue_script__$f = script$f;
 /* template */
 
-var __vue_render__$d = function __vue_render__() {
+var __vue_render__$f = function __vue_render__() {
   var _vm = this;
 
   var _h = _vm.$createElement;
@@ -3992,13 +4565,14 @@ var __vue_render__$d = function __vue_render__() {
     staticClass: "event-card",
     class: {
       'editing': _vm.editing,
+      'is-flat': _vm.flat,
       'is-past': _vm.isPast,
-      overlaps: _vm.overlaps > 0,
+      overlaps: _vm.overlaps > 1,
       'two-in-one': _vm.total > 1,
-      'event-card__mini': _vm.event.distance <= 10,
-      'event-card__small': _vm.event.distance > 10 && _vm.event.distance < 40 || _vm.overlaps > 1
+      'event-card__mini': _vm.event.distance <= 30,
+      'event-card__small': _vm.event.distance > 30 && _vm.event.distance < 60 || _vm.overlaps > 1
     },
-    style: "\n          height: " + _vm.distance + "; \n          width: calc(" + _vm.width_value + "); \n          left: calc(" + _vm.left_offset + ");\n          top: " + _vm.top_offset + ";\n        "
+    style: "\n          height: " + _vm.distance + ";\n          width: calc(" + _vm.width_value + ");\n          left: calc(" + _vm.left_offset + ");\n          top: " + _vm.top_offset + ";\n        "
   }, [_vm.status === 'creating' || _vm.status === 'popup-initiated' ? _c('div', {
     on: {
       "click": _vm.editEvent
@@ -4050,13 +4624,13 @@ var __vue_render__$d = function __vue_render__() {
   })], 1) : _vm._e()]);
 };
 
-var __vue_staticRenderFns__$d = [];
+var __vue_staticRenderFns__$f = [];
 /* style */
 
-var __vue_inject_styles__$d = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$f = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-5bd69c90_0", {
-    source: ".event-card{display:flex;flex-direction:column;height:100%;width:100%;z-index:5;position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0;color:#fff;user-select:none;will-change:height}.event-card h4,.event-card p{margin:0}.event-card>*{flex:1;position:relative}.event-card.editing{z-index:10}.event-card.creating{z-index:-1}.event-card.overlaps>*{border:solid 1px #fff!important}.event-card__mini .created-event>div>.details-card small{display:none}.event-card__mini .appointment-title,.event-card__mini .time{position:absolute;top:0;font-size:9px;line-height:1;z-index:1;overflow:visible;height:100%}.event-card__small .appointment-title{font-size:80%}.event-card__small .time{font-size:70%}.event-card.two-in-one .details-card>*{font-size:60%}.event-card h1,.event-card h2,.event-card h3,.event-card h4,.event-card h5,.event-card h6,.event-card p{margin:0}.time{position:absolute;bottom:0;right:0;font-size:11px}.popup-wrapper{text-shadow:none;color:#000;z-index:10;position:absolute;top:0;left:calc(100% + 5px);display:flex;flex-direction:column;pointer-events:all;user-select:none;background-color:#fff;border:solid 1px rgba(0,0,0,.08);border-radius:4px;box-shadow:0 2px 12px -3px rgba(0,0,0,.3);padding:10px}.popup-wrapper h4{color:#000;font-weight:400}.popup-wrapper input,.popup-wrapper textarea{border:none;background-color:#ebebeb;color:#030303;border-radius:4px;padding:5px 8px;margin-bottom:5px}.created-event{pointer-events:all;position:relative}.created-event>.details-card{max-width:100%;width:100%}.created-event>.details-card h2,.created-event>.details-card h3,.created-event>.details-card h4,.created-event>.details-card p,.created-event>.details-card small,.created-event>.details-card span,.created-event>.details-card strong,.created-event>.details-card>h1{text-overflow:ellipsis;overflow:hidden;display:block}ul:nth-last-child(-n+3) .popup-wrapper{left:auto;right:100%;margin-right:10px}.day-view ul .popup-wrapper{left:auto;right:auto;width:calc(100% - 10px);top:10px}",
+  inject("data-v-1803549c_0", {
+    source: ".event-card{display:flex;flex-direction:column;height:100%;width:100%;z-index:5;color:#fff;user-select:none;will-change:height}.event-card h4,.event-card p{margin:0}.event-card>*{flex:1;position:relative}.event-card.editing{z-index:10}.event-card.creating{z-index:-1}.event-card.overlaps>*{border:solid 1px #fff!important}.event-card__mini .created-event>div>.details-card small{display:none}.event-card__mini .appointment-title,.event-card__mini .time{position:absolute;top:0;font-size:9px;line-height:1;z-index:1;overflow:visible;height:100%}.event-card__small .appointment-title{font-size:80%}.event-card__small .time{font-size:70%}.event-card.two-in-one .details-card>*{font-size:60%}.event-card.is-flat{margin-bottom:3px}.event-card.is-flat .details-card>small{display:none}.event-card.is-flat .remove{top:1px}.event-card:not(.is-flat){position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0}.event-card h1,.event-card h2,.event-card h3,.event-card h4,.event-card h5,.event-card h6,.event-card p{margin:0}.time{position:absolute;bottom:0;right:0;font-size:11px}.popup-wrapper{text-shadow:none;color:#000;z-index:10;position:absolute;top:0;left:calc(100% + 5px);display:flex;flex-direction:column;pointer-events:all;user-select:none;background-color:#fff;border:solid 1px rgba(0,0,0,.08);border-radius:4px;box-shadow:0 2px 12px -3px rgba(0,0,0,.3);padding:10px}.popup-wrapper h4{color:#000;font-weight:400}.popup-wrapper input,.popup-wrapper textarea{border:none;background-color:#ebebeb;color:#030303;border-radius:4px;padding:5px 8px;margin-bottom:5px}.created-event{pointer-events:all;position:relative}.created-event>.details-card{max-width:100%;width:100%}.created-event>.details-card h2,.created-event>.details-card h3,.created-event>.details-card h4,.created-event>.details-card p,.created-event>.details-card small,.created-event>.details-card span,.created-event>.details-card strong,.created-event>.details-card>h1{text-overflow:ellipsis;overflow:hidden;display:block}ul:nth-last-child(-n+3) .popup-wrapper{left:auto;right:100%;margin-right:10px}.day-view ul .popup-wrapper{left:auto;right:auto;width:calc(100% - 10px);top:10px}",
     map: undefined,
     media: undefined
   });
@@ -4064,18 +4638,18 @@ var __vue_inject_styles__$d = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$d = undefined;
+var __vue_scope_id__$f = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$d = undefined;
+var __vue_module_identifier__$f = undefined;
 /* functional template */
 
-var __vue_is_functional_template__$d = false;
+var __vue_is_functional_template__$f = false;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$d = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__$d,
-  staticRenderFns: __vue_staticRenderFns__$d
-}, __vue_inject_styles__$d, __vue_script__$d, __vue_scope_id__$d, __vue_is_functional_template__$d, __vue_module_identifier__$d, false, createInjector, undefined, undefined);var kalendarEvent=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$d});exports.Kalendar=__vue_component__$7;exports.default=plugin;
+var __vue_component__$f = /*#__PURE__*/normalizeComponent({
+  render: __vue_render__$f,
+  staticRenderFns: __vue_staticRenderFns__$f
+}, __vue_inject_styles__$f, __vue_script__$f, __vue_scope_id__$f, __vue_is_functional_template__$f, __vue_module_identifier__$f, false, createInjector, undefined, undefined);var kalendarEvent=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$f});exports.Kalendar=__vue_component__$7;exports.default=plugin;
