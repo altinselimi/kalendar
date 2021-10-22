@@ -467,7 +467,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vue2-timepicker/dist/VueTimepicker.css';
 .b-edit-card {
   display: flex;
   flex-direction: column;
