@@ -54,6 +54,10 @@
     </div>
 </template>
 <script>
+import Vue from "vue";
+import vClickOutside from 'v-click-outside'
+Vue.use(vClickOutside)
+
 import { isBefore, getLocaleTime, addTimezoneInfo } from './utils.js';
 
 export default {
