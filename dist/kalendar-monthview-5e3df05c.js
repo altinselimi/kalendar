@@ -1,11 +1,11 @@
-import { b as beginningOfPeriod, a as addDays, i as incrementPeriod, c as beginningOfWeek, e as endOfWeekInMonth, d as dayDiff, f as _toConsumableArray, g as getLocaleTime, h as __vue_normalize__, j as __vue_create_injector__ } from './index-5f6c8367.js';
+import { b as beginningOfPeriod, a as addDays, i as incrementPeriod, c as beginningOfWeek, e as endOfWeekInMonth, d as dayDiff, f as _toConsumableArray, g as getLocaleTime, h as __vue_normalize__, j as __vue_create_injector__ } from './index-f1820ee2.js';
 import 'vue';
 
 var script = {
   name: "kalendar-monthview",
   components: {
     KalendarDay: function KalendarDay() {
-      return import('./kalendar-daymonth-0970e4a3.js');
+      return import('./kalendar-daymonth-50d6831b.js');
     }
   },
   props: {

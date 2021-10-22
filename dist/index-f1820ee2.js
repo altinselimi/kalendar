@@ -2166,13 +2166,13 @@ var __vue_component__$5 = /*#__PURE__*/normalizeComponent({
 var script$6 = {
   components: {
     KalendarMonthview: function KalendarMonthview() {
-      return import('./kalendar-monthview-f298a0ea.js');
+      return import('./kalendar-monthview-5e3df05c.js');
     },
     KalendarWeekView: function KalendarWeekView() {
-      return import('./kalendar-weekview-868b3d6d.js');
+      return import('./kalendar-weekview-80efd9ea.js');
     },
     ScrollContainer: function ScrollContainer() {
-      return import('./scroll-container-9dc718c7.js');
+      return import('./scroll-container-982871df.js');
     },
     KalendarCreatedCardSlot: __vue_component__,
     KalendarPopupCardSlot: __vue_component__$4,

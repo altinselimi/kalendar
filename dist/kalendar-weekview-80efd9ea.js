@@ -1,4 +1,4 @@
-import { k as isWeekend, l as isToday, g as getLocaleTime, m as _objectSpread2, n as cloneObject, h as __vue_normalize__, j as __vue_create_injector__, o as isBefore, q as getHourlessDate, r as addTimezoneInfo } from './index-5f6c8367.js';
+import { k as isWeekend, l as isToday, g as getLocaleTime, m as _objectSpread2, n as cloneObject, h as __vue_normalize__, j as __vue_create_injector__, o as isBefore, q as getHourlessDate, r as addTimezoneInfo } from './index-f1820ee2.js';
 import 'vue';
 import { m as myWorker } from './index-d71cc8ae.js';
 
@@ -37,10 +37,10 @@ var script = {
   },
   components: {
     kalendarCell: function kalendarCell() {
-      return import('./kalendar-cell-5b373977.js');
+      return import('./kalendar-cell-49f58f55.js');
     },
     kalendarWorkingTimeCell: function kalendarWorkingTimeCell() {
-      return import('./kalendar-working-time-cell-9e37d78a.js');
+      return import('./kalendar-working-time-cell-f808717d.js');
     }
   },
   provide: function provide() {

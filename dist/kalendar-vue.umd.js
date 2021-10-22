@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var Vue=_interopDefault(require('vue')),selectable=_interopDefault(require('vue-selectable'));function ownKeys(object, enumerableOnly) {
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var Vue=_interopDefault(require('vue')),selectable=_interopDefault(require('vue-selectable')),vClickOutside=_interopDefault(require('v-click-outside'));function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
 
   if (Object.getOwnPropertySymbols) {
@@ -4379,7 +4379,8 @@ var __vue_is_functional_template__$d = false;
 var __vue_component__$d = /*#__PURE__*/normalizeComponent({
   render: __vue_render__$d,
   staticRenderFns: __vue_staticRenderFns__$d
-}, __vue_inject_styles__$d, __vue_script__$d, __vue_scope_id__$d, __vue_is_functional_template__$d, __vue_module_identifier__$d, false, createInjector, undefined, undefined);var kalendarWorkingTimeCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$d});var script$e = {
+}, __vue_inject_styles__$d, __vue_script__$d, __vue_scope_id__$d, __vue_is_functional_template__$d, __vue_module_identifier__$d, false, createInjector, undefined, undefined);var kalendarWorkingTimeCell=/*#__PURE__*/Object.freeze({__proto__:null,'default': __vue_component__$d});Vue.use(vClickOutside);
+var script$e = {
   props: ['event', 'total', 'index', 'overlaps', 'kalendar_events', 'isShowEditPopup', 'day_events', 'flat' // for month view
   ],
   created: function created() {},
@@ -4530,7 +4531,7 @@ var __vue_staticRenderFns__$e = [];
 
 var __vue_inject_styles__$e = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-1803549c_0", {
+  inject("data-v-1ce6854a_0", {
     source: ".event-card{display:flex;flex-direction:column;height:100%;width:100%;z-index:5;color:#fff;user-select:none;will-change:height}.event-card h4,.event-card p{margin:0}.event-card>*{flex:1;position:relative}.event-card.editing{z-index:10}.event-card.creating{z-index:-1}.event-card.overlaps>*{border:solid 1px #fff!important}.event-card__mini .created-event>div>.details-card small{display:none}.event-card__mini .appointment-title,.event-card__mini .time{position:absolute;top:0;font-size:9px;line-height:1;z-index:1;overflow:visible;height:100%}.event-card__small .appointment-title{font-size:80%}.event-card__small .time{font-size:70%}.event-card.two-in-one .details-card>*{font-size:60%}.event-card.is-flat{margin-bottom:3px}.event-card.is-flat .details-card>small{display:none}.event-card.is-flat .remove{top:1px}.event-card:not(.is-flat){position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0}.event-card h1,.event-card h2,.event-card h3,.event-card h4,.event-card h5,.event-card h6,.event-card p{margin:0}.time{position:absolute;bottom:0;right:0;font-size:11px}.popup-wrapper{text-shadow:none;color:#000;z-index:10;position:absolute;top:0;left:calc(100% + 5px);display:flex;flex-direction:column;pointer-events:all;user-select:none;background-color:#fff;border:solid 1px rgba(0,0,0,.08);border-radius:4px;box-shadow:0 2px 12px -3px rgba(0,0,0,.3);padding:10px}.popup-wrapper h4{color:#000;font-weight:400}.popup-wrapper input,.popup-wrapper textarea{border:none;background-color:#ebebeb;color:#030303;border-radius:4px;padding:5px 8px;margin-bottom:5px}.created-event{pointer-events:all;position:relative}.created-event>.details-card{max-width:100%;width:100%}.created-event>.details-card h2,.created-event>.details-card h3,.created-event>.details-card h4,.created-event>.details-card p,.created-event>.details-card small,.created-event>.details-card span,.created-event>.details-card strong,.created-event>.details-card>h1{text-overflow:ellipsis;overflow:hidden;display:block}ul:nth-last-child(-n+3) .popup-wrapper{left:auto;right:100%;margin-right:10px}.day-view ul .popup-wrapper{left:auto;right:auto;width:calc(100% - 10px);top:10px}",
     map: undefined,
     media: undefined
