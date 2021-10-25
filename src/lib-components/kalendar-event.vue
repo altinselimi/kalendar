@@ -21,21 +21,21 @@
                 (event.distance > 30 && event.distance < 60) || overlaps > 1,
         }"
     >
-        <div @click="editEvent" v-if="status === 'creating' || status === 'popup-initiated'">
+        <div ref="target" v-if="status === 'creating' || status === 'popup-initiated'">
           <portal-target
               :slot-props="information"
               name="event-creation"
               slim
           />
         </div>
-        <div @click="editEvent" v-else>
+        <div ref="target" @click="editEvent" v-else>
           <portal-target
               name="event-details"
               :slot-props="information"
               slim
           />
         </div>
-        <div class="popup-wrapper" v-if="status === 'popup-initiated'">
+        <div ref="popup" class="popup-wrapper" v-if="status === 'popup-initiated'">
             <portal-target
                 name="event-popup-form"
                 slim
@@ -43,7 +43,7 @@
                 v-click-outside="closeEditFormEvent"
             />
         </div>
-        <div class="popup-wrapper" v-if="editing && status !== 'popup-initiated'">
+        <div ref="popup" class="popup-wrapper" v-if="editing && status !== 'popup-initiated'" >
             <portal-target
               name="event-edit-form"
               :slot-props="information"
@@ -57,7 +57,7 @@
 import Vue from "vue";
 import vClickOutside from 'v-click-outside'
 Vue.use(vClickOutside)
-
+import { createPopper } from '@popperjs/core';
 import { isBefore, getLocaleTime, addTimezoneInfo } from './utils.js';
 
 export default {
@@ -75,11 +75,19 @@ export default {
     inject: ['kalendar_options'],
     data: () => ({
         editing: false,
+        popper: null
     }),
     watch: {
       isShowEditPopup (value) {
         if (!value) {
           this.closeEditFormEvent()
+        }
+      },
+      status (value) {
+        if (value === 'creating' || value === 'popup-initiated') {
+          this.$nextTick(() => {
+            this.createPopup()
+          })
         }
       }
     },
@@ -127,11 +135,31 @@ export default {
         editEvent () {
           this.$kalendar.toggleEditPopup(true)
           this.editing = true
+
+          this.$nextTick(() => {
+            this.createPopup()
+          })
         },
         closeEditFormEvent () {
           this.editing = false;
           this.$kalendar.closePopups()
           this.$kalendar.toggleEditPopup(false)
+          this.popper.destroy()
+        },
+        createPopup() {
+          const popcorn = this.$refs['target'];
+          const tooltip = this.$refs['popup'];
+          this.popper = createPopper(popcorn, tooltip, {
+            placement: 'right',
+            modifiers: [
+              {
+                name: 'flip',
+                options: {
+                  fallbackPlacements: ['top', 'right', 'bottom', 'left'],
+                },
+              },
+            ],
+          });
         }
     }
 };
@@ -177,12 +205,7 @@ $creator-content: white;
 
         .appointment-title,
         .time {
-            position: absolute;
-            top: 0;
             font-size: 9px;
-            line-height: 1;
-            z-index: 1;
-            overflow: visible;
             height: 100%;
         }
     }
@@ -234,14 +257,11 @@ $creator-content: white;
     h5,
     h6,
     p {
-        margin: 0px;
+        margin: 0;
     }
 }
 
 .time {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
     font-size: 11px;
 }
 

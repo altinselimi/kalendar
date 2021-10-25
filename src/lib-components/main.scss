@@ -86,13 +86,14 @@ html {
             }
 
             border-left: none;
-            border-radius: 10px;
+            border-radius: 6px;
             opacity: 1;
             border-bottom: solid 1px rgba(0, 0, 0, 0.03);
             font-size: 14px;
-            padding: 0 5px;
+            padding: 5px 10px;
 
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
         }
@@ -101,8 +102,8 @@ html {
             color: var(--main-color);
             background-color: #7AFFD7;
             font-size: 12px;
-            padding: 0 20px;
-            border-radius: 10px;
+            padding: 5px 10px;
+            border-radius: 6px;
             align-items: flex-start;
             .time {
                 color: var(--main-color);
@@ -121,10 +122,6 @@ html {
 
         .created-event {
             width: 100%;
-
-            .time {
-                right: 2px;
-            }
             &:hover {
                 cursor: pointer;
                 background-color: var(--main-color);
