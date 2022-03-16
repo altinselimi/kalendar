@@ -50,7 +50,7 @@
           </li>
         </ul>
         <div
-          v-show="kalendar_options.style !== 'material_design'"
+          v-show="kalendar_options.style !== 'material_design' && passedTimeVisible"
           class="hour-indicator-line"
           :style="`top:${passedTime.distance}px`"
         >
@@ -116,18 +116,21 @@ export default {
       //this.kalendar_options.cell_height * (60 / this.kalendar_options.split_value);
       // * this.kalendar_options.hour_parts;
     },
+    passedTimeVisible() {
+      return this.passedTime > -1;
+    },
     passedTime() {
       let { day_starts_at, day_ends_at, now } = this.kalendar_options;
-      let time = getLocaleTime(now);
-      let day_starts = `${time.split("T")[0]}T${(day_starts_at + "").padStart(2, '0')}:00:00.000Z`;
-      let day_ends = `${time.split("T")[0]}T${(day_ends_at + "").padStart(2, '0')}:00:00.000Z`;
-      let time_obj = new Date(time);
+      let res = { distance: -1, time: getLocaleTime(now) };
+      let day_starts = `${res.time.split("T")[0]}T${(day_starts_at + "").padStart(2, '0')}:00:00.000Z`;
+      let day_ends = `${res.time.split("T")[0]}T${(day_ends_at + "").padStart(2, '0')}:00:00.000Z`;
+      let time_obj = new Date(res.time);
 
-      if(new Date(day_ends) < time_obj || time_obj < new Date(day_starts)) return null;
+      if(new Date(day_ends) < time_obj || time_obj < new Date(day_starts)) return res;
 
-      let distance = (time_obj - new Date(day_starts)) / 1000 / 60;
-      return {distance, time};
-    }
+      res.distance = (time_obj - new Date(day_starts)) / 1000 / 60;
+      return res;
+    },
   },
   methods: {
     _isToday(day) {
