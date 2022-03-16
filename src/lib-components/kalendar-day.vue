@@ -16,13 +16,15 @@
           ? 'hour-indicator-line'
           : 'hour-indicator-tooltip'
       "
-      v-if="isToday"
+      v-if="isToday && passedTimeVisible"
       :style="`top:${passedTime}px`"
+      v-show="passedTimeVisible"
     >
       <span
         class="line"
         v-show="kalendar_options.style === 'material_design'"
       ></span>
+      <!-- kalendar_options.style === 'material_design' && passedTimeVisible -->
     </div>
     <kalendar-cell
       v-for="(cell, index) in day_cells"
@@ -73,6 +75,9 @@ export default {
     },
     isToday() {
       return isToday(this.day.value);
+    },
+    passedTimeVisible() {
+      return this.passedTime > -1;
     }
   },
   data: () => ({
