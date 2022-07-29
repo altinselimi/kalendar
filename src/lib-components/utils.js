@@ -71,13 +71,17 @@ const startOfWeek = date => {
   let d = new Date(date);
   let day = d.getDay(),
     diff = d.getDate() - day;
+
+  // diff is 0-indexed
+  diff++;
+
   return new Date(d.setDate(diff));
 };
 
 const endOfWeek = date => {
   let dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
-  let toAdd = 6 - dateObj.getDay();
+  let toAdd = 7 - dateObj.getDay(); // getDate is also 0-indexed
   return addDays(dateObj, toAdd);
 };
 
