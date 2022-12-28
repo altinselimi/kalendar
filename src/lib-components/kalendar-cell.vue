@@ -188,7 +188,7 @@ export default {
     },
 };
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 $creator-bg: #34aadc;
 $creator-content: white;
 
