@@ -131,8 +131,10 @@ $creator-content: white;
         border: solid 1px white !important;
     }
 
-    &.inspecting {
+    &.inspecting {        
         z-index: 11 !important;
+        width: 75% !important;
+        transform: scale(115%);
 
         .created-event {
             box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),

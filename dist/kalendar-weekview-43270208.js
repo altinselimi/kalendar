@@ -1,4 +1,4 @@
-import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-2728afd2.js';
+import { i as isWeekend, a as isToday, g as getLocaleTime, b as _objectSpread2, c as cloneObject, d as __vue_normalize__, e as __vue_create_injector__, f as isBefore, h as getHourlessDate, j as addTimezoneInfo } from './index-0f911d9e.js';
 import 'vue';
 
 function PromiseWorker (worker) {
@@ -124,7 +124,7 @@ var script = {
   },
   components: {
     kalendarCell: function kalendarCell() {
-      return import('./kalendar-cell-143f31bb.js');
+      return import('./kalendar-cell-0103ae6f.js');
     }
   },
   provide: function provide() {
@@ -167,7 +167,7 @@ var script = {
       temporary_event: null,
       // day cells and events are used for rendering purposes
       day_cells: [],
-      day_events: {}
+      day_events: null
     };
   },
   methods: {
@@ -497,7 +497,7 @@ var __vue_render__ = function __vue_render__() {
     staticStyle: {
       "position": "relative"
     }
-  }, [_vm.isToday ? _c('div', {
+  }, [_vm.isToday && _vm.passedTime ? _c('div', {
     ref: "nowIndicator",
     class: _vm.kalendar_options.style === 'material_design' ? 'hour-indicator-line' : 'hour-indicator-tooltip',
     style: "top:" + _vm.passedTime + "px"
@@ -537,7 +537,7 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-bfd2ca88_0", {
+  inject("data-v-f46e040c_0", {
     source: "ul.kalendar-day{position:relative;background-color:#fff}ul.kalendar-day.is-weekend{background-color:var(--weekend-color)}ul.kalendar-day.is-today{background-color:var(--current-day-color)}ul.kalendar-day .clear{position:absolute;z-index:1;top:-20px;right:0;font-size:10px}ul.kalendar-day.creating{z-index:11}ul.kalendar-day.creating .created-event{pointer-events:none}",
     map: undefined,
     media: undefined
@@ -610,13 +610,14 @@ var script$1 = {
       var _this$kalendar_option = this.kalendar_options,
           day_starts_at = _this$kalendar_option.day_starts_at,
           day_ends_at = _this$kalendar_option.day_ends_at,
-          now = _this$kalendar_option.now;
+          now = _this$kalendar_option.now,
+          cell_height = _this$kalendar_option.cell_height;
       var time = getLocaleTime(now);
       var day_starts = "".concat(time.split("T")[0], "T").concat((day_starts_at + "").padStart(2, '0'), ":00:00.000Z");
       var day_ends = "".concat(time.split("T")[0], "T").concat((day_ends_at + "").padStart(2, '0'), ":00:00.000Z");
       var time_obj = new Date(time);
       if (new Date(day_ends) < time_obj || time_obj < new Date(day_starts)) return null;
-      var distance = (time_obj - new Date(day_starts)) / 1000 / 60;
+      var distance = (time_obj - new Date(day_starts)) / 1000 / 60 / 10 * cell_height;
       return {
         distance: distance,
         time: time
@@ -792,7 +793,7 @@ var __vue_render__$1 = function __vue_render__() {
       staticClass: "hour-row-identifier",
       style: "height:" + _vm.hourHeight + "px"
     }, [_c('span', [_vm._v(_vm._s(_vm.kalendar_options.formatLeftHours(hour.value)))])]);
-  }), 0), _vm._v(" "), _c('div', {
+  }), 0), _vm._v(" "), _vm.passedTime ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -805,7 +806,7 @@ var __vue_render__$1 = function __vue_render__() {
     staticClass: "time-value"
   }, [_vm._v(_vm._s(_vm.passedTime.value))]), _vm._v(" "), _c('span', {
     staticClass: "line"
-  })]), _vm._v(" "), _vm._l(_vm.days, function (day, index) {
+  })]) : _vm._e(), _vm._v(" "), _vm._l(_vm.days, function (day, index) {
     return _c('kalendar-days', {
       key: day.value.slice(0, 10),
       ref: day.value.slice(0, 10),
@@ -814,7 +815,7 @@ var __vue_render__$1 = function __vue_render__() {
       class: "day-" + (index + 1),
       attrs: {
         "day": day,
-        "passed-time": _vm.passedTime.distance
+        "passed-time": _vm.passedTime ? _vm.passedTime.distance : false
       }
     });
   })], 2)]) : _vm._e()]);
@@ -825,7 +826,7 @@ var __vue_staticRenderFns__$1 = [];
 
 var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-8cb3eace_0", {
+  inject("data-v-de351972_0", {
     source: ".calendar-wrap{display:flex;flex-direction:column}.calendar-wrap ul{list-style:none;padding:0}.calendar-wrap ul>li{display:flex}.sticky-top{position:sticky;top:0;z-index:20;background-color:#fff}.sticky-top .days{margin:0;display:flex;margin-left:55px}.sticky-top .days li{display:inline-flex;align-items:flex-end;padding-top:10px;flex:1;font-size:1.1rem;color:#666;font-weight:300;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5;padding-bottom:5px;position:relative;font-size:18px}.sticky-top .days li span{margin-right:3px}.sticky-top .days li span:first-child{font-size:20px;font-weight:500}.sticky-top .days .today{border-bottom-color:var(--main-color);color:var(--main-color)!important}.sticky-top .days .today::after{content:\"\";position:absolute;height:2px;bottom:0;left:0;width:100%;background-color:var(--main-color)}.sticky-top .all-day{display:flex;margin-bottom:0;margin-top:0;border-bottom:solid 2px #e5e5e5}.sticky-top .all-day span{display:flex;align-items:center;padding:0 5px;width:55px;font-weight:500;font-size:.8rem;color:#b8bbca;text-transform:lowercase}.sticky-top .all-day li{flex:1;margin-right:var(--space-between-cols)}.sticky-top .all-day li.all-today{background-color:#fef4f4}.dummy-row{display:flex;padding-left:55px}.dummy-row ul{display:flex;flex:1;margin:0}.dummy-row li{flex:1;height:15px;margin-right:var(--space-between-cols);border-bottom:solid 1px #e5e5e5}.blocks{display:flex;position:relative;height:100%}.blocks ul{margin-top:0}.blocks .building-blocks{flex:1;margin-right:var(--space-between-cols);margin-bottom:0;display:flex;flex-direction:column}.blocks .calendar-blocks{width:100%;display:flex;position:relative}.hours{display:flex;flex-direction:column;color:#b8bbca;font-weight:500;font-size:.85rem;width:55px;height:100%;margin-bottom:0}.hours li{color:var(--hour-row-color);border-bottom:solid 1px transparent;padding-left:8px}.hours li span{margin-top:-8px}.hours li:first-child span{visibility:hidden}",
     map: undefined,
     media: undefined
