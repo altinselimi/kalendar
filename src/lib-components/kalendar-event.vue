@@ -133,7 +133,7 @@ $creator-content: white;
 
     &.inspecting {        
         z-index: 11 !important;
-        width: 75% !important;
+        width: 100% !important;
         transform: scale(115%);
 
         .created-event {
