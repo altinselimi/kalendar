@@ -178,9 +178,10 @@ export default {
       ]);
     },
     addHelperMethods() {
-      this.$kalendar.buildWeek = () => {
-        this.constructWeek();
-      };
+      this.$kalendar.buildWeek = () => this.constructWeek(),
+      
+      this.$kalendar.getVisibleDays = () => this.days;
+      
       this.$kalendar.addNewEvent = payload => {
         if (!payload) return Promise.reject("No payload");
 
